@@ -1,7 +1,16 @@
 # Campsite Bookings API
 
-<!-- START doctoc -->
-<!-- END doctoc -->
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [Technical Task](#technical-task)
+  - [Booking Constraints](#booking-constraints)
+  - [System Requirements](#system-requirements)
+- [Implementation Details](#implementation-details)
+  - [Technology Stack](#technology-stack)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Technical Task
 
