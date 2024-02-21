@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package bookingspb.v1;
+
+option go_package = "bookingspb/v1;bookingspbv1";
+
+import "proto/googleapis/actions/type/date_range.proto";
+
+// Message to define the structure of a Booking.
+message Booking {
+  // Unique identifier for the booking.
+  string booking_id = 1;
+  // Email address of the person who made the booking.
+  string email = 2;
+  // Full name of the person who made the booking.
+  string full_name = 3;
+  // Date range for the booking period exclusive the end date.
+  google.actions.type.DateRange booking_start_end = 4;
+}
