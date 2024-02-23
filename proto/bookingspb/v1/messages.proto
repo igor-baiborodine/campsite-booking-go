@@ -6,14 +6,32 @@ option go_package = "bookingspb/v1;bookingspbv1";
 
 import "proto/googleapis/actions/type/date_range.proto";
 
-// Message to define the structure of a Booking.
+// Message to define the structure of a booking.
 message Booking {
-  // Unique identifier for the booking.
+  // Unique identifier of the booking.
   string booking_id = 1;
-  // Email address of the person who made the booking.
-  string email = 2;
+  // Identifier of the campsite booked.
+  string campsite_id = 2;
+  // Email of the person who made the booking.
+  string email = 3;
   // Full name of the person who made the booking.
-  string full_name = 3;
-  // Date range for the booking period exclusive the end date.
-  google.actions.type.DateRange booking_start_end = 4;
+  string full_name = 4;
+  // Booking date range (start and end date); end date exclusive
+  google.actions.type.DateRange booking_start_end = 5;
+}
+
+// Message to define the structure of a campsite.
+message Campsite {
+  // Unique identifier of the campsite.
+  string campsite_id = 1;
+  // Maximum number of people the campsite can accommodate.
+  int32 capacity = 2;
+  // Indicates if the campsite has drinking water.
+  bool drinking_water = 3;
+  // Indicates if the campsite has restrooms.
+  bool restrooms = 4;
+  // Indicates if the campsite has a picnic table.
+  bool picnic_table = 5;
+  // Indicates if the campsite has a fire pit.
+  bool fire_pit = 6;
 }
