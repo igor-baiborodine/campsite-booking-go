@@ -1,5 +1,7 @@
 package domain
 
+import "time"
+
 type Booking struct {
 	// Persistence ID
 	ID int64
@@ -8,8 +10,8 @@ type Booking struct {
 	CampsiteID string
 	Email      string
 	FullName   string
-	StartDate  string
-	EndDate    string
+	StartDate  time.Time
+	EndDate    time.Time
 	Active     bool
 }
 
@@ -48,12 +50,12 @@ func (b *BookingBuilder) FullName(fullName string) *BookingBuilder {
 	return b
 }
 
-func (b *BookingBuilder) StartDate(startDate string) *BookingBuilder {
+func (b *BookingBuilder) StartDate(startDate time.Time) *BookingBuilder {
 	b.booking.StartDate = startDate
 	return b
 }
 
-func (b *BookingBuilder) EndDate(endDate string) *BookingBuilder {
+func (b *BookingBuilder) EndDate(endDate time.Time) *BookingBuilder {
 	b.booking.EndDate = endDate
 	return b
 }
