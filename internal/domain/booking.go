@@ -19,6 +19,12 @@ type BookingBuilder struct {
 	booking *Booking
 }
 
+func (b *Booking) Cancel() (err error) {
+	// TODO: add error handling for already canceled booking
+	b.Active = false
+	return nil
+}
+
 func NewBookingBuilder() *BookingBuilder {
 	booking := &Booking{}
 	b := &BookingBuilder{booking: booking}
