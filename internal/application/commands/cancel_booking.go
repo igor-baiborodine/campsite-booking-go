@@ -24,7 +24,8 @@ func (h CancelBookingHandler) CancelBooking(ctx context.Context, cmd CancelBooki
 	if err != nil {
 		return err
 	}
-
-	// TODO: add error handling for already canceled booking
+	if err := booking.Cancel(); err != nil {
+		return err
+	}
 	return h.bookings.Update(ctx, booking)
 }
