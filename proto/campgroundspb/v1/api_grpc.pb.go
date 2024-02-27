@@ -2,9 +2,9 @@
 // versions:
 // - protoc-gen-go-grpc v1.3.0
 // - protoc             (unknown)
-// source: proto/bookingspb/v1/api.proto
+// source: proto/campgroundspb/v1/api.proto
 
-package bookingspbv1
+package campgroundspbv1
 
 import (
 	context "context"
@@ -19,19 +19,144 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	BookingsService_GetCampsites_FullMethodName   = "/bookingspb.v1.BookingsService/GetCampsites"
-	BookingsService_GetBooking_FullMethodName     = "/bookingspb.v1.BookingsService/GetBooking"
-	BookingsService_CreateBooking_FullMethodName  = "/bookingspb.v1.BookingsService/CreateBooking"
-	BookingsService_UpdateBooking_FullMethodName  = "/bookingspb.v1.BookingsService/UpdateBooking"
-	BookingsService_CancelBooking_FullMethodName  = "/bookingspb.v1.BookingsService/CancelBooking"
-	BookingsService_GetVacantDates_FullMethodName = "/bookingspb.v1.BookingsService/GetVacantDates"
+	CampsitesService_GetCampsites_FullMethodName   = "/campgroundspb.v1.CampsitesService/GetCampsites"
+	CampsitesService_CreateCampsite_FullMethodName = "/campgroundspb.v1.CampsitesService/CreateCampsite"
+)
+
+// CampsitesServiceClient is the client API for CampsitesService service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type CampsitesServiceClient interface {
+	GetCampsites(ctx context.Context, in *GetCampsitesRequest, opts ...grpc.CallOption) (*GetCampsitesResponse, error)
+	CreateCampsite(ctx context.Context, in *CreateCampsiteRequest, opts ...grpc.CallOption) (*CreateCampsiteResponse, error)
+}
+
+type campsitesServiceClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewCampsitesServiceClient(cc grpc.ClientConnInterface) CampsitesServiceClient {
+	return &campsitesServiceClient{cc}
+}
+
+func (c *campsitesServiceClient) GetCampsites(ctx context.Context, in *GetCampsitesRequest, opts ...grpc.CallOption) (*GetCampsitesResponse, error) {
+	out := new(GetCampsitesResponse)
+	err := c.cc.Invoke(ctx, CampsitesService_GetCampsites_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *campsitesServiceClient) CreateCampsite(ctx context.Context, in *CreateCampsiteRequest, opts ...grpc.CallOption) (*CreateCampsiteResponse, error) {
+	out := new(CreateCampsiteResponse)
+	err := c.cc.Invoke(ctx, CampsitesService_CreateCampsite_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// CampsitesServiceServer is the server API for CampsitesService service.
+// All implementations must embed UnimplementedCampsitesServiceServer
+// for forward compatibility
+type CampsitesServiceServer interface {
+	GetCampsites(context.Context, *GetCampsitesRequest) (*GetCampsitesResponse, error)
+	CreateCampsite(context.Context, *CreateCampsiteRequest) (*CreateCampsiteResponse, error)
+	mustEmbedUnimplementedCampsitesServiceServer()
+}
+
+// UnimplementedCampsitesServiceServer must be embedded to have forward compatible implementations.
+type UnimplementedCampsitesServiceServer struct {
+}
+
+func (UnimplementedCampsitesServiceServer) GetCampsites(context.Context, *GetCampsitesRequest) (*GetCampsitesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetCampsites not implemented")
+}
+func (UnimplementedCampsitesServiceServer) CreateCampsite(context.Context, *CreateCampsiteRequest) (*CreateCampsiteResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateCampsite not implemented")
+}
+func (UnimplementedCampsitesServiceServer) mustEmbedUnimplementedCampsitesServiceServer() {}
+
+// UnsafeCampsitesServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to CampsitesServiceServer will
+// result in compilation errors.
+type UnsafeCampsitesServiceServer interface {
+	mustEmbedUnimplementedCampsitesServiceServer()
+}
+
+func RegisterCampsitesServiceServer(s grpc.ServiceRegistrar, srv CampsitesServiceServer) {
+	s.RegisterService(&CampsitesService_ServiceDesc, srv)
+}
+
+func _CampsitesService_GetCampsites_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetCampsitesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CampsitesServiceServer).GetCampsites(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CampsitesService_GetCampsites_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CampsitesServiceServer).GetCampsites(ctx, req.(*GetCampsitesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CampsitesService_CreateCampsite_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateCampsiteRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CampsitesServiceServer).CreateCampsite(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CampsitesService_CreateCampsite_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CampsitesServiceServer).CreateCampsite(ctx, req.(*CreateCampsiteRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// CampsitesService_ServiceDesc is the grpc.ServiceDesc for CampsitesService service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var CampsitesService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "campgroundspb.v1.CampsitesService",
+	HandlerType: (*CampsitesServiceServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "GetCampsites",
+			Handler:    _CampsitesService_GetCampsites_Handler,
+		},
+		{
+			MethodName: "CreateCampsite",
+			Handler:    _CampsitesService_CreateCampsite_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "proto/campgroundspb/v1/api.proto",
+}
+
+const (
+	BookingsService_GetBooking_FullMethodName     = "/campgroundspb.v1.BookingsService/GetBooking"
+	BookingsService_CreateBooking_FullMethodName  = "/campgroundspb.v1.BookingsService/CreateBooking"
+	BookingsService_UpdateBooking_FullMethodName  = "/campgroundspb.v1.BookingsService/UpdateBooking"
+	BookingsService_CancelBooking_FullMethodName  = "/campgroundspb.v1.BookingsService/CancelBooking"
+	BookingsService_GetVacantDates_FullMethodName = "/campgroundspb.v1.BookingsService/GetVacantDates"
 )
 
 // BookingsServiceClient is the client API for BookingsService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type BookingsServiceClient interface {
-	GetCampsites(ctx context.Context, in *GetCampsitesRequest, opts ...grpc.CallOption) (*GetCampsitesResponse, error)
 	GetBooking(ctx context.Context, in *GetBookingRequest, opts ...grpc.CallOption) (*GetBookingResponse, error)
 	CreateBooking(ctx context.Context, in *CreateBookingRequest, opts ...grpc.CallOption) (*CreateBookingResponse, error)
 	UpdateBooking(ctx context.Context, in *UpdateBookingRequest, opts ...grpc.CallOption) (*UpdateBookingResponse, error)
@@ -45,15 +170,6 @@ type bookingsServiceClient struct {
 
 func NewBookingsServiceClient(cc grpc.ClientConnInterface) BookingsServiceClient {
 	return &bookingsServiceClient{cc}
-}
-
-func (c *bookingsServiceClient) GetCampsites(ctx context.Context, in *GetCampsitesRequest, opts ...grpc.CallOption) (*GetCampsitesResponse, error) {
-	out := new(GetCampsitesResponse)
-	err := c.cc.Invoke(ctx, BookingsService_GetCampsites_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
 }
 
 func (c *bookingsServiceClient) GetBooking(ctx context.Context, in *GetBookingRequest, opts ...grpc.CallOption) (*GetBookingResponse, error) {
@@ -105,7 +221,6 @@ func (c *bookingsServiceClient) GetVacantDates(ctx context.Context, in *GetVacan
 // All implementations must embed UnimplementedBookingsServiceServer
 // for forward compatibility
 type BookingsServiceServer interface {
-	GetCampsites(context.Context, *GetCampsitesRequest) (*GetCampsitesResponse, error)
 	GetBooking(context.Context, *GetBookingRequest) (*GetBookingResponse, error)
 	CreateBooking(context.Context, *CreateBookingRequest) (*CreateBookingResponse, error)
 	UpdateBooking(context.Context, *UpdateBookingRequest) (*UpdateBookingResponse, error)
@@ -118,9 +233,6 @@ type BookingsServiceServer interface {
 type UnimplementedBookingsServiceServer struct {
 }
 
-func (UnimplementedBookingsServiceServer) GetCampsites(context.Context, *GetCampsitesRequest) (*GetCampsitesResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetCampsites not implemented")
-}
 func (UnimplementedBookingsServiceServer) GetBooking(context.Context, *GetBookingRequest) (*GetBookingResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetBooking not implemented")
 }
@@ -147,24 +259,6 @@ type UnsafeBookingsServiceServer interface {
 
 func RegisterBookingsServiceServer(s grpc.ServiceRegistrar, srv BookingsServiceServer) {
 	s.RegisterService(&BookingsService_ServiceDesc, srv)
-}
-
-func _BookingsService_GetCampsites_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetCampsitesRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(BookingsServiceServer).GetCampsites(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: BookingsService_GetCampsites_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(BookingsServiceServer).GetCampsites(ctx, req.(*GetCampsitesRequest))
-	}
-	return interceptor(ctx, in, info, handler)
 }
 
 func _BookingsService_GetBooking_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -261,13 +355,9 @@ func _BookingsService_GetVacantDates_Handler(srv interface{}, ctx context.Contex
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var BookingsService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "bookingspb.v1.BookingsService",
+	ServiceName: "campgroundspb.v1.BookingsService",
 	HandlerType: (*BookingsServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
-		{
-			MethodName: "GetCampsites",
-			Handler:    _BookingsService_GetCampsites_Handler,
-		},
 		{
 			MethodName: "GetBooking",
 			Handler:    _BookingsService_GetBooking_Handler,
@@ -290,5 +380,5 @@ var BookingsService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "proto/bookingspb/v1/api.proto",
+	Metadata: "proto/campgroundspb/v1/api.proto",
 }

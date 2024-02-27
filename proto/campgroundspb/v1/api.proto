@@ -1,14 +1,18 @@
 syntax = "proto3";
 
-package bookingspb.v1;
+package campgroundspb.v1;
 
-option go_package = "bookingspb/v1;bookingspbv1";
+option go_package = "campgroundspb/v1;campgroundspbv1";
 
 import "proto/googleapis/type/date.proto";
 import "proto/googleapis/actions/type/date_range.proto";
 
-service BookingsService {
+service CampsitesService {
   rpc GetCampsites(GetCampsitesRequest) returns (GetCampsitesResponse) {};
+  rpc CreateCampsite(CreateCampsiteRequest) returns (CreateCampsiteResponse) {};
+}
+
+service BookingsService {
   rpc GetBooking(GetBookingRequest) returns (GetBookingResponse) {};
   rpc CreateBooking(CreateBookingRequest) returns (CreateBookingResponse) {};
   rpc UpdateBooking(UpdateBookingRequest) returns (UpdateBookingResponse) {};
@@ -20,6 +24,19 @@ message GetCampsitesRequest {}
 
 message GetCampsitesResponse {
   repeated Campsite campsites = 1;
+}
+
+message CreateCampsiteRequest {
+  string campsite_code = 1;
+  int32 capacity = 2;
+  bool drinking_water = 3;
+  bool restrooms = 4;
+  bool picnic_table = 5;
+  bool fire_pit = 6;
+}
+
+message CreateCampsiteResponse {
+  string campsite_id = 1;
 }
 
 message GetBookingRequest {
@@ -34,7 +51,7 @@ message CreateBookingRequest {
   string campsite_id = 1;
   string email = 2;
   string full_name = 3;
-  google.actions.type.DateRange booking_start_end = 4;
+  google.actions.type.DateRange start_end = 4;
 }
 
 message CreateBookingResponse {
@@ -66,16 +83,18 @@ message GetVacantDatesResponse {
 message Campsite {
   // Unique identifier of the campsite.
   string campsite_id = 1;
+  // Unique code of the campsite.
+  string campsite_code = 2;
   // Maximum number of people the campsite can accommodate.
-  int32 capacity = 2;
+  int32 capacity = 3;
   // Indicates if the campsite has drinking water.
-  bool drinking_water = 3;
+  bool drinking_water = 4;
   // Indicates if the campsite has restrooms.
-  bool restrooms = 4;
+  bool restrooms = 5;
   // Indicates if the campsite has a picnic table.
-  bool picnic_table = 5;
+  bool picnic_table = 6;
   // Indicates if the campsite has a fire pit.
-  bool fire_pit = 6;
+  bool fire_pit = 7;
 }
 
 // Message to define the structure of a booking.
