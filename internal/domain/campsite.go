@@ -5,6 +5,7 @@ type Campsite struct {
 	ID int64
 	// Business ID
 	CampsiteID    string
+	CampsiteCode  string
 	Capacity      int32
 	DrinkingWater bool
 	Restrooms     bool
@@ -29,6 +30,11 @@ func (b *CampsiteBuilder) ID(ID int64) *CampsiteBuilder {
 
 func (b *CampsiteBuilder) CampsiteId(campsiteID string) *CampsiteBuilder {
 	b.campsite.CampsiteID = campsiteID
+	return b
+}
+
+func (b *CampsiteBuilder) CampsiteCode(campsiteCode string) *CampsiteBuilder {
+	b.campsite.CampsiteCode = campsiteCode
 	return b
 }
 
@@ -58,5 +64,6 @@ func (b *CampsiteBuilder) FirePit(firePit bool) *CampsiteBuilder {
 }
 
 func (b *CampsiteBuilder) Build() (*Campsite, error) {
+	// TODO: add validation for fields
 	return b.campsite, nil
 }

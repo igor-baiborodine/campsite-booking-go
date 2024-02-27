@@ -72,5 +72,6 @@ func (b *BookingBuilder) Active(active bool) *BookingBuilder {
 }
 
 func (b *BookingBuilder) Build() (*Booking, error) {
+	// TODO: add validation for fields
 	return b.booking, nil
 }
