@@ -53,35 +53,26 @@ func (s *campsiteSuite) SetupSuite() {
 				WithOccurrence(2).
 				WithStartupTimeout(5*time.Second)),
 	)
-	if err != nil {
-		s.T().Fatal(err)
-	}
+	s.checkError(err)
 
 	connStr, err := s.container.ConnectionString(ctx, "sslmode=disable")
-	if err != nil {
-		s.T().Fatal(err)
-	}
+	s.checkError(err)
 
 	s.db, err = sql.Open("pgx", connStr)
-	if err != nil {
-		s.T().Fatal(err)
-	}
+	s.checkError(err)
 
 	goose.SetLogger(&log.SilentLogger{})
 	goose.SetBaseFS(migrations.FS)
-	if err := goose.SetDialect("postgres"); err != nil {
-		s.T().Fatal(err)
-	}
-	if err := goose.Up(s.db, "."); err != nil {
-		s.T().Fatal(err)
-	}
+	err = goose.SetDialect("postgres")
+	s.checkError(err)
+
+	err = goose.Up(s.db, ".")
+	s.checkError(err)
 }
 
 func (s *campsiteSuite) TearDownSuite() {
 	err := s.db.Close()
-	if err != nil {
-		s.T().Fatal(err)
-	}
+	s.checkError(err)
 	if err := s.container.Terminate(context.Background()); err != nil {
 		s.T().Fatal("failed to terminate postgres container", err)
 	}
@@ -92,6 +83,17 @@ func (s *campsiteSuite) SetupTest() {
 }
 func (s *campsiteSuite) TearDownTest() {
 	_, err := s.db.ExecContext(context.Background(), "TRUNCATE campsites")
+	s.checkError(err)
+}
+
+func (s *campsiteSuite) createCampsite() domain.Campsite {
+	campsite := domain.Campsite{}
+	err := faker.FakeData(&campsite)
+	s.checkError(err)
+	return campsite
+}
+
+func (s *campsiteSuite) checkError(err error) {
 	if err != nil {
 		s.T().Fatal(err)
 	}
@@ -99,8 +101,7 @@ func (s *campsiteSuite) TearDownTest() {
 
 func (s *campsiteSuite) TestCampsiteRepository_FindAll() {
 	// given
-	campsite := domain.Campsite{}
-	faker.FakeData(&campsite)
+	campsite := s.createCampsite()
 	campsite.ID = math.MaxInt64
 	const query = "INSERT INTO campsites " +
 		"(campsite_id, campsite_code, capacity, restrooms, drinking_water, picnic_table, fire_pit, active, created_at, updated_at) " +
@@ -123,8 +124,7 @@ func (s *campsiteSuite) TestCampsiteRepository_FindAll() {
 
 func (s *campsiteSuite) TestCampsiteRepository_Insert() {
 	// given
-	campsite := domain.Campsite{}
-	faker.FakeData(&campsite)
+	campsite := s.createCampsite()
 	// when
 	s.NoError(s.repo.Insert(context.Background(), &campsite))
 	// then
