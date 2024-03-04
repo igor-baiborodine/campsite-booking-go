@@ -11,6 +11,7 @@ type Campsite struct {
 	Restrooms     bool
 	PicnicTable   bool
 	FirePit       bool
+	Active        bool
 }
 
 type CampsiteBuilder struct {
@@ -60,6 +61,11 @@ func (b *CampsiteBuilder) PicnicTable(picnicTable bool) *CampsiteBuilder {
 
 func (b *CampsiteBuilder) FirePit(firePit bool) *CampsiteBuilder {
 	b.campsite.FirePit = firePit
+	return b
+}
+
+func (b *CampsiteBuilder) Active(active bool) *CampsiteBuilder {
+	b.campsite.Active = active
 	return b
 }
 
