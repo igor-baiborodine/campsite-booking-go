@@ -4,7 +4,6 @@ go 1.21.6
 
 require (
 	github.com/go-faker/faker/v4 v4.3.0
-	github.com/google/go-cmp v0.6.0
 	github.com/jackc/pgx/v4 v4.18.1
 	github.com/pressly/goose/v3 v3.17.0
 	github.com/stackus/errors v0.1.5
@@ -12,7 +11,6 @@ require (
 	github.com/testcontainers/testcontainers-go v0.28.0
 	github.com/testcontainers/testcontainers-go/modules/postgres v0.28.0
 	google.golang.org/grpc v1.62.0
-	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.3.0
 	google.golang.org/protobuf v1.32.0
 )
 
