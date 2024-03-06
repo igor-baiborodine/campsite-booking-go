@@ -5,6 +5,10 @@ package postgres_test
 import (
 	"context"
 	"database/sql"
+	"math"
+	"testing"
+	"time"
+
 	"github.com/go-faker/faker/v4"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/domain"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/logger/log"
@@ -13,13 +17,15 @@ import (
 	"github.com/stretchr/testify/suite"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
-	"math"
-	"testing"
-	"time"
 
 	"github.com/igor-baiborodine/campsite-booking-go/db/migrations"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/postgres"
 	pg "github.com/testcontainers/testcontainers-go/modules/postgres"
+)
+
+const (
+	truncateCampsites  = "TRUNCATE campsites.campsites"
+	selectByCampsiteId = "SELECT campsite_code FROM campsites.campsites WHERE campsite_id = $1"
 )
 
 type campsiteSuite struct {
@@ -79,10 +85,10 @@ func (s *campsiteSuite) TearDownSuite() {
 }
 
 func (s *campsiteSuite) SetupTest() {
-	s.repo = postgres.NewCampsiteRepository("campsites", s.db)
+	s.repo = postgres.NewCampsiteRepository(s.db)
 }
 func (s *campsiteSuite) TearDownTest() {
-	_, err := s.db.ExecContext(context.Background(), "TRUNCATE campsites")
+	_, err := s.db.ExecContext(context.Background(), truncateCampsites)
 	s.checkError(err)
 }
 
@@ -103,11 +109,8 @@ func (s *campsiteSuite) TestCampsiteRepository_FindAll() {
 	// given
 	campsite := s.createCampsite()
 	campsite.ID = math.MaxInt64
-	const query = "INSERT INTO campsites " +
-		"(campsite_id, campsite_code, capacity, restrooms, drinking_water, picnic_table, fire_pit, active, created_at, updated_at) " +
-		"VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)"
 	createdAt := time.Now()
-	_, err := s.db.ExecContext(context.Background(), query, campsite.CampsiteID, campsite.CampsiteCode,
+	_, err := s.db.ExecContext(context.Background(), postgres.InsertIntoCampsites, campsite.CampsiteID, campsite.CampsiteCode,
 		campsite.Capacity, campsite.Restrooms, campsite.DrinkingWater, campsite.PicnicTable,
 		campsite.FirePit, campsite.Active, createdAt, createdAt)
 	s.NoError(err)
@@ -128,7 +131,7 @@ func (s *campsiteSuite) TestCampsiteRepository_Insert() {
 	// when
 	s.NoError(s.repo.Insert(context.Background(), &campsite))
 	// then
-	row := s.db.QueryRow("SELECT campsite_code FROM campsites WHERE campsite_id = $1", campsite.CampsiteID)
+	row := s.db.QueryRow(selectByCampsiteId, campsite.CampsiteID)
 	if s.NoError(row.Err()) {
 		var campsiteCode string
 		s.NoError(row.Scan(&campsiteCode))
