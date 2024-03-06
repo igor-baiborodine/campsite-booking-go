@@ -9,17 +9,13 @@ import (
 	"testing"
 	"time"
 
+	ct "github.com/igor-baiborodine/campsite-booking-go/internal/common_testing"
+
 	"github.com/go-faker/faker/v4"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/domain"
-	"github.com/igor-baiborodine/campsite-booking-go/internal/logger/log"
-	_ "github.com/jackc/pgx/v4/stdlib"
-	"github.com/pressly/goose/v3"
-	"github.com/stretchr/testify/suite"
-	"github.com/testcontainers/testcontainers-go"
-	"github.com/testcontainers/testcontainers-go/wait"
-
-	"github.com/igor-baiborodine/campsite-booking-go/db/migrations"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/postgres"
+	_ "github.com/jackc/pgx/v4/stdlib"
+	"github.com/stretchr/testify/suite"
 	pg "github.com/testcontainers/testcontainers-go/modules/postgres"
 )
 
@@ -44,35 +40,10 @@ func TestCampsiteRepository(t *testing.T) {
 
 func (s *campsiteSuite) SetupSuite() {
 	var err error
-	ctx := context.Background()
-	dbName := "test_campgrounds"
-	dbUser := "test_campgrounds_user"
-	dbPassword := "test_campgrounds_pass"
-
-	s.container, err = pg.RunContainer(ctx,
-		testcontainers.WithImage("docker.io/postgres:15.2-alpine"),
-		pg.WithDatabase(dbName),
-		pg.WithUsername(dbUser),
-		pg.WithPassword(dbPassword),
-		testcontainers.WithWaitStrategy(
-			wait.ForLog("database system is ready to accept connections").
-				WithOccurrence(2).
-				WithStartupTimeout(5*time.Second)),
-	)
+	s.container, err = ct.NewPostgresContainer()
 	s.checkError(err)
 
-	connStr, err := s.container.ConnectionString(ctx, "sslmode=disable")
-	s.checkError(err)
-
-	s.db, err = sql.Open("pgx", connStr)
-	s.checkError(err)
-
-	goose.SetLogger(&log.SilentLogger{})
-	goose.SetBaseFS(migrations.FS)
-	err = goose.SetDialect("postgres")
-	s.checkError(err)
-
-	err = goose.Up(s.db, ".")
+	s.db, err = ct.NewDB(s.container)
 	s.checkError(err)
 }
 
