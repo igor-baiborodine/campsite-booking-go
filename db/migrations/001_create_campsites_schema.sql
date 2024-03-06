@@ -23,4 +23,4 @@ CREATE UNIQUE INDEX unique_campsites_campsite_id ON campsites (campsite_id);
 CREATE UNIQUE INDEX unique_campsites_campsite_code ON campsites (campsite_code);
 
 -- +goose Down
-DROP SCHEMA IF EXISTS stores CASCADE;
+DROP SCHEMA IF EXISTS campsites CASCADE;
