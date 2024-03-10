@@ -5,15 +5,11 @@ package postgres_test
 import (
 	"context"
 	"database/sql"
-	"math"
 	"testing"
-	"time"
 
 	ct "github.com/igor-baiborodine/campsite-booking-go/internal/common_testing"
-	"github.com/igor-baiborodine/campsite-booking-go/internal/domain"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/postgres"
 
-	"github.com/go-faker/faker/v4"
 	_ "github.com/jackc/pgx/v4/stdlib"
 	"github.com/stretchr/testify/suite"
 	pg "github.com/testcontainers/testcontainers-go/modules/postgres"
@@ -41,15 +37,21 @@ func TestCampsiteRepository(t *testing.T) {
 func (s *campsiteSuite) SetupSuite() {
 	var err error
 	s.container, err = ct.NewPostgresContainer()
-	s.checkError(err)
+	if err != nil {
+		s.T().Fatal(err)
+	}
 
 	s.db, err = ct.NewDB(s.container)
-	s.checkError(err)
+	if err != nil {
+		s.T().Fatal(err)
+	}
 }
 
 func (s *campsiteSuite) TearDownSuite() {
 	err := s.db.Close()
-	s.checkError(err)
+	if err != nil {
+		s.T().Fatal(err)
+	}
 	if err := s.container.Terminate(context.Background()); err != nil {
 		s.T().Fatal("failed to terminate postgres container", err)
 	}
@@ -60,17 +62,6 @@ func (s *campsiteSuite) SetupTest() {
 }
 func (s *campsiteSuite) TearDownTest() {
 	_, err := s.db.ExecContext(context.Background(), deleteCampsites)
-	s.checkError(err)
-}
-
-func (s *campsiteSuite) createCampsite() domain.Campsite {
-	campsite := domain.Campsite{}
-	err := faker.FakeData(&campsite)
-	s.checkError(err)
-	return campsite
-}
-
-func (s *campsiteSuite) checkError(err error) {
 	if err != nil {
 		s.T().Fatal(err)
 	}
@@ -78,13 +69,10 @@ func (s *campsiteSuite) checkError(err error) {
 
 func (s *campsiteSuite) TestCampsiteRepository_FindAll() {
 	// given
-	campsite := s.createCampsite()
-	campsite.ID = math.MaxInt64
-	createdAt := time.Now()
-	_, err := s.db.ExecContext(context.Background(), postgres.InsertIntoCampsites,
-		campsite.CampsiteID, campsite.CampsiteCode, campsite.Capacity, campsite.Restrooms,
-		campsite.DrinkingWater, campsite.PicnicTable, campsite.FirePit, campsite.Active,
-		createdAt, createdAt)
+	campsite, err := ct.FakeCampsite()
+	s.NoError(err)
+
+	err = ct.InsertCampsite(s.db, &campsite)
 	s.NoError(err)
 	// when
 	result, err := s.repo.FindAll(context.Background())
@@ -99,7 +87,8 @@ func (s *campsiteSuite) TestCampsiteRepository_FindAll() {
 
 func (s *campsiteSuite) TestCampsiteRepository_Insert() {
 	// given
-	campsite := s.createCampsite()
+	campsite, err := ct.FakeCampsite()
+	s.NoError(err)
 	// when
 	s.NoError(s.repo.Insert(context.Background(), &campsite))
 	// then

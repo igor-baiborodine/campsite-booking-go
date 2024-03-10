@@ -20,8 +20,11 @@ type CampsiteBuilder struct {
 
 func NewCampsiteBuilder() *CampsiteBuilder {
 	campsite := &Campsite{}
-	b := &CampsiteBuilder{campsite: campsite}
-	return b
+	return &CampsiteBuilder{campsite: campsite}
+}
+
+func (c *Campsite) ToBuilder() *CampsiteBuilder {
+	return &CampsiteBuilder{campsite: c}
 }
 
 func (b *CampsiteBuilder) ID(ID int64) *CampsiteBuilder {
