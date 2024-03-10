@@ -10,18 +10,18 @@ import (
 	"time"
 
 	ct "github.com/igor-baiborodine/campsite-booking-go/internal/common_testing"
-
-	"github.com/go-faker/faker/v4"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/domain"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/postgres"
+
+	"github.com/go-faker/faker/v4"
 	_ "github.com/jackc/pgx/v4/stdlib"
 	"github.com/stretchr/testify/suite"
 	pg "github.com/testcontainers/testcontainers-go/modules/postgres"
 )
 
 const (
-	truncateCampsites  = "TRUNCATE campsites.campsites"
-	selectByCampsiteId = "SELECT campsite_code FROM campsites.campsites WHERE campsite_id = $1"
+	deleteCampsites    = "DELETE FROM campgrounds.campsites"
+	selectByCampsiteId = "SELECT campsite_code FROM campgrounds.campsites WHERE campsite_id = $1"
 )
 
 type campsiteSuite struct {
@@ -59,7 +59,7 @@ func (s *campsiteSuite) SetupTest() {
 	s.repo = postgres.NewCampsiteRepository(s.db)
 }
 func (s *campsiteSuite) TearDownTest() {
-	_, err := s.db.ExecContext(context.Background(), truncateCampsites)
+	_, err := s.db.ExecContext(context.Background(), deleteCampsites)
 	s.checkError(err)
 }
 
@@ -81,18 +81,19 @@ func (s *campsiteSuite) TestCampsiteRepository_FindAll() {
 	campsite := s.createCampsite()
 	campsite.ID = math.MaxInt64
 	createdAt := time.Now()
-	_, err := s.db.ExecContext(context.Background(), postgres.InsertIntoCampsites, campsite.CampsiteID, campsite.CampsiteCode,
-		campsite.Capacity, campsite.Restrooms, campsite.DrinkingWater, campsite.PicnicTable,
-		campsite.FirePit, campsite.Active, createdAt, createdAt)
+	_, err := s.db.ExecContext(context.Background(), postgres.InsertIntoCampsites,
+		campsite.CampsiteID, campsite.CampsiteCode, campsite.Capacity, campsite.Restrooms,
+		campsite.DrinkingWater, campsite.PicnicTable, campsite.FirePit, campsite.Active,
+		createdAt, createdAt)
 	s.NoError(err)
 	// when
-	campsites, err := s.repo.FindAll(context.Background())
+	result, err := s.repo.FindAll(context.Background())
 	// then
 	if s.NoError(err) {
-		s.Equal(1, len(campsites))
-		s.NotEqual(campsite.ID, campsites[0].ID)
-		campsite.ID = campsites[0].ID
-		s.Equal(&campsite, campsites[0])
+		s.Equal(1, len(result))
+		s.NotEqual(campsite.ID, result[0].ID)
+		campsite.ID = result[0].ID
+		s.Equal(&campsite, result[0])
 	}
 }
 
