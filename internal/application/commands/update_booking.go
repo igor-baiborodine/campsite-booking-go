@@ -2,8 +2,9 @@ package commands
 
 import (
 	"context"
-	"github.com/igor-baiborodine/campsite-booking-go/internal/domain"
 	"time"
+
+	"github.com/igor-baiborodine/campsite-booking-go/internal/domain"
 )
 
 type (
@@ -30,17 +31,13 @@ func (h UpdateBookingHandler) UpdateBooking(ctx context.Context, cmd UpdateBooki
 	if err != nil {
 		return err
 	}
-	bookingBuilder := domain.NewBookingBuilder().
-		BookingID(cmd.BookingID).
-		CampsiteID(cmd.CampsiteID).
-		Email(cmd.Email).
-		FullName(cmd.FullName).
-		StartDate(cmd.StartDate).
-		EndDate(cmd.EndDate)
+	booking := domain.Booking{}
+	booking.BookingID = cmd.BookingID
+	booking.CampsiteID = cmd.CampsiteID
+	booking.Email = cmd.Email
+	booking.FullName = cmd.FullName
+	booking.StartDate = cmd.StartDate
+	booking.EndDate = cmd.EndDate
 
-	booking, err := bookingBuilder.Build()
-	if err != nil {
-		return err
-	}
-	return h.bookings.Update(ctx, booking)
+	return h.bookings.Update(ctx, &booking)
 }

@@ -72,7 +72,7 @@ func (s *campsiteSuite) TestCampsiteRepository_FindAll() {
 	campsite, err := ct.FakeCampsite()
 	s.NoError(err)
 
-	err = ct.InsertCampsite(s.db, &campsite)
+	err = ct.InsertCampsite(s.db, campsite)
 	s.NoError(err)
 	// when
 	result, err := s.repo.FindAll(context.Background())
@@ -81,7 +81,7 @@ func (s *campsiteSuite) TestCampsiteRepository_FindAll() {
 		s.Equal(1, len(result))
 		s.NotEqual(campsite.ID, result[0].ID)
 		campsite.ID = result[0].ID
-		s.Equal(&campsite, result[0])
+		s.Equal(campsite, result[0])
 	}
 }
 
@@ -90,7 +90,7 @@ func (s *campsiteSuite) TestCampsiteRepository_Insert() {
 	campsite, err := ct.FakeCampsite()
 	s.NoError(err)
 	// when
-	s.NoError(s.repo.Insert(context.Background(), &campsite))
+	s.NoError(s.repo.Insert(context.Background(), campsite))
 	// then
 	row := s.db.QueryRow(selectByCampsiteId, campsite.CampsiteID)
 	if s.NoError(row.Err()) {

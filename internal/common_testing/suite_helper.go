@@ -63,11 +63,35 @@ func NewDB(c *pg.PostgresContainer) (*sql.DB, error) {
 	return db, nil
 }
 
-func FakeCampsite() (domain.Campsite, error) {
+func FakeCampsite() (*domain.Campsite, error) {
 	campsite := domain.Campsite{}
 	err := faker.FakeData(&campsite)
+
+	if err != nil {
+		return nil, err
+	}
 	campsite.CampsiteID = uuid.New().String()
-	return campsite, err
+	campsite.Active = true
+
+	return &campsite, nil
+}
+
+func FakeBooking(campsiteId string) (*domain.Booking, error) {
+	booking := domain.Booking{}
+	err := faker.FakeData(&booking)
+
+	if err != nil {
+		return nil, err
+	}
+	now := truncateToStartOfDayInUTC(time.Now())
+
+	booking.BookingID = uuid.New().String()
+	booking.CampsiteID = campsiteId
+	booking.StartDate = now.AddDate(0, 0, 1)
+	booking.EndDate = now.AddDate(0, 0, 2)
+	booking.Active = true
+
+	return &booking, nil
 }
 
 func InsertCampsite(db *sql.DB, c *domain.Campsite) error {
@@ -76,4 +100,16 @@ func InsertCampsite(db *sql.DB, c *domain.Campsite) error {
 		c.CampsiteID, c.CampsiteCode, c.Capacity, c.Restrooms, c.DrinkingWater, c.PicnicTable,
 		c.FirePit, c.Active, createdAt, createdAt)
 	return err
+}
+
+func InsertBooking(db *sql.DB, b *domain.Booking) error {
+	createdAt := time.Now()
+	_, err := db.ExecContext(context.Background(), postgres.InsertIntoBookings,
+		b.BookingID, b.CampsiteID, b.Email, b.FullName, b.StartDate, b.EndDate, b.Active, createdAt,
+		createdAt)
+	return err
+}
+
+func truncateToStartOfDayInUTC(t time.Time) time.Time {
+	return time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, time.UTC)
 }
