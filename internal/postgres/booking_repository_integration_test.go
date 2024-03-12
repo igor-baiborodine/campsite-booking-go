@@ -71,7 +71,7 @@ func (s *bookingSuite) TearDownTest() {
 	}
 }
 
-func (s *bookingSuite) TestBookingRepository_Find() {
+func (s *bookingSuite) TestBookingRepository_Find_Success() {
 	// given
 	campsite, err := ct.FakeCampsite()
 	s.NoError(err)
@@ -93,4 +93,8 @@ func (s *bookingSuite) TestBookingRepository_Find() {
 		booking.ID = result.ID
 		s.Equal(booking, result)
 	}
+}
+
+func (s *bookingSuite) TestBookingRepository_Find_NotFound() {
+	// TODO: implement me
 }

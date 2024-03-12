@@ -23,7 +23,7 @@ func NewCampsiteRepository(db *sql.DB) CampsiteRepository {
 func (r CampsiteRepository) FindAll(ctx context.Context) (campsites []*domain.Campsite, err error) {
 	tx, err := r.db.BeginTx(ctx, &sql.TxOptions{ReadOnly: true})
 	if err != nil {
-		return nil, errors.Wrapf(err, "begin transaction")
+		return nil, errors.Wrap(err, "begin transaction")
 	}
 	defer tx.Rollback()
 
@@ -34,13 +34,13 @@ func (r CampsiteRepository) FindAll(ctx context.Context) (campsites []*domain.Ca
 	defer func(rows *sql.Rows) {
 		err := rows.Close()
 		if err != nil {
-			err = errors.Wrapf(err, "close campsite rows")
+			err = errors.Wrap(err, "close campsite rows")
 		}
 	}(rows)
 
 	for rows.Next() {
 		campsite := &domain.Campsite{}
-		err := rows.Scan(&campsite.ID, &campsite.CampsiteID, &campsite.CampsiteCode,
+		err = rows.Scan(&campsite.ID, &campsite.CampsiteID, &campsite.CampsiteCode,
 			&campsite.Capacity, &campsite.Restrooms, &campsite.DrinkingWater, &campsite.PicnicTable,
 			&campsite.FirePit, &campsite.Active)
 		if err != nil {
@@ -52,8 +52,8 @@ func (r CampsiteRepository) FindAll(ctx context.Context) (campsites []*domain.Ca
 	if err = rows.Err(); err != nil {
 		return nil, errors.Wrap(err, "finish campsite rows")
 	}
-	if err := tx.Commit(); err != nil {
-		return nil, errors.Wrapf(err, "commit transaction")
+	if err = tx.Commit(); err != nil {
+		return nil, errors.Wrap(err, "commit transaction")
 	}
 	return campsites, nil
 }
@@ -61,7 +61,7 @@ func (r CampsiteRepository) FindAll(ctx context.Context) (campsites []*domain.Ca
 func (r CampsiteRepository) Insert(ctx context.Context, campsite *domain.Campsite) error {
 	tx, err := r.db.BeginTx(ctx, nil)
 	if err != nil {
-		return errors.Wrapf(err, "begin transaction")
+		return errors.Wrap(err, "begin transaction")
 	}
 	defer tx.Rollback()
 
@@ -71,11 +71,11 @@ func (r CampsiteRepository) Insert(ctx context.Context, campsite *domain.Campsit
 		campsite.DrinkingWater, campsite.PicnicTable, campsite.FirePit, campsite.Active,
 		createdAt, createdAt)
 	if err != nil {
-		return errors.Wrapf(err, "insert campsite")
+		return errors.Wrap(err, "insert campsite")
 	}
 
-	if err := tx.Commit(); err != nil {
-		return errors.Wrapf(err, "commit transaction")
+	if err = tx.Commit(); err != nil {
+		return errors.Wrap(err, "commit transaction")
 	}
 	return nil
 }

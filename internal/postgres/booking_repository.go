@@ -20,19 +20,34 @@ func NewBookingRepository(db *sql.DB) BookingRepository {
 }
 
 func (r BookingRepository) Find(ctx context.Context, bookingID string) (*domain.Booking, error) {
-	booking := &domain.Booking{}
-	err := r.db.QueryRowContext(ctx, SelectByBookingIdFromBookings, bookingID).Scan(
-		&booking.ID, &booking.BookingID, &booking.CampsiteID, &booking.Email,
-		&booking.FullName, &booking.StartDate, &booking.EndDate, &booking.Active)
+	tx, err := r.db.BeginTx(ctx, &sql.TxOptions{ReadOnly: true})
 	if err != nil {
-		return nil, errors.Wrap(err, "scanning booking")
+		return nil, errors.Wrapf(err, "begin transaction")
+	}
+	defer tx.Rollback()
+
+	booking := &domain.Booking{}
+	if err = tx.QueryRowContext(
+		ctx, SelectByBookingIdFromBookings, bookingID,
+	).Scan(
+		&booking.ID, &booking.BookingID, &booking.CampsiteID, &booking.Email,
+		&booking.FullName, &booking.StartDate, &booking.EndDate, &booking.Active,
+	); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, errors.Wrap(errors.ErrNotFound, "booking for ID not found: "+bookingID)
+		}
+		return nil, errors.Wrap(err, "scan booking row")
+	}
+
+	if err = tx.Commit(); err != nil {
+		return nil, errors.Wrap(err, "commit transaction")
 	}
 	return booking, nil
 }
 
 func (r BookingRepository) FindForDateRange(
-	ctx context.Context, campsiteID string, startDate time.Time, endDate time.Time) (
-	[]*domain.Booking, error) {
+	ctx context.Context, campsiteID string, startDate time.Time, endDate time.Time,
+) ([]*domain.Booking, error) {
 	//TODO implement me
 	panic("implement me")
 }
