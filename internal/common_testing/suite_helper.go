@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"github.com/google/uuid"
+	"math"
 	"time"
 
 	"github.com/igor-baiborodine/campsite-booking-go/internal/postgres"
@@ -70,6 +71,7 @@ func FakeCampsite() (*domain.Campsite, error) {
 	if err != nil {
 		return nil, err
 	}
+	campsite.ID = math.MaxInt64
 	campsite.CampsiteID = uuid.New().String()
 	campsite.Active = true
 
@@ -85,6 +87,7 @@ func FakeBooking(campsiteId string) (*domain.Booking, error) {
 	}
 	now := truncateToStartOfDayInUTC(time.Now())
 
+	booking.ID = math.MaxInt64
 	booking.BookingID = uuid.New().String()
 	booking.CampsiteID = campsiteId
 	booking.StartDate = now.AddDate(0, 0, 1)
