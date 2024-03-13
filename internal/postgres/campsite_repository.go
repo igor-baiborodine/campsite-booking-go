@@ -20,7 +20,7 @@ func NewCampsiteRepository(db *sql.DB) CampsiteRepository {
 	return CampsiteRepository{db: db}
 }
 
-func (r CampsiteRepository) FindAll(ctx context.Context) (campsites []*domain.Campsite, err error) {
+func (r CampsiteRepository) FindAll(ctx context.Context) ([]*domain.Campsite, error) {
 	tx, err := r.db.BeginTx(ctx, &sql.TxOptions{ReadOnly: true})
 	if err != nil {
 		return nil, errors.Wrap(err, "begin transaction")
@@ -38,6 +38,7 @@ func (r CampsiteRepository) FindAll(ctx context.Context) (campsites []*domain.Ca
 		}
 	}(rows)
 
+	var campsites []*domain.Campsite
 	for rows.Next() {
 		campsite := &domain.Campsite{}
 		err = rows.Scan(&campsite.ID, &campsite.CampsiteID, &campsite.CampsiteCode,

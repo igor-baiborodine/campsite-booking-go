@@ -71,9 +71,10 @@ const (
 		    end_date, 
 		    active
 		FROM campgrounds.bookings
-		WHERE ((start_date < $1 and $2 < end_date) 
-		           OR ($1 < end_date and end_date <= $2) 
-		           OR ($1 <= start_date and start_date <= $2)) 
-		  AND active = TRUE and campsite_id = $3
+		WHERE active = TRUE 
+		  AND campsite_id = $1
+		  AND ((start_date < $2 AND $3 < end_date) 
+		           OR ($2 < end_date AND end_date <= $3) 
+		           OR ($2 <= start_date AND start_date <= $3)) 
 	`
 )
