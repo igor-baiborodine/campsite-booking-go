@@ -2,8 +2,10 @@ package commands
 
 import (
 	"context"
-	"github.com/igor-baiborodine/campsite-booking-go/internal/domain"
 	"time"
+
+	"github.com/google/uuid"
+	"github.com/igor-baiborodine/campsite-booking-go/internal/domain"
 )
 
 type (
@@ -25,17 +27,14 @@ func NewCreateBookingHandler(bookings domain.BookingRepository) CreateBookingHan
 }
 
 func (h CreateBookingHandler) CreateBooking(ctx context.Context, cmd CreateBooking) error {
-	bookingBuilder := domain.NewBookingBuilder().
-		CampsiteID(cmd.CampsiteID).
-		Email(cmd.Email).
-		FullName(cmd.FullName).
-		StartDate(cmd.StartDate).
-		EndDate(cmd.EndDate).
-		Active(true)
+	booking := domain.Booking{}
+	booking.BookingID = uuid.New().String()
+	booking.CampsiteID = cmd.CampsiteID
+	booking.Email = cmd.Email
+	booking.FullName = cmd.FullName
+	booking.StartDate = cmd.StartDate
+	booking.EndDate = cmd.EndDate
+	booking.Active = true
 
-	booking, err := bookingBuilder.Build()
-	if err != nil {
-		return err
-	}
-	return h.bookings.Insert(ctx, booking)
+	return h.bookings.Insert(ctx, &booking)
 }

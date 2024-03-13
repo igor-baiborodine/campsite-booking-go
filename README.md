@@ -47,4 +47,5 @@
 * [Go](https://github.com/golang/go), [gRPC](https://github.com/grpc/grpc-go)
 * [PostgreSQL](https://www.postgresql.org/)  
 * [Docker](https://www.docker.com/)
+* [Goose](https://pressly.github.io/goose/) (DB migrations)
 * TODO

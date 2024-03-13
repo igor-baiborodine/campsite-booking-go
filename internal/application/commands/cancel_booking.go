@@ -2,6 +2,7 @@ package commands
 
 import (
 	"context"
+
 	"github.com/igor-baiborodine/campsite-booking-go/internal/domain"
 )
 
