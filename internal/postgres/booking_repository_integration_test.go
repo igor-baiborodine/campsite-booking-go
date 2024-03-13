@@ -5,6 +5,8 @@ package postgres_test
 import (
 	"context"
 	"database/sql"
+	"github.com/igor-baiborodine/campsite-booking-go/internal/domain"
+	"github.com/stackus/errors"
 	"testing"
 
 	ct "github.com/igor-baiborodine/campsite-booking-go/internal/common_testing"
@@ -96,5 +98,18 @@ func (s *bookingSuite) TestBookingRepository_Find_Success() {
 }
 
 func (s *bookingSuite) TestBookingRepository_Find_NotFound() {
-	// TODO: implement me
+	// given
+	booking := &domain.Booking{
+		BookingID: "non-existing-booking-id",
+	}
+	// when
+	result, err := s.repo.Find(context.Background(), booking.BookingID)
+	// then
+	if s.Error(err) {
+		s.Nil(result)
+		s.True(errors.Is(err, sql.ErrNoRows))
+		s.Equal(
+			"booking for ID not found: non-existing-booking-id: sql: no rows in result set",
+			err.Error())
+	}
 }

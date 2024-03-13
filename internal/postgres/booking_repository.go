@@ -34,7 +34,7 @@ func (r BookingRepository) Find(ctx context.Context, bookingID string) (*domain.
 		&booking.FullName, &booking.StartDate, &booking.EndDate, &booking.Active,
 	); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, errors.Wrap(errors.ErrNotFound, "booking for ID not found: "+bookingID)
+			return nil, errors.Wrap(err, "booking for ID not found: "+bookingID)
 		}
 		return nil, errors.Wrap(err, "scan booking row")
 	}
