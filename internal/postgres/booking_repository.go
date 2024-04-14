@@ -3,6 +3,7 @@ package postgres
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"time"
 
 	"github.com/igor-baiborodine/campsite-booking-go/internal/domain"
@@ -22,7 +23,7 @@ func NewBookingRepository(db *sql.DB) BookingRepository {
 func (r BookingRepository) Find(ctx context.Context, bookingID string) (*domain.Booking, error) {
 	tx, err := r.db.BeginTx(ctx, &sql.TxOptions{ReadOnly: true})
 	if err != nil {
-		return nil, errors.Wrapf(err, "begin transaction")
+		return nil, errors.Wrap(err, "begin transaction")
 	}
 	defer tx.Rollback()
 
@@ -50,21 +51,23 @@ func (r BookingRepository) FindForDateRange(
 ) ([]*domain.Booking, error) {
 	tx, err := r.db.BeginTx(ctx, &sql.TxOptions{ReadOnly: true})
 	if err != nil {
-		return nil, errors.Wrapf(err, "begin transaction")
+		return nil, errors.Wrap(err, "begin transaction")
 	}
 	defer tx.Rollback()
 
-	bookings, err := r.findForDateRange(ctx, tx, campsiteID, startDate, endDate)
+	bookings, err := r.findForDateRangeWithTx(
+		ctx, tx, FindForDateRangeInBookings, campsiteID, startDate, endDate)
 	if err = tx.Commit(); err != nil {
 		return nil, errors.Wrap(err, "commit transaction")
 	}
 	return bookings, nil
 }
 
-func (r BookingRepository) findForDateRange(
-	ctx context.Context, tx *sql.Tx, campsiteID string, startDate time.Time, endDate time.Time,
+func (r BookingRepository) findForDateRangeWithTx(
+	ctx context.Context, tx *sql.Tx, query string, campsiteID string, startDate time.Time,
+	endDate time.Time,
 ) ([]*domain.Booking, error) {
-	rows, err := tx.QueryContext(ctx, FindForDateRangeInBookings, campsiteID, startDate, endDate)
+	rows, err := tx.QueryContext(ctx, query, campsiteID, startDate, endDate)
 	if err != nil {
 		return nil, errors.Wrap(err, "query bookings for date range")
 	}
@@ -94,8 +97,34 @@ func (r BookingRepository) findForDateRange(
 }
 
 func (r BookingRepository) Insert(ctx context.Context, booking *domain.Booking) error {
-	//TODO implement me
-	panic("implement me")
+	tx, err := r.db.BeginTx(ctx, &sql.TxOptions{Isolation: sql.LevelReadCommitted, ReadOnly: false})
+	if err != nil {
+		return errors.Wrap(err, "begin transaction")
+	}
+	defer tx.Rollback()
+
+	query := FindForDateRangeInBookings + " FOR UPDATE"
+	bookings, err := r.findForDateRangeWithTx(
+		ctx, tx, query, booking.CampsiteID, booking.StartDate, booking.EndDate)
+	if err != nil {
+		return errors.Wrap(err, "query bookings for date range")
+	}
+	if bookings != nil {
+		return fmt.Errorf("no vacant dates from %v to %v", booking.StartDate, booking.EndDate)
+	}
+
+	_, err = tx.ExecContext(
+		ctx, InsertIntoBookings, booking.BookingID, booking.CampsiteID, booking.Email,
+		booking.FullName, booking.StartDate, booking.EndDate, booking.Active,
+	)
+	if err != nil {
+		return errors.Wrap(err, "insert booking")
+	}
+
+	if err = tx.Commit(); err != nil {
+		return errors.Wrap(err, "commit transaction")
+	}
+	return nil
 }
 
 func (r BookingRepository) Update(ctx context.Context, booking *domain.Booking) error {
