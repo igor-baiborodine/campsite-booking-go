@@ -107,10 +107,8 @@ func (s *bookingSuite) TestBookingRepository_Find_NotFound() {
 	// then
 	if s.Error(err) {
 		s.Nil(result)
-		s.True(errors.Is(err, sql.ErrNoRows))
-		s.Equal(
-			"booking for ID not found: non-existing-booking-id: sql: no rows in result set",
-			err.Error())
+		s.True(errors.Is(err, domain.ErrBookingNotFound{BookingID: booking.BookingID}))
+		s.Equal("booking not found for BookingID non-existing-booking-id", err.Error())
 	}
 }
 

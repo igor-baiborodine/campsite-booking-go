@@ -3,7 +3,6 @@ package postgres
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"time"
 
 	"github.com/igor-baiborodine/campsite-booking-go/internal/domain"
@@ -35,7 +34,7 @@ func (r BookingRepository) Find(ctx context.Context, bookingID string) (*domain.
 		&booking.FullName, &booking.StartDate, &booking.EndDate, &booking.Active,
 	); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, errors.Wrap(err, "booking for ID not found: "+bookingID)
+			return nil, domain.ErrBookingNotFound{BookingID: bookingID}
 		}
 		return nil, errors.Wrap(err, "scan booking row")
 	}
@@ -109,8 +108,11 @@ func (r BookingRepository) Insert(ctx context.Context, booking *domain.Booking) 
 	if err != nil {
 		return errors.Wrap(err, "query bookings for date range")
 	}
-	if bookings != nil {
-		return fmt.Errorf("no vacant dates from %v to %v", booking.StartDate, booking.EndDate)
+	if len(bookings) > 0 {
+		return domain.ErrBookingDatesNotAvailable{
+			StartDate: booking.StartDate,
+			EndDate:   booking.EndDate,
+		}
 	}
 
 	_, err = tx.ExecContext(
