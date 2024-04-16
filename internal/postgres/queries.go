@@ -60,7 +60,7 @@ const (
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
 	`
 
-	FindAllBookingsForDateRange = `
+	FindAllBookingsForDateRangeQuery = `
 		SELECT
 		    id,
 		    booking_id, 
@@ -78,7 +78,7 @@ const (
 		            OR ($2 <= start_date AND start_date <= $3)) 
 	`
 
-	UpdateBooking = `
+	UpdateBookingQuery = `
 		UPDATE campgrounds.bookings
 		SET 
 		    campsite_id = $2, 
@@ -86,7 +86,8 @@ const (
 		    full_name = $4, 
 		    start_date = $5,
 		    end_date = $5,
-		    active = $6
-		WHERE booking_id = $1
+		    active = $6,
+		    updated_at = $7
+		WHERE booking_id = E$1
 	`
 )

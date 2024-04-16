@@ -28,7 +28,7 @@ func (r BookingRepository) Find(ctx context.Context, bookingID string) (*domain.
 
 	booking := &domain.Booking{}
 	if err = tx.QueryRowContext(
-		ctx, SelectByBookingIdFromBookings, bookingID,
+		ctx, FindBookingByBookingIdQuery, bookingID,
 	).Scan(
 		&booking.ID, &booking.BookingID, &booking.CampsiteID, &booking.Email,
 		&booking.FullName, &booking.StartDate, &booking.EndDate, &booking.Active,
@@ -55,11 +55,82 @@ func (r BookingRepository) FindForDateRange(
 	defer tx.Rollback()
 
 	bookings, err := r.findForDateRangeWithTx(
-		ctx, tx, FindForDateRangeInBookings, campsiteID, startDate, endDate)
+		ctx, tx, FindAllBookingsForDateRangeQuery, campsiteID, startDate, endDate)
 	if err = tx.Commit(); err != nil {
 		return nil, errors.Wrap(err, "commit transaction")
 	}
 	return bookings, nil
+}
+
+func (r BookingRepository) Insert(ctx context.Context, booking *domain.Booking) error {
+	tx, err := r.db.BeginTx(ctx, &sql.TxOptions{Isolation: sql.LevelReadCommitted, ReadOnly: false})
+	if err != nil {
+		return errors.Wrap(err, "begin transaction")
+	}
+	defer tx.Rollback()
+
+	query := FindAllBookingsForDateRangeQuery + " FOR UPDATE"
+	bookings, err := r.findForDateRangeWithTx(
+		ctx, tx, query, booking.CampsiteID, booking.StartDate, booking.EndDate)
+	if err != nil {
+		return errors.Wrap(err, "query bookings for date range")
+	}
+	if len(bookings) > 0 {
+		return domain.ErrBookingDatesNotAvailable{
+			StartDate: booking.StartDate,
+			EndDate:   booking.EndDate,
+		}
+	}
+
+	createdAt := time.Now()
+	_, err = tx.ExecContext(
+		ctx, InsertBookingQuery, booking.BookingID, booking.CampsiteID, booking.Email,
+		booking.FullName, booking.StartDate, booking.EndDate, booking.Active, createdAt, createdAt,
+	)
+	if err != nil {
+		return errors.Wrap(err, "insert booking")
+	}
+
+	if err = tx.Commit(); err != nil {
+		return errors.Wrap(err, "commit transaction")
+	}
+	return nil
+}
+
+func (r BookingRepository) Update(ctx context.Context, booking *domain.Booking) error {
+	tx, err := r.db.BeginTx(ctx, &sql.TxOptions{Isolation: sql.LevelReadCommitted, ReadOnly: false})
+	if err != nil {
+		return errors.Wrap(err, "begin transaction")
+	}
+	defer tx.Rollback()
+
+	query := FindAllBookingsForDateRangeQuery +
+		" WHERE booking_id NOT IN (" + booking.BookingID + ") FOR UPDATE"
+	bookings, err := r.findForDateRangeWithTx(
+		ctx, tx, query, booking.CampsiteID, booking.StartDate, booking.EndDate)
+	if err != nil {
+		return errors.Wrap(err, "query bookings for date range")
+	}
+	if len(bookings) > 0 {
+		return domain.ErrBookingDatesNotAvailable{
+			StartDate: booking.StartDate,
+			EndDate:   booking.EndDate,
+		}
+	}
+
+	updatedAt := time.Now()
+	_, err = tx.ExecContext(
+		ctx, UpdateBookingQuery, booking.BookingID, booking.CampsiteID, booking.Email,
+		booking.FullName, booking.StartDate, booking.EndDate, booking.Active, updatedAt,
+	)
+	if err != nil {
+		return errors.Wrap(err, "update booking")
+	}
+
+	if err = tx.Commit(); err != nil {
+		return errors.Wrap(err, "commit transaction")
+	}
+	return nil
 }
 
 func (r BookingRepository) findForDateRangeWithTx(
@@ -93,44 +164,4 @@ func (r BookingRepository) findForDateRangeWithTx(
 		return nil, errors.Wrap(err, "finish booking rows")
 	}
 	return bookings, nil
-}
-
-func (r BookingRepository) Insert(ctx context.Context, booking *domain.Booking) error {
-	tx, err := r.db.BeginTx(ctx, &sql.TxOptions{Isolation: sql.LevelReadCommitted, ReadOnly: false})
-	if err != nil {
-		return errors.Wrap(err, "begin transaction")
-	}
-	defer tx.Rollback()
-
-	query := FindForDateRangeInBookings + " FOR UPDATE"
-	bookings, err := r.findForDateRangeWithTx(
-		ctx, tx, query, booking.CampsiteID, booking.StartDate, booking.EndDate)
-	if err != nil {
-		return errors.Wrap(err, "query bookings for date range")
-	}
-	if len(bookings) > 0 {
-		return domain.ErrBookingDatesNotAvailable{
-			StartDate: booking.StartDate,
-			EndDate:   booking.EndDate,
-		}
-	}
-
-	createdAt := time.Now()
-	_, err = tx.ExecContext(
-		ctx, InsertIntoBookings, booking.BookingID, booking.CampsiteID, booking.Email,
-		booking.FullName, booking.StartDate, booking.EndDate, booking.Active, createdAt, createdAt,
-	)
-	if err != nil {
-		return errors.Wrap(err, "insert booking")
-	}
-
-	if err = tx.Commit(); err != nil {
-		return errors.Wrap(err, "commit transaction")
-	}
-	return nil
-}
-
-func (r BookingRepository) Update(ctx context.Context, booking *domain.Booking) error {
-	//TODO implement me
-	panic("implement me")
 }
