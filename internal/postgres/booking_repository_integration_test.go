@@ -5,6 +5,7 @@ package postgres_test
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	ct "github.com/igor-baiborodine/campsite-booking-go/internal/common_testing"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/domain"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/postgres"
@@ -97,7 +98,7 @@ func (s *bookingSuite) TestBookingRepository_Find_Success() {
 	}
 }
 
-func (s *bookingSuite) TestBookingRepository_Find_NotFound() {
+func (s *bookingSuite) TestBookingRepository_Find_ErrNotFound() {
 	// given
 	booking := &domain.Booking{
 		BookingID: "non-existing-booking-id",
@@ -112,7 +113,7 @@ func (s *bookingSuite) TestBookingRepository_Find_NotFound() {
 	}
 }
 
-func (s *bookingSuite) TestBookingRepository_FindForDateRange() {
+func (s *bookingSuite) TestBookingRepository_FindForDateRange_Success() {
 	tests := map[string]struct {
 		s, e   string // existing booking start/end dates in ISO 8601 format, denoted as S and E
 		rs, re string // given date range start/end in ISO 8601 format, denoted as |-|
@@ -155,5 +156,60 @@ func (s *bookingSuite) TestBookingRepository_FindForDateRange() {
 				s.Equal(test.len, len(result))
 			}
 		})
+	}
+}
+
+func (s *bookingSuite) TestBookingRepository_Insert_Success() {
+	// given
+	campsite, err := ct.FakeCampsite()
+	s.NoError(err)
+
+	err = ct.InsertCampsite(s.db, campsite)
+	s.NoError(err)
+
+	booking, err := ct.FakeBooking(campsite.CampsiteID)
+	s.NoError(err)
+	// when
+	err = s.repo.Insert(context.Background(), booking)
+	// then
+	if s.NoError(err) {
+		found, err := ct.FindBooking(s.db, booking.BookingID)
+		s.NoError(err)
+		s.NotNil(found)
+		s.NotEqual(booking.ID, found.ID)
+		booking.ID = found.ID
+		s.Equal(booking, found)
+	}
+}
+
+func (s *bookingSuite) TestBookingRepository_Insert_ErrBookingDatesNotAvailable() {
+	// given
+	campsite, err := ct.FakeCampsite()
+	s.NoError(err)
+
+	err = ct.InsertCampsite(s.db, campsite)
+	s.NoError(err)
+
+	booking1, err := ct.FakeBooking(campsite.CampsiteID)
+	s.NoError(err)
+
+	err = ct.InsertBooking(s.db, booking1)
+	s.NoError(err)
+
+	booking2, err := ct.FakeBooking(campsite.CampsiteID)
+	s.NoError(err)
+	booking2.StartDate = booking1.StartDate
+	booking2.EndDate = booking1.EndDate
+	// when
+	err = s.repo.Insert(context.Background(), booking2)
+	// then
+	if s.Error(err) {
+		s.True(errors.Is(err, domain.ErrBookingDatesNotAvailable{
+			StartDate: booking2.StartDate,
+			EndDate:   booking2.EndDate,
+		}))
+		errMsg := fmt.Sprintf("booking dates not available from %s to %s",
+			booking2.StartDate.Format(time.DateOnly), booking2.EndDate.Format(time.DateOnly))
+		s.Equal(errMsg, err.Error())
 	}
 }

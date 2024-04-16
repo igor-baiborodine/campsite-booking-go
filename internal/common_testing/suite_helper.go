@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"github.com/google/uuid"
+	"github.com/stackus/errors"
 	"math"
 	"time"
 
@@ -111,6 +112,22 @@ func InsertBooking(db *sql.DB, b *domain.Booking) error {
 		b.BookingID, b.CampsiteID, b.Email, b.FullName, b.StartDate, b.EndDate, b.Active, createdAt,
 		createdAt)
 	return err
+}
+
+func FindBooking(db *sql.DB, bookingID string) (*domain.Booking, error) {
+	booking := &domain.Booking{}
+	if err := db.QueryRowContext(
+		context.Background(), postgres.SelectByBookingIdFromBookings, bookingID,
+	).Scan(
+		&booking.ID, &booking.BookingID, &booking.CampsiteID, &booking.Email,
+		&booking.FullName, &booking.StartDate, &booking.EndDate, &booking.Active,
+	); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, domain.ErrBookingNotFound{BookingID: bookingID}
+		}
+		return nil, errors.Wrap(err, "scan booking row")
+	}
+	return booking, nil
 }
 
 func truncateToStartOfDayInUTC(t time.Time) time.Time {

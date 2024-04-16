@@ -115,9 +115,10 @@ func (r BookingRepository) Insert(ctx context.Context, booking *domain.Booking) 
 		}
 	}
 
+	createdAt := time.Now()
 	_, err = tx.ExecContext(
 		ctx, InsertIntoBookings, booking.BookingID, booking.CampsiteID, booking.Email,
-		booking.FullName, booking.StartDate, booking.EndDate, booking.Active,
+		booking.FullName, booking.StartDate, booking.EndDate, booking.Active, createdAt, createdAt,
 	)
 	if err != nil {
 		return errors.Wrap(err, "insert booking")
