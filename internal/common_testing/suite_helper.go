@@ -100,7 +100,7 @@ func FakeBooking(campsiteId string) (*domain.Booking, error) {
 
 func InsertCampsite(db *sql.DB, c *domain.Campsite) error {
 	createdAt := time.Now()
-	_, err := db.ExecContext(context.Background(), postgres.InsertIntoCampsites,
+	_, err := db.ExecContext(context.Background(), postgres.InsertCampsiteQuery,
 		c.CampsiteID, c.CampsiteCode, c.Capacity, c.Restrooms, c.DrinkingWater, c.PicnicTable,
 		c.FirePit, c.Active, createdAt, createdAt)
 	return err
@@ -108,7 +108,7 @@ func InsertCampsite(db *sql.DB, c *domain.Campsite) error {
 
 func InsertBooking(db *sql.DB, b *domain.Booking) error {
 	createdAt := time.Now()
-	_, err := db.ExecContext(context.Background(), postgres.InsertIntoBookings,
+	_, err := db.ExecContext(context.Background(), postgres.InsertBookingQuery,
 		b.BookingID, b.CampsiteID, b.Email, b.FullName, b.StartDate, b.EndDate, b.Active, createdAt,
 		createdAt)
 	return err
@@ -117,7 +117,7 @@ func InsertBooking(db *sql.DB, b *domain.Booking) error {
 func FindBooking(db *sql.DB, bookingID string) (*domain.Booking, error) {
 	booking := &domain.Booking{}
 	if err := db.QueryRowContext(
-		context.Background(), postgres.SelectByBookingIdFromBookings, bookingID,
+		context.Background(), postgres.FindBookingByBookingIdQuery, bookingID,
 	).Scan(
 		&booking.ID, &booking.BookingID, &booking.CampsiteID, &booking.Email,
 		&booking.FullName, &booking.StartDate, &booking.EndDate, &booking.Active,

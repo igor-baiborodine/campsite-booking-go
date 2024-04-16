@@ -27,7 +27,7 @@ func (r CampsiteRepository) FindAll(ctx context.Context) ([]*domain.Campsite, er
 	}
 	defer tx.Rollback()
 
-	rows, err := tx.QueryContext(ctx, FindAllInCampsites)
+	rows, err := tx.QueryContext(ctx, FindAllCampsitesQuery)
 	if err != nil {
 		return nil, errors.Wrap(err, "query campsites")
 	}
@@ -67,7 +67,7 @@ func (r CampsiteRepository) Insert(ctx context.Context, campsite *domain.Campsit
 	defer tx.Rollback()
 
 	createdAt := time.Now()
-	_, err = tx.ExecContext(ctx, InsertIntoCampsites,
+	_, err = tx.ExecContext(ctx, InsertCampsiteQuery,
 		campsite.CampsiteID, campsite.CampsiteCode, campsite.Capacity, campsite.Restrooms,
 		campsite.DrinkingWater, campsite.PicnicTable, campsite.FirePit, campsite.Active,
 		createdAt, createdAt)
