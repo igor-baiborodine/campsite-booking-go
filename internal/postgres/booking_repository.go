@@ -104,20 +104,21 @@ func (r BookingRepository) Update(ctx context.Context, booking *domain.Booking) 
 	}
 	defer tx.Rollback()
 
-	query := FindAllBookingsForDateRangeQuery +
-		" WHERE booking_id NOT IN (" + booking.BookingID + ") FOR UPDATE"
+	query := FindAllBookingsForDateRangeQuery + "FOR UPDATE"
 	bookings, err := r.findForDateRangeWithTx(
 		ctx, tx, query, booking.CampsiteID, booking.StartDate, booking.EndDate)
 	if err != nil {
 		return errors.Wrap(err, "query bookings for date range")
 	}
-	if len(bookings) > 0 {
-		return domain.ErrBookingDatesNotAvailable{
-			StartDate: booking.StartDate,
-			EndDate:   booking.EndDate,
+
+	for _, b := range bookings {
+		if b.BookingID != booking.BookingID {
+			return domain.ErrBookingDatesNotAvailable{
+				StartDate: booking.StartDate,
+				EndDate:   booking.EndDate,
+			}
 		}
 	}
-
 	updatedAt := time.Now()
 	_, err = tx.ExecContext(
 		ctx, UpdateBookingQuery, booking.BookingID, booking.CampsiteID, booking.Email,

@@ -80,6 +80,10 @@ func FakeCampsite() (*domain.Campsite, error) {
 }
 
 func FakeBooking(campsiteId string) (*domain.Booking, error) {
+	return FakeBookingWithAddDays(campsiteId, 1, 2)
+}
+
+func FakeBookingWithAddDays(campsiteId string, startAddDays int, endAddDays int) (*domain.Booking, error) {
 	booking := domain.Booking{}
 	err := faker.FakeData(&booking)
 
@@ -91,8 +95,8 @@ func FakeBooking(campsiteId string) (*domain.Booking, error) {
 	booking.ID = math.MaxInt64
 	booking.BookingID = uuid.New().String()
 	booking.CampsiteID = campsiteId
-	booking.StartDate = now.AddDate(0, 0, 1)
-	booking.EndDate = now.AddDate(0, 0, 2)
+	booking.StartDate = now.AddDate(0, 0, startAddDays)
+	booking.EndDate = now.AddDate(0, 0, endAddDays)
 	booking.Active = true
 
 	return &booking, nil

@@ -213,3 +213,84 @@ func (s *bookingSuite) TestBookingRepository_Insert_ErrBookingDatesNotAvailable(
 		s.Equal(errMsg, err.Error())
 	}
 }
+
+func (s *bookingSuite) TestBookingRepository_Update_Success() {
+	// given
+	campsite1, err := ct.FakeCampsite()
+	s.NoError(err)
+
+	err = ct.InsertCampsite(s.db, campsite1)
+	s.NoError(err)
+
+	booking, err := ct.FakeBookingWithAddDays(campsite1.CampsiteID, 1, 2)
+	s.NoError(err)
+
+	err = ct.InsertBooking(s.db, booking)
+	s.NoError(err)
+
+	campsite2, err := ct.FakeCampsite()
+	s.NoError(err)
+
+	err = ct.InsertCampsite(s.db, campsite2)
+	s.NoError(err)
+
+	existingBooking, err := ct.FindBooking(s.db, booking.BookingID)
+	s.NoError(err)
+
+	bookingToUpdate, err := ct.FakeBookingWithAddDays(campsite2.CampsiteID, 2, 3)
+	s.NoError(err)
+
+	bookingToUpdate.BookingID = existingBooking.BookingID
+	bookingToUpdate.Active = !existingBooking.Active
+	// when
+	err = s.repo.Update(context.Background(), bookingToUpdate)
+	// then
+	if s.NoError(err) {
+		updatedBooking, err := ct.FindBooking(s.db, bookingToUpdate.BookingID)
+		s.NoError(err)
+		s.NotNil(updatedBooking)
+		s.Equal(existingBooking.ID, updatedBooking.ID)
+
+		s.NotEqual(existingBooking.CampsiteID, updatedBooking.CampsiteID)
+		s.NotEqual(existingBooking.Email, updatedBooking.Email)
+		s.NotEqual(existingBooking.FullName, updatedBooking.FullName)
+		s.NotEqual(existingBooking.StartDate, updatedBooking.StartDate)
+		s.NotEqual(existingBooking.EndDate, updatedBooking.EndDate)
+		s.NotEqual(existingBooking.Active, updatedBooking.Active)
+	}
+}
+
+func (s *bookingSuite) TestBookingRepository_Update_ErrBookingDatesNotAvailable() {
+	// given
+	campsite, err := ct.FakeCampsite()
+	s.NoError(err)
+
+	err = ct.InsertCampsite(s.db, campsite)
+	s.NoError(err)
+
+	booking1, err := ct.FakeBookingWithAddDays(campsite.CampsiteID, 1, 2)
+	s.NoError(err)
+
+	err = ct.InsertBooking(s.db, booking1)
+	s.NoError(err)
+
+	booking2, err := ct.FakeBookingWithAddDays(campsite.CampsiteID, 2, 3)
+	s.NoError(err)
+
+	err = ct.InsertBooking(s.db, booking2)
+	s.NoError(err)
+	booking2.StartDate = booking1.StartDate
+	booking2.EndDate = booking1.EndDate
+	// when
+	err = s.repo.Update(context.Background(), booking2)
+	// then
+	if s.Error(err) {
+		s.True(errors.Is(err, domain.ErrBookingDatesNotAvailable{
+			StartDate: booking2.StartDate,
+			EndDate:   booking2.EndDate,
+		}))
+		errMsg := fmt.Sprintf("booking dates not available from %s to %s",
+			booking2.StartDate.Format(time.DateOnly), booking2.EndDate.Format(time.DateOnly))
+		s.Equal(errMsg, err.Error())
+	}
+}

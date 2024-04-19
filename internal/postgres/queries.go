@@ -85,9 +85,9 @@ const (
 		    email = $3, 
 		    full_name = $4, 
 		    start_date = $5,
-		    end_date = $5,
-		    active = $6,
-		    updated_at = $7
-		WHERE booking_id = E$1
+		    end_date = $6,
+		    active = $7,
+		    updated_at = $8
+		WHERE booking_id = $1
 	`
 )
