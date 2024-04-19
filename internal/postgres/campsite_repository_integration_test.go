@@ -5,27 +5,19 @@ package postgres_test
 import (
 	"context"
 	"database/sql"
-	"math"
 	"testing"
-	"time"
 
-	"github.com/go-faker/faker/v4"
-	"github.com/igor-baiborodine/campsite-booking-go/internal/domain"
-	"github.com/igor-baiborodine/campsite-booking-go/internal/logger/log"
-	_ "github.com/jackc/pgx/v4/stdlib"
-	"github.com/pressly/goose/v3"
-	"github.com/stretchr/testify/suite"
-	"github.com/testcontainers/testcontainers-go"
-	"github.com/testcontainers/testcontainers-go/wait"
-
-	"github.com/igor-baiborodine/campsite-booking-go/db/migrations"
+	ct "github.com/igor-baiborodine/campsite-booking-go/internal/common_testing"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/postgres"
+
+	_ "github.com/jackc/pgx/v4/stdlib"
+	"github.com/stretchr/testify/suite"
 	pg "github.com/testcontainers/testcontainers-go/modules/postgres"
 )
 
 const (
-	truncateCampsites  = "TRUNCATE campsites.campsites"
-	selectByCampsiteId = "SELECT campsite_code FROM campsites.campsites WHERE campsite_id = $1"
+	deleteCampsites    = "DELETE FROM campgrounds.campsites"
+	selectByCampsiteId = "SELECT campsite_code FROM campgrounds.campsites WHERE campsite_id = $1"
 )
 
 type campsiteSuite struct {
@@ -44,41 +36,22 @@ func TestCampsiteRepository(t *testing.T) {
 
 func (s *campsiteSuite) SetupSuite() {
 	var err error
-	ctx := context.Background()
-	dbName := "test_campgrounds"
-	dbUser := "test_campgrounds_user"
-	dbPassword := "test_campgrounds_pass"
+	s.container, err = ct.NewPostgresContainer()
+	if err != nil {
+		s.T().Fatal(err)
+	}
 
-	s.container, err = pg.RunContainer(ctx,
-		testcontainers.WithImage("docker.io/postgres:15.2-alpine"),
-		pg.WithDatabase(dbName),
-		pg.WithUsername(dbUser),
-		pg.WithPassword(dbPassword),
-		testcontainers.WithWaitStrategy(
-			wait.ForLog("database system is ready to accept connections").
-				WithOccurrence(2).
-				WithStartupTimeout(5*time.Second)),
-	)
-	s.checkError(err)
-
-	connStr, err := s.container.ConnectionString(ctx, "sslmode=disable")
-	s.checkError(err)
-
-	s.db, err = sql.Open("pgx", connStr)
-	s.checkError(err)
-
-	goose.SetLogger(&log.SilentLogger{})
-	goose.SetBaseFS(migrations.FS)
-	err = goose.SetDialect("postgres")
-	s.checkError(err)
-
-	err = goose.Up(s.db, ".")
-	s.checkError(err)
+	s.db, err = ct.NewDB(s.container)
+	if err != nil {
+		s.T().Fatal(err)
+	}
 }
 
 func (s *campsiteSuite) TearDownSuite() {
 	err := s.db.Close()
-	s.checkError(err)
+	if err != nil {
+		s.T().Fatal(err)
+	}
 	if err := s.container.Terminate(context.Background()); err != nil {
 		s.T().Fatal("failed to terminate postgres container", err)
 	}
@@ -88,18 +61,7 @@ func (s *campsiteSuite) SetupTest() {
 	s.repo = postgres.NewCampsiteRepository(s.db)
 }
 func (s *campsiteSuite) TearDownTest() {
-	_, err := s.db.ExecContext(context.Background(), truncateCampsites)
-	s.checkError(err)
-}
-
-func (s *campsiteSuite) createCampsite() domain.Campsite {
-	campsite := domain.Campsite{}
-	err := faker.FakeData(&campsite)
-	s.checkError(err)
-	return campsite
-}
-
-func (s *campsiteSuite) checkError(err error) {
+	_, err := s.db.ExecContext(context.Background(), deleteCampsites)
 	if err != nil {
 		s.T().Fatal(err)
 	}
@@ -107,29 +69,28 @@ func (s *campsiteSuite) checkError(err error) {
 
 func (s *campsiteSuite) TestCampsiteRepository_FindAll() {
 	// given
-	campsite := s.createCampsite()
-	campsite.ID = math.MaxInt64
-	createdAt := time.Now()
-	_, err := s.db.ExecContext(context.Background(), postgres.InsertIntoCampsites, campsite.CampsiteID, campsite.CampsiteCode,
-		campsite.Capacity, campsite.Restrooms, campsite.DrinkingWater, campsite.PicnicTable,
-		campsite.FirePit, campsite.Active, createdAt, createdAt)
+	campsite, err := ct.FakeCampsite()
+	s.NoError(err)
+
+	err = ct.InsertCampsite(s.db, campsite)
 	s.NoError(err)
 	// when
-	campsites, err := s.repo.FindAll(context.Background())
+	result, err := s.repo.FindAll(context.Background())
 	// then
 	if s.NoError(err) {
-		s.Equal(1, len(campsites))
-		s.NotEqual(campsite.ID, campsites[0].ID)
-		campsite.ID = campsites[0].ID
-		s.Equal(&campsite, campsites[0])
+		s.Equal(1, len(result))
+		s.NotEqual(campsite.ID, result[0].ID)
+		campsite.ID = result[0].ID
+		s.Equal(campsite, result[0])
 	}
 }
 
 func (s *campsiteSuite) TestCampsiteRepository_Insert() {
 	// given
-	campsite := s.createCampsite()
+	campsite, err := ct.FakeCampsite()
+	s.NoError(err)
 	// when
-	s.NoError(s.repo.Insert(context.Background(), &campsite))
+	s.NoError(s.repo.Insert(context.Background(), campsite))
 	// then
 	row := s.db.QueryRow(selectByCampsiteId, campsite.CampsiteID)
 	if s.NoError(row.Err()) {

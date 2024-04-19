@@ -2,6 +2,8 @@ package commands
 
 import (
 	"context"
+
+	"github.com/google/uuid"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/domain"
 )
 
@@ -25,17 +27,14 @@ func NewCreateCampsiteHandler(campsites domain.CampsiteRepository) CreateCampsit
 }
 
 func (h CreateCampsiteHandler) CreateCampsite(ctx context.Context, cmd CreateCampsite) error {
-	campsiteBuilder := domain.NewCampsiteBuilder().
-		CampsiteCode(cmd.CampsiteCode).
-		Capacity(cmd.Capacity).
-		DrinkingWater(cmd.DrinkingWater).
-		Restrooms(cmd.Restrooms).
-		PicnicTable(cmd.PicnicTable).
-		FirePit(cmd.FirePit)
+	campsite := domain.Campsite{}
+	campsite.CampsiteID = uuid.New().String()
+	campsite.CampsiteCode = cmd.CampsiteCode
+	campsite.Capacity = cmd.Capacity
+	campsite.DrinkingWater = cmd.DrinkingWater
+	campsite.Restrooms = cmd.Restrooms
+	campsite.PicnicTable = cmd.PicnicTable
+	campsite.FirePit = cmd.FirePit
 
-	campsite, err := campsiteBuilder.Build()
-	if err != nil {
-		return err
-	}
-	return h.campsites.Insert(ctx, campsite)
+	return h.campsites.Insert(ctx, &campsite)
 }

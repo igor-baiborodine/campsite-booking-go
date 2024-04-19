@@ -20,40 +20,63 @@ func NewCampsiteRepository(db *sql.DB) CampsiteRepository {
 	return CampsiteRepository{db: db}
 }
 
-func (r CampsiteRepository) FindAll(ctx context.Context) (campsites []*domain.Campsite, err error) {
-	rows, err := r.db.QueryContext(ctx, FindAllInCampsites)
+func (r CampsiteRepository) FindAll(ctx context.Context) ([]*domain.Campsite, error) {
+	tx, err := r.db.BeginTx(ctx, &sql.TxOptions{ReadOnly: true})
 	if err != nil {
-		return nil, errors.Wrap(err, "querying campsites")
+		return nil, errors.Wrap(err, "begin transaction")
+	}
+	defer tx.Rollback()
+
+	rows, err := tx.QueryContext(ctx, FindAllCampsitesQuery)
+	if err != nil {
+		return nil, errors.Wrap(err, "query campsites")
 	}
 	defer func(rows *sql.Rows) {
 		err := rows.Close()
 		if err != nil {
-			err = errors.Wrap(err, "closing campsite rows")
+			err = errors.Wrap(err, "close campsite rows")
 		}
 	}(rows)
 
+	var campsites []*domain.Campsite
 	for rows.Next() {
 		campsite := &domain.Campsite{}
-		err := rows.Scan(&campsite.CampsiteID, &campsite.CampsiteCode, &campsite.Capacity,
-			&campsite.Restrooms, &campsite.DrinkingWater, &campsite.PicnicTable, &campsite.FirePit,
-			&campsite.Active)
+		err = rows.Scan(&campsite.ID, &campsite.CampsiteID, &campsite.CampsiteCode,
+			&campsite.Capacity, &campsite.Restrooms, &campsite.DrinkingWater, &campsite.PicnicTable,
+			&campsite.FirePit, &campsite.Active)
 		if err != nil {
-			return nil, errors.Wrap(err, "scanning campsite")
+			return nil, errors.Wrap(err, "scan campsite row")
 		}
 		campsites = append(campsites, campsite)
 	}
 
 	if err = rows.Err(); err != nil {
-		return nil, errors.Wrap(err, "finishing campsite rows")
+		return nil, errors.Wrap(err, "finish campsite rows")
+	}
+	if err = tx.Commit(); err != nil {
+		return nil, errors.Wrap(err, "commit transaction")
 	}
 	return campsites, nil
 }
 
 func (r CampsiteRepository) Insert(ctx context.Context, campsite *domain.Campsite) error {
-	createdAt := time.Now()
-	_, err := r.db.ExecContext(ctx, InsertIntoCampsites, campsite.CampsiteID, campsite.CampsiteCode,
-		campsite.Capacity, campsite.Restrooms, campsite.DrinkingWater, campsite.PicnicTable,
-		campsite.FirePit, campsite.Active, createdAt, createdAt)
+	tx, err := r.db.BeginTx(ctx, nil)
+	if err != nil {
+		return errors.Wrap(err, "begin transaction")
+	}
+	defer tx.Rollback()
 
-	return errors.Wrap(err, "inserting campsite")
+	createdAt := time.Now()
+	_, err = tx.ExecContext(ctx, InsertCampsiteQuery,
+		campsite.CampsiteID, campsite.CampsiteCode, campsite.Capacity, campsite.Restrooms,
+		campsite.DrinkingWater, campsite.PicnicTable, campsite.FirePit, campsite.Active,
+		createdAt, createdAt)
+	if err != nil {
+		return errors.Wrap(err, "insert campsite")
+	}
+
+	if err = tx.Commit(); err != nil {
+		return errors.Wrap(err, "commit transaction")
+	}
+	return nil
 }
