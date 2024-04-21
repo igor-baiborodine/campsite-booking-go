@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.3.0
 // - protoc             (unknown)
-// source: proto/campgroundspb/v1/api.proto
+// source: campgroundspb/v1/api.proto
 
 package campgroundspbv1
 
@@ -142,7 +142,7 @@ var CampsitesService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "proto/campgroundspb/v1/api.proto",
+	Metadata: "campgroundspb/v1/api.proto",
 }
 
 const (
@@ -380,5 +380,5 @@ var BookingsService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "proto/campgroundspb/v1/api.proto",
+	Metadata: "campgroundspb/v1/api.proto",
 }

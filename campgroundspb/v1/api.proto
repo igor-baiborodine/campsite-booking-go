@@ -4,9 +4,6 @@ package campgroundspb.v1;
 
 option go_package = "campgroundspb/v1;campgroundspbv1";
 
-import "proto/googleapis/type/date.proto";
-import "proto/googleapis/actions/type/date_range.proto";
-
 service CampsitesService {
   rpc GetCampsites(GetCampsitesRequest) returns (GetCampsitesResponse) {};
   rpc CreateCampsite(CreateCampsiteRequest) returns (CreateCampsiteResponse) {};
@@ -51,7 +48,7 @@ message CreateBookingRequest {
   string campsite_id = 1;
   string email = 2;
   string full_name = 3;
-  google.actions.type.DateRange start_end = 4;
+  string start_date = 4;
 }
 
 message CreateBookingResponse {
@@ -72,11 +69,12 @@ message CancelBookingResponse {}
 
 message GetVacantDatesRequest {
   string campsite_id = 1;
-  google.actions.type.DateRange start_end = 2;
+  string start_date = 2;
+  string end_date = 3;
 }
 
 message GetVacantDatesResponse {
-  repeated google.type.Date vacant_dates = 1;
+  repeated string vacant_dates = 1;
 }
 
 // Message to define the structure of a campsite.
@@ -107,6 +105,8 @@ message Booking {
   string email = 3;
   // Full name of the person who made the booking.
   string full_name = 4;
-  // Booking date range (start and end date); end date exclusive
-  google.actions.type.DateRange booking_start_end = 5;
+  // Start date of the booking in ISO-8601 format (YYYY-MM-DD).
+  string start_date = 5;
+  // End date of the booking in ISO-8601 format (YYYY-MM-DD).
+  string end_date = 6;
 }
