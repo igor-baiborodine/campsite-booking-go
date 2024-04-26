@@ -1,15 +1,12 @@
 syntax = "proto3";
 
-package campgroundspb.v1;
+package campsites.v1;
 
-option go_package = "campgroundspb/v1;campgroundspbv1";
+option go_package = "campsites/v1;campsitesv1";
 
 service CampsitesService {
   rpc GetCampsites(GetCampsitesRequest) returns (GetCampsitesResponse) {};
   rpc CreateCampsite(CreateCampsiteRequest) returns (CreateCampsiteResponse) {};
-}
-
-service BookingsService {
   rpc GetBooking(GetBookingRequest) returns (GetBookingResponse) {};
   rpc CreateBooking(CreateBookingRequest) returns (CreateBookingResponse) {};
   rpc UpdateBooking(UpdateBookingRequest) returns (UpdateBookingResponse) {};
