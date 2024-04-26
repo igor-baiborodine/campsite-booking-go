@@ -4,7 +4,7 @@
 // - protoc             (unknown)
 // source: campsitespb/v1/api.proto
 
-package campsitesv1
+package campsitespbv1
 
 import (
 	context "context"
@@ -19,13 +19,13 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	CampsitesService_GetCampsites_FullMethodName   = "/campsites.v1.CampsitesService/GetCampsites"
-	CampsitesService_CreateCampsite_FullMethodName = "/campsites.v1.CampsitesService/CreateCampsite"
-	CampsitesService_GetBooking_FullMethodName     = "/campsites.v1.CampsitesService/GetBooking"
-	CampsitesService_CreateBooking_FullMethodName  = "/campsites.v1.CampsitesService/CreateBooking"
-	CampsitesService_UpdateBooking_FullMethodName  = "/campsites.v1.CampsitesService/UpdateBooking"
-	CampsitesService_CancelBooking_FullMethodName  = "/campsites.v1.CampsitesService/CancelBooking"
-	CampsitesService_GetVacantDates_FullMethodName = "/campsites.v1.CampsitesService/GetVacantDates"
+	CampsitesService_GetCampsites_FullMethodName   = "/campsitespb.v1.CampsitesService/GetCampsites"
+	CampsitesService_CreateCampsite_FullMethodName = "/campsitespb.v1.CampsitesService/CreateCampsite"
+	CampsitesService_GetBooking_FullMethodName     = "/campsitespb.v1.CampsitesService/GetBooking"
+	CampsitesService_CreateBooking_FullMethodName  = "/campsitespb.v1.CampsitesService/CreateBooking"
+	CampsitesService_UpdateBooking_FullMethodName  = "/campsitespb.v1.CampsitesService/UpdateBooking"
+	CampsitesService_CancelBooking_FullMethodName  = "/campsitespb.v1.CampsitesService/CancelBooking"
+	CampsitesService_GetVacantDates_FullMethodName = "/campsitespb.v1.CampsitesService/GetVacantDates"
 )
 
 // CampsitesServiceClient is the client API for CampsitesService service.
@@ -294,7 +294,7 @@ func _CampsitesService_GetVacantDates_Handler(srv interface{}, ctx context.Conte
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var CampsitesService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "campsites.v1.CampsitesService",
+	ServiceName: "campsitespb.v1.CampsitesService",
 	HandlerType: (*CampsitesServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
