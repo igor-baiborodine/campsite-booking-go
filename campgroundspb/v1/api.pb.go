@@ -848,9 +848,9 @@ type Booking struct {
 	Email string `protobuf:"bytes,3,opt,name=email,proto3" json:"email,omitempty"`
 	// Full name of the person who made the booking.
 	FullName string `protobuf:"bytes,4,opt,name=full_name,json=fullName,proto3" json:"full_name,omitempty"`
-	// Start date of the booking in ISO-8601 format(YYYY-MM-DD).
+	// Start date of the booking in ISO-8601 format (YYYY-MM-DD).
 	StartDate string `protobuf:"bytes,5,opt,name=start_date,json=startDate,proto3" json:"start_date,omitempty"`
-	// End date of the booking in ISO-8601 format(YYYY-MM-DD).
+	// End date of the booking in ISO-8601 format (YYYY-MM-DD).
 	EndDate string `protobuf:"bytes,6,opt,name=end_date,json=endDate,proto3" json:"end_date,omitempty"`
 }
 

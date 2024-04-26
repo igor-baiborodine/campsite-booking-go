@@ -50,6 +50,7 @@ func NewDB(c *pg.PostgresContainer) (*sql.DB, error) {
 	if err != nil {
 		return nil, err
 	}
+	// TODO: check if app's logger can be used here
 	goose.SetLogger(&log.SilentLogger{})
 	goose.SetBaseFS(migrations.FS)
 

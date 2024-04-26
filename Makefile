@@ -10,6 +10,5 @@ install-tools:
 .PHONY: generate
 generate:
 	echo running code generation
-	buf generate
-	mockery --quiet --dir ./internal -r --all --inpackage --case underscore
+	go generate
 	echo done
