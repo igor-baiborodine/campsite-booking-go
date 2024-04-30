@@ -25,8 +25,10 @@ func (h CancelBookingHandler) CancelBooking(ctx context.Context, cmd CancelBooki
 	if err != nil {
 		return err
 	}
-	if err := booking.Cancel(); err != nil {
-		return err
+	if !booking.Active {
+		return domain.ErrBookingAlreadyCancelled{BookingID: cmd.BookingID}
 	}
+	booking.Active = false
+
 	return h.bookings.Update(ctx, booking)
 }
