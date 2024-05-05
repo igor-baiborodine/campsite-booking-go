@@ -9,6 +9,7 @@ import (
 
 type (
 	CreateCampsite struct {
+		CampsiteId    string
 		CampsiteCode  string
 		Capacity      int32
 		DrinkingWater bool

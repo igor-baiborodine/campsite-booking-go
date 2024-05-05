@@ -46,6 +46,7 @@ message CreateBookingRequest {
   string email = 2;
   string full_name = 3;
   string start_date = 4;
+  string end_date = 5;
 }
 
 message CreateBookingResponse {

@@ -1,6 +1,8 @@
 package domain
 
-import "time"
+import (
+	"time"
+)
 
 type Booking struct {
 	// Persistence ID
@@ -15,8 +17,10 @@ type Booking struct {
 	Active     bool
 }
 
-func (b *Booking) Cancel() (err error) {
-	// TODO: add error handling for already canceled booking
-	b.Active = false
-	return nil
+func (b *Booking) BookingDates() []time.Time {
+	var dates []time.Time
+	for d := b.StartDate; d.Before(b.EndDate); d = d.AddDate(0, 0, 1) {
+		dates = append(dates, d)
+	}
+	return dates
 }
