@@ -3,68 +3,15 @@ package common_testing
 import (
 	"context"
 	"database/sql"
-	"github.com/google/uuid"
-	"github.com/stackus/errors"
 	"math"
 	"time"
 
-	"github.com/igor-baiborodine/campsite-booking-go/internal/postgres"
-
 	"github.com/go-faker/faker/v4"
+	"github.com/google/uuid"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/domain"
-
-	"github.com/igor-baiborodine/campsite-booking-go/db/migrations"
-	"github.com/igor-baiborodine/campsite-booking-go/internal/logger/log"
-	"github.com/pressly/goose/v3"
-	"github.com/testcontainers/testcontainers-go"
-	pg "github.com/testcontainers/testcontainers-go/modules/postgres"
-	"github.com/testcontainers/testcontainers-go/wait"
+	"github.com/igor-baiborodine/campsite-booking-go/internal/postgres"
+	"github.com/stackus/errors"
 )
-
-func NewPostgresContainer() (*pg.PostgresContainer, error) {
-	ctx := context.Background()
-	dbName := "test_campgrounds"
-	dbUser := "test_campgrounds_user"
-	dbPassword := "test_campgrounds_pass"
-
-	return pg.RunContainer(ctx,
-		testcontainers.WithImage("docker.io/postgres:15.2-alpine"),
-		pg.WithDatabase(dbName),
-		pg.WithUsername(dbUser),
-		pg.WithPassword(dbPassword),
-		testcontainers.WithWaitStrategy(
-			wait.ForLog("database system is ready to accept connections").
-				WithOccurrence(2).
-				WithStartupTimeout(5*time.Second)),
-	)
-}
-
-func NewDB(c *pg.PostgresContainer) (*sql.DB, error) {
-	ctx := context.Background()
-	connStr, err := c.ConnectionString(ctx, "sslmode=disable")
-	if err != nil {
-		return nil, err
-	}
-
-	db, err := sql.Open("pgx", connStr)
-	if err != nil {
-		return nil, err
-	}
-	// TODO: check if app's logger can be used here
-	goose.SetLogger(&log.SilentLogger{})
-	goose.SetBaseFS(migrations.FS)
-
-	err = goose.SetDialect("postgres")
-	if err != nil {
-		return nil, err
-	}
-
-	err = goose.Up(db, ".")
-	if err != nil {
-		return nil, err
-	}
-	return db, nil
-}
 
 func FakeCampsite() (*domain.Campsite, error) {
 	campsite := domain.Campsite{}
