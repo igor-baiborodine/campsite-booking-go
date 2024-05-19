@@ -16,6 +16,7 @@ import (
 	"github.com/igor-baiborodine/campsite-booking-go/internal/logger"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/postgres"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/waiter"
+	_ "github.com/jackc/pgx/v4/stdlib"
 	"github.com/pressly/goose/v3"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/grpc"
@@ -92,8 +93,11 @@ func (s *Service) MigrateDB(fs fs.FS) error {
 		return err
 	}
 	if err := goose.Up(s.db, "."); err != nil {
+		s.logger.Error("failed connect to DB", err)
 		return err
 	}
+	s.logger.Info("completed DB migration")
+
 	return nil
 }
 

@@ -2,7 +2,7 @@ package main
 
 import (
 	"database/sql"
-	"fmt"
+	"log/slog"
 	"os"
 
 	"github.com/igor-baiborodine/campsite-booking-go/db/migrations"
@@ -12,7 +12,7 @@ import (
 
 func main() {
 	if err := run(); err != nil {
-		fmt.Printf("campgrounds exitted abnormally: %s\n", err)
+		slog.Error("campgrounds exited abnormally:", err)
 		os.Exit(1)
 	}
 }
@@ -41,8 +41,8 @@ func run() (err error) {
 		return err
 	}
 
-	fmt.Println("started campgrounds service")
-	defer fmt.Println("stopped campgrounds service")
+	slog.Info("⚡ started campgrounds app")
+	defer slog.Error("stopped campgrounds app")
 
 	s.Waiter().Add(s.WaitForRPC)
 
