@@ -16,8 +16,8 @@ import (
 )
 
 const (
-	deleteCampsites    = "DELETE FROM campgrounds.campsites"
-	selectByCampsiteId = "SELECT campsite_code FROM campgrounds.campsites WHERE campsite_id = $1"
+	deleteCampsites    = "DELETE FROM campsites"
+	selectByCampsiteId = "SELECT campsite_code FROM campsites WHERE campsite_id = $1"
 )
 
 type campsiteSuite struct {

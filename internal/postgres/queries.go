@@ -2,7 +2,7 @@ package postgres
 
 const (
 	InsertCampsiteQuery = `
-		INSERT INTO campgrounds.campsites (
+		INSERT INTO campsites (
 			campsite_id, 
 			campsite_code, 
 			capacity, 
@@ -28,7 +28,7 @@ const (
 		    picnic_table, 
 		    fire_pit, 
 		    active
-		FROM campgrounds.campsites
+		FROM campsites
 	`
 
 	FindBookingByBookingIdQuery = `
@@ -41,12 +41,12 @@ const (
 		    start_date, 
 		    end_date, 
 		    active
-		FROM campgrounds.bookings
+		FROM bookings
 		WHERE booking_id = $1
 	`
 
 	InsertBookingQuery = `
-		INSERT INTO campgrounds.bookings (
+		INSERT INTO bookings (
 			booking_id, 
 			campsite_id, 
 			email, 
@@ -70,7 +70,7 @@ const (
 		    start_date, 
 		    end_date, 
 		    active
-		FROM campgrounds.bookings
+		FROM bookings
 		WHERE active = TRUE 
 		  	AND campsite_id = $1
 		  	AND ((start_date < $2 AND $3 < end_date) 
@@ -79,7 +79,7 @@ const (
 	`
 
 	UpdateBookingQuery = `
-		UPDATE campgrounds.bookings
+		UPDATE bookings
 		SET 
 		    campsite_id = $2, 
 		    email = $3, 

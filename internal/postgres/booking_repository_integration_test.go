@@ -6,12 +6,13 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"testing"
+	"time"
+
 	ct "github.com/igor-baiborodine/campsite-booking-go/internal/common_testing"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/domain"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/postgres"
 	"github.com/stackus/errors"
-	"testing"
-	"time"
 
 	_ "github.com/jackc/pgx/v4/stdlib"
 	"github.com/stretchr/testify/suite"
@@ -19,7 +20,7 @@ import (
 )
 
 const (
-	deleteBookings = "DELETE FROM campgrounds.bookings"
+	deleteBookings = "DELETE FROM bookings"
 )
 
 type bookingSuite struct {
