@@ -7,8 +7,3 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-E
   GRANT USAGE ON SCHEMA public TO campgrounds_user;
   GRANT CREATE, CONNECT ON DATABASE campgrounds TO campgrounds_user;
 EOSQL
-
-psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "campgrounds" <<-EOSQL
-  CREATE SCHEMA campgrounds;
-  GRANT CREATE, USAGE ON SCHEMA campgrounds TO campgrounds_user;
-EOSQL

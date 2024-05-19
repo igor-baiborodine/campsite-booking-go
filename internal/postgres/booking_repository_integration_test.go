@@ -20,7 +20,7 @@ import (
 )
 
 const (
-	deleteBookings = "DELETE FROM campgrounds.bookings"
+	deleteBookings = "DELETE FROM bookings"
 )
 
 type bookingSuite struct {
