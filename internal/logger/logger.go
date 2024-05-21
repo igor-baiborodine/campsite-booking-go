@@ -4,6 +4,8 @@ import (
 	std "log"
 	"log/slog"
 	"os"
+
+	"github.com/jba/slog/handlers/loghandler"
 )
 
 type SilentLogger struct{}
@@ -41,7 +43,7 @@ func New(cfg LogConfig) *slog.Logger {
 	case "production":
 		return slog.New(slog.NewJSONHandler(os.Stdout, opts))
 	default:
-		return slog.New(slog.NewTextHandler(os.Stdout, opts))
+		return slog.New(loghandler.New(os.Stdout, opts))
 	}
 }
 

@@ -64,7 +64,8 @@ func (s *Service) Logger() *slog.Logger {
 	return s.logger
 }
 
-func (s *Service) initDB() (err error) {
+func (s *Service) initDB() error {
+	var err error
 	s.db, err = sql.Open("pgx", s.cfg.PG.Conn)
 	return err
 }
@@ -93,15 +94,12 @@ func (s *Service) MigrateDB(fs fs.FS) error {
 		return err
 	}
 	if err := goose.Up(s.db, "."); err != nil {
-		s.logger.Error("failed connect to DB", err)
 		return err
 	}
-	s.logger.Info("completed DB migration")
-
 	return nil
 }
 
-func (s *Service) Startup() (err error) {
+func (s *Service) Startup() error {
 	// setup driven adapters
 	campsites := postgres.NewCampsiteRepository(s.db)
 	bookings := postgres.NewBookingRepository(s.db)
@@ -111,7 +109,7 @@ func (s *Service) Startup() (err error) {
 	if err := rpc.RegisterServer(app, s.rpc); err != nil {
 		return err
 	}
-	return
+	return nil
 }
 
 func (s *Service) WaitForRPC(ctx context.Context) error {
@@ -119,7 +117,6 @@ func (s *Service) WaitForRPC(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-
 	group, gCtx := errgroup.WithContext(ctx)
 	group.Go(func() error {
 		fmt.Println("rpc server started")
@@ -129,6 +126,7 @@ func (s *Service) WaitForRPC(ctx context.Context) error {
 		}
 		return nil
 	})
+
 	group.Go(func() error {
 		<-gCtx.Done()
 		fmt.Println("rpc server to be shutdown")

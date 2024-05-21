@@ -6,6 +6,7 @@ require (
 	github.com/go-faker/faker/v4 v4.4.1
 	github.com/google/uuid v1.6.0
 	github.com/jackc/pgx/v4 v4.18.1
+	github.com/jba/slog v0.2.0
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/pressly/goose/v3 v3.19.2
 	github.com/stackus/dotenv v0.0.0-20221206033122-02295762494b
