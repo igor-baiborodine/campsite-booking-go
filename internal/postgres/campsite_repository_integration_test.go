@@ -9,7 +9,6 @@ import (
 
 	ct "github.com/igor-baiborodine/campsite-booking-go/internal/common_testing"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/postgres"
-
 	_ "github.com/jackc/pgx/v4/stdlib"
 	"github.com/stretchr/testify/suite"
 	pg "github.com/testcontainers/testcontainers-go/modules/postgres"

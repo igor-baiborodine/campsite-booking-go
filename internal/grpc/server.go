@@ -2,6 +2,8 @@ package grpc
 
 import (
 	"context"
+	"time"
+
 	"github.com/google/uuid"
 	api "github.com/igor-baiborodine/campsite-booking-go/campsitespb/v1"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/application"
@@ -9,7 +11,6 @@ import (
 	"github.com/igor-baiborodine/campsite-booking-go/internal/application/queries"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/domain"
 	"google.golang.org/grpc"
-	"time"
 )
 
 type server struct {
@@ -19,7 +20,7 @@ type server struct {
 
 var _ api.CampsitesServiceServer = (*server)(nil)
 
-func RegisterServer(_ context.Context, app application.App, registrar grpc.ServiceRegistrar) error {
+func RegisterServer(app application.App, registrar grpc.ServiceRegistrar) error {
 	api.RegisterCampsitesServiceServer(registrar, server{app: app})
 	return nil
 }

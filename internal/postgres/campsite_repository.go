@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/igor-baiborodine/campsite-booking-go/internal/domain"
-
 	"github.com/stackus/errors"
 )
 

@@ -3,17 +3,18 @@ package queries_test
 import (
 	"context"
 	"errors"
+	"testing"
+	"time"
+
 	"github.com/igor-baiborodine/campsite-booking-go/internal/application/queries"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/domain"
 	"github.com/stretchr/testify/assert"
-	"testing"
-	"time"
 )
 
 func parseDateStr(t *testing.T, d string) time.Time {
 	date, err := time.Parse(time.DateOnly, d)
 	if err != nil {
-		t.Errorf("cannot parse date %s", d)
+		t.Errorf("failed to parse date %s", d)
 	}
 	return date
 }
@@ -47,7 +48,7 @@ func TestGetVacantDates(t *testing.T) {
 			},
 			on:      nil,
 			want:    nil,
-			wantErr: "cannot parse start date 9999-88-88",
+			wantErr: "failed to parse start date 9999-88-88",
 		},
 		"ParseEndDateError": {
 			args: args{
@@ -60,7 +61,7 @@ func TestGetVacantDates(t *testing.T) {
 			},
 			on:      nil,
 			want:    nil,
-			wantErr: "cannot parse end date 9999-99-99",
+			wantErr: "failed to parse end date 9999-99-99",
 		},
 		"FindForDateRangeError": {
 			args: args{

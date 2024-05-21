@@ -2,9 +2,10 @@ package queries
 
 import (
 	"context"
+	"time"
+
 	"github.com/igor-baiborodine/campsite-booking-go/internal/domain"
 	"github.com/stackus/errors"
-	"time"
 )
 
 type (
@@ -26,12 +27,12 @@ func NewGetVacantDatesHandler(bookings domain.BookingRepository) GetVacantDatesH
 func (h GetVacantDatesHandler) GetVacantDates(ctx context.Context, qry GetVacantDates) ([]string, error) {
 	startDate, err := time.Parse(time.DateOnly, qry.StartDate)
 	if err != nil {
-		return nil, errors.Wrapf(err, "cannot parse start date %s", qry.StartDate)
+		return nil, errors.Wrapf(err, "failed to parse start date %s", qry.StartDate)
 	}
 
 	endDate, err := time.Parse(time.DateOnly, qry.EndDate)
 	if err != nil {
-		return nil, errors.Wrapf(err, "cannot parse end date %s", qry.EndDate)
+		return nil, errors.Wrapf(err, "failed to parse end date %s", qry.EndDate)
 	}
 
 	datesForRange := make(map[time.Time]bool)
