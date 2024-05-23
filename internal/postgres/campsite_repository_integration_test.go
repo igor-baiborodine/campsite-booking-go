@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/igor-baiborodine/campsite-booking-go/internal/postgres"
-	"github.com/igor-baiborodine/campsite-booking-go/internal/testing/scaffold"
+	"github.com/igor-baiborodine/campsite-booking-go/internal/testing/bootstrap"
 	_ "github.com/jackc/pgx/v4/stdlib"
 	"github.com/stretchr/testify/suite"
 	pg "github.com/testcontainers/testcontainers-go/modules/postgres"
@@ -35,12 +35,12 @@ func TestCampsiteRepository(t *testing.T) {
 
 func (s *campsiteSuite) SetupSuite() {
 	var err error
-	s.container, err = scaffold.NewPostgresContainer()
+	s.container, err = bootstrap.NewPostgresContainer()
 	if err != nil {
 		s.T().Fatal(err)
 	}
 
-	s.db, err = scaffold.NewDB(s.container)
+	s.db, err = bootstrap.NewDB(s.container)
 	if err != nil {
 		s.T().Fatal(err)
 	}
@@ -68,10 +68,10 @@ func (s *campsiteSuite) TearDownTest() {
 
 func (s *campsiteSuite) TestCampsiteRepository_FindAll() {
 	// given
-	campsite, err := scaffold.FakeCampsite()
+	campsite, err := bootstrap.NewCampsite()
 	s.NoError(err)
 
-	err = scaffold.InsertCampsite(s.db, campsite)
+	err = bootstrap.InsertCampsite(s.db, campsite)
 	s.NoError(err)
 	// when
 	result, err := s.repo.FindAll(context.Background())
@@ -86,7 +86,7 @@ func (s *campsiteSuite) TestCampsiteRepository_FindAll() {
 
 func (s *campsiteSuite) TestCampsiteRepository_Insert() {
 	// given
-	campsite, err := scaffold.FakeCampsite()
+	campsite, err := bootstrap.NewCampsite()
 	s.NoError(err)
 	// when
 	s.NoError(s.repo.Insert(context.Background(), campsite))

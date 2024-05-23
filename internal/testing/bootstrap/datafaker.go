@@ -1,4 +1,4 @@
-package scaffold
+package bootstrap
 
 import (
 	"context"
@@ -13,7 +13,7 @@ import (
 	"github.com/stackus/errors"
 )
 
-func FakeCampsite() (*domain.Campsite, error) {
+func NewCampsite() (*domain.Campsite, error) {
 	campsite := domain.Campsite{}
 	err := faker.FakeData(&campsite)
 
@@ -27,11 +27,11 @@ func FakeCampsite() (*domain.Campsite, error) {
 	return &campsite, nil
 }
 
-func FakeBooking(campsiteId string) (*domain.Booking, error) {
-	return FakeBookingWithAddDays(campsiteId, 1, 2)
+func NewBooking(campsiteId string) (*domain.Booking, error) {
+	return NewBookingWithAddDays(campsiteId, 1, 2)
 }
 
-func FakeBookingWithAddDays(campsiteId string, startAddDays int, endAddDays int) (*domain.Booking, error) {
+func NewBookingWithAddDays(campsiteId string, startAddDays int, endAddDays int) (*domain.Booking, error) {
 	booking := domain.Booking{}
 	err := faker.FakeData(&booking)
 
