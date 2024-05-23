@@ -2,9 +2,9 @@ package commands
 
 import (
 	"context"
-	"github.com/google/uuid"
-	"github.com/igor-baiborodine/campsite-booking-go/internal/domain"
 	"time"
+
+	"github.com/igor-baiborodine/campsite-booking-go/internal/domain"
 )
 
 type (
@@ -28,7 +28,7 @@ func NewCreateBookingHandler(bookings domain.BookingRepository) CreateBookingHan
 
 func (h CreateBookingHandler) CreateBooking(ctx context.Context, cmd CreateBooking) error {
 	booking := domain.Booking{}
-	booking.BookingID = uuid.New().String()
+	booking.BookingID = cmd.BookingID
 	booking.CampsiteID = cmd.CampsiteID
 	booking.Email = cmd.Email
 	booking.FullName = cmd.FullName

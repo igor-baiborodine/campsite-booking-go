@@ -2,8 +2,9 @@ package commands
 
 import (
 	"context"
-	"github.com/igor-baiborodine/campsite-booking-go/internal/domain"
 	"time"
+
+	"github.com/igor-baiborodine/campsite-booking-go/internal/domain"
 )
 
 type (
