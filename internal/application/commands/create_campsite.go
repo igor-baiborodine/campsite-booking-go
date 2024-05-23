@@ -36,6 +36,7 @@ func (h CreateCampsiteHandler) CreateCampsite(ctx context.Context, cmd CreateCam
 	campsite.Restrooms = cmd.Restrooms
 	campsite.PicnicTable = cmd.PicnicTable
 	campsite.FirePit = cmd.FirePit
+	campsite.Active = true
 
 	return h.campsites.Insert(ctx, &campsite)
 }

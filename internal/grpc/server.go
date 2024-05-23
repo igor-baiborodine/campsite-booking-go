@@ -142,6 +142,7 @@ func (s server) campsiteFromDomain(campsite *domain.Campsite) *api.Campsite {
 		Restrooms:     campsite.Restrooms,
 		PicnicTable:   campsite.PicnicTable,
 		FirePit:       campsite.FirePit,
+		Active:        campsite.Active,
 	}
 }
 
