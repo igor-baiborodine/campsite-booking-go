@@ -28,7 +28,7 @@ func (r BookingRepository) Find(ctx context.Context, bookingID string) (*domain.
 
 	booking := &domain.Booking{}
 	if err = tx.QueryRowContext(
-		ctx, FindBookingByBookingIdQuery, bookingID,
+		ctx, FindBookingByBookingIDQuery, bookingID,
 	).Scan(
 		&booking.ID, &booking.BookingID, &booking.CampsiteID, &booking.Email,
 		&booking.FullName, &booking.StartDate, &booking.EndDate, &booking.Active,

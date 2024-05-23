@@ -16,7 +16,7 @@ import (
 
 const (
 	deleteCampsites    = "DELETE FROM campsites"
-	selectByCampsiteId = "SELECT campsite_code FROM campsites WHERE campsite_id = $1"
+	selectByCampsiteID = "SELECT campsite_code FROM campsites WHERE campsite_id = $1"
 )
 
 type campsiteSuite struct {
@@ -91,7 +91,7 @@ func (s *campsiteSuite) TestCampsiteRepository_Insert() {
 	// when
 	s.NoError(s.repo.Insert(context.Background(), campsite))
 	// then
-	row := s.db.QueryRow(selectByCampsiteId, campsite.CampsiteID)
+	row := s.db.QueryRow(selectByCampsiteID, campsite.CampsiteID)
 	if s.NoError(row.Err()) {
 		var campsiteCode string
 		s.NoError(row.Scan(&campsiteCode))

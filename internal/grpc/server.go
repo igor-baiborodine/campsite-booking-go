@@ -42,23 +42,22 @@ func (s server) GetCampsites(ctx context.Context, _ *api.GetCampsitesRequest) (*
 }
 
 func (s server) CreateCampsite(ctx context.Context, req *api.CreateCampsiteRequest) (*api.CreateCampsiteResponse, error) {
-	campsiteID := uuid.New().String()
-
-	err := s.app.CreateCampsite(ctx, commands.CreateCampsite{
-		CampsiteId:    campsiteID,
+	campsite := commands.CreateCampsite{
+		CampsiteID:    uuid.New().String(),
 		CampsiteCode:  req.CampsiteCode,
 		Capacity:      req.Capacity,
 		DrinkingWater: req.DrinkingWater,
 		Restrooms:     req.Restrooms,
 		PicnicTable:   req.PicnicTable,
 		FirePit:       req.FirePit,
-	})
+	}
+	err := s.app.CreateCampsite(ctx, campsite)
 	if err != nil {
 		return nil, err
 	}
 
 	return &api.CreateCampsiteResponse{
-		CampsiteId: campsiteID,
+		CampsiteId: campsite.CampsiteID,
 	}, nil
 }
 
