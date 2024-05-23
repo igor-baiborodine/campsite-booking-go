@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	api "github.com/igor-baiborodine/campsite-booking-go/campsitespb/v1"
+	api "github.com/igor-baiborodine/campsite-booking-go/campgroundspb/v1"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/application"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/application/commands"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/application/queries"
@@ -15,13 +15,13 @@ import (
 
 type server struct {
 	app application.App
-	api.UnimplementedCampsitesServiceServer
+	api.UnimplementedCampgroundsServiceServer
 }
 
-var _ api.CampsitesServiceServer = (*server)(nil)
+var _ api.CampgroundsServiceServer = (*server)(nil)
 
 func RegisterServer(app application.App, registrar grpc.ServiceRegistrar) error {
-	api.RegisterCampsitesServiceServer(registrar, server{app: app})
+	api.RegisterCampgroundsServiceServer(registrar, server{app: app})
 	return nil
 }
 
