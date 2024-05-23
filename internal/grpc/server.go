@@ -92,14 +92,15 @@ func (s server) CreateBooking(ctx context.Context, req *api.CreateBookingRequest
 }
 
 func (s server) UpdateBooking(ctx context.Context, req *api.UpdateBookingRequest) (*api.UpdateBookingResponse, error) {
-	err := s.app.UpdateBooking(ctx, commands.UpdateBooking{
+	booking := commands.UpdateBooking{
 		BookingID:  req.Booking.BookingId,
 		CampsiteID: req.Booking.CampsiteId,
 		Email:      req.Booking.Email,
 		FullName:   req.Booking.FullName,
 		StartDate:  req.Booking.StartDate,
 		EndDate:    req.Booking.EndDate,
-	})
+	}
+	err := s.app.UpdateBooking(ctx, booking)
 	if err != nil {
 		return nil, err
 	}
@@ -107,9 +108,10 @@ func (s server) UpdateBooking(ctx context.Context, req *api.UpdateBookingRequest
 }
 
 func (s server) CancelBooking(ctx context.Context, req *api.CancelBookingRequest) (*api.CancelBookingResponse, error) {
-	err := s.app.CancelBooking(ctx, commands.CancelBooking{
+	booking := commands.CancelBooking{
 		BookingID: req.GetBookingId(),
-	})
+	}
+	err := s.app.CancelBooking(ctx, booking)
 	if err != nil {
 		return nil, err
 	}
