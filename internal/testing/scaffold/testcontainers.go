@@ -1,4 +1,4 @@
-package common_testing
+package scaffold
 
 import (
 	"context"
