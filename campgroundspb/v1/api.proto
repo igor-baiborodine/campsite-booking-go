@@ -109,4 +109,6 @@ message Booking {
   string start_date = 5;
   // End date of the booking in ISO-8601 format (YYYY-MM-DD).
   string end_date = 6;
+  // Indicates if the booking is active.
+  bool active = 8;
 }

@@ -154,5 +154,6 @@ func (s server) bookingFromDomain(booking *domain.Booking) *api.Booking {
 		FullName:   booking.FullName,
 		StartDate:  booking.StartDate.Format(time.DateOnly),
 		EndDate:    booking.EndDate.Format(time.DateOnly),
+		Active:     booking.Active,
 	}
 }
