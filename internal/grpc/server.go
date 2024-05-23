@@ -73,22 +73,21 @@ func (s server) GetBooking(ctx context.Context, req *api.GetBookingRequest) (*ap
 }
 
 func (s server) CreateBooking(ctx context.Context, req *api.CreateBookingRequest) (*api.CreateBookingResponse, error) {
-	bookingID := uuid.New().String()
-
-	err := s.app.CreateBooking(ctx, commands.CreateBooking{
-		BookingID:  bookingID,
+	booking := commands.CreateBooking{
+		BookingID:  uuid.New().String(),
 		CampsiteID: req.CampsiteId,
 		Email:      req.Email,
 		FullName:   req.FullName,
 		StartDate:  req.StartDate,
 		EndDate:    req.EndDate,
-	})
+	}
+	err := s.app.CreateBooking(ctx, booking)
 	if err != nil {
 		return nil, err
 	}
 
 	return &api.CreateBookingResponse{
-		BookingId: bookingID,
+		BookingId: booking.BookingID,
 	}, nil
 }
 

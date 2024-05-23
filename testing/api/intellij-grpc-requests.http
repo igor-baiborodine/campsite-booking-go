@@ -1,12 +1,12 @@
 ###
 GRPC localhost:8085/campgroundspb.v1.CampgroundsService/GetCampsites
+Content-Type: application/json
 
 {}
 
-<> 2024-05-23T152334.OK.json
-
 ###
 GRPC localhost:8085/campgroundspb.v1.CampgroundsService/CreateCampsite
+Content-Type: application/json
 
 {
   "campsite_code": "CAMP09",
@@ -15,4 +15,24 @@ GRPC localhost:8085/campgroundspb.v1.CampgroundsService/CreateCampsite
   "drinking_water": true,
   "picnic_table": true,
   "fire_pit": true
+}
+
+###
+GRPC localhost:8085/campgroundspb.v1.CampgroundsService/GetBooking
+Content-Type: application/json
+
+{
+  "booking_id": "ddd1b17a-9baf-403a-98ac-ef36b643c04d"
+}
+
+###
+GRPC localhost:8085/campgroundspb.v1.CampgroundsService/CreateBooking
+Content-Type: application/json
+
+{
+  "campsite_id": "b5839e4a-1dab-4c0a-8aa5-6a4e6910ce46",
+  "email": "john.smith@example.com",
+  "full_name": "John Smith",
+  "start_date": "2024-05-30",
+  "end_date": "2024-05-31"
 }

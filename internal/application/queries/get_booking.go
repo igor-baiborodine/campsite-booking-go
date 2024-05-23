@@ -2,6 +2,7 @@ package queries
 
 import (
 	"context"
+
 	"github.com/igor-baiborodine/campsite-booking-go/internal/domain"
 )
 
