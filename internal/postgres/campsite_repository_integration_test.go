@@ -7,8 +7,8 @@ import (
 	"database/sql"
 	"testing"
 
-	ct "github.com/igor-baiborodine/campsite-booking-go/internal/common_testing"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/postgres"
+	"github.com/igor-baiborodine/campsite-booking-go/internal/testing/bootstrap"
 	_ "github.com/jackc/pgx/v4/stdlib"
 	"github.com/stretchr/testify/suite"
 	pg "github.com/testcontainers/testcontainers-go/modules/postgres"
@@ -16,7 +16,7 @@ import (
 
 const (
 	deleteCampsites    = "DELETE FROM campsites"
-	selectByCampsiteId = "SELECT campsite_code FROM campsites WHERE campsite_id = $1"
+	selectByCampsiteID = "SELECT campsite_code FROM campsites WHERE campsite_id = $1"
 )
 
 type campsiteSuite struct {
@@ -35,12 +35,12 @@ func TestCampsiteRepository(t *testing.T) {
 
 func (s *campsiteSuite) SetupSuite() {
 	var err error
-	s.container, err = ct.NewPostgresContainer()
+	s.container, err = bootstrap.NewPostgresContainer()
 	if err != nil {
 		s.T().Fatal(err)
 	}
 
-	s.db, err = ct.NewDB(s.container)
+	s.db, err = bootstrap.NewDB(s.container)
 	if err != nil {
 		s.T().Fatal(err)
 	}
@@ -68,10 +68,10 @@ func (s *campsiteSuite) TearDownTest() {
 
 func (s *campsiteSuite) TestCampsiteRepository_FindAll() {
 	// given
-	campsite, err := ct.FakeCampsite()
+	campsite, err := bootstrap.NewCampsite()
 	s.NoError(err)
 
-	err = ct.InsertCampsite(s.db, campsite)
+	err = bootstrap.InsertCampsite(s.db, campsite)
 	s.NoError(err)
 	// when
 	result, err := s.repo.FindAll(context.Background())
@@ -86,12 +86,12 @@ func (s *campsiteSuite) TestCampsiteRepository_FindAll() {
 
 func (s *campsiteSuite) TestCampsiteRepository_Insert() {
 	// given
-	campsite, err := ct.FakeCampsite()
+	campsite, err := bootstrap.NewCampsite()
 	s.NoError(err)
 	// when
 	s.NoError(s.repo.Insert(context.Background(), campsite))
 	// then
-	row := s.db.QueryRow(selectByCampsiteId, campsite.CampsiteID)
+	row := s.db.QueryRow(selectByCampsiteID, campsite.CampsiteID)
 	if s.NoError(row.Err()) {
 		var campsiteCode string
 		s.NoError(row.Scan(&campsiteCode))

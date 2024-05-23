@@ -1,4 +1,4 @@
-package common_testing
+package bootstrap
 
 import (
 	"context"
@@ -9,21 +9,21 @@ import (
 	"github.com/igor-baiborodine/campsite-booking-go/internal/logger"
 	"github.com/pressly/goose/v3"
 	"github.com/testcontainers/testcontainers-go"
-	pg "github.com/testcontainers/testcontainers-go/modules/postgres"
+	"github.com/testcontainers/testcontainers-go/modules/postgres"
 	"github.com/testcontainers/testcontainers-go/wait"
 )
 
-func NewPostgresContainer() (*pg.PostgresContainer, error) {
+func NewPostgresContainer() (*postgres.PostgresContainer, error) {
 	ctx := context.Background()
 	dbName := "test_campgrounds"
 	dbUser := "test_campgrounds_user"
 	dbPassword := "test_campgrounds_pass"
 
-	return pg.RunContainer(ctx,
+	return postgres.RunContainer(ctx,
 		testcontainers.WithImage("docker.io/postgres:15.2-alpine"),
-		pg.WithDatabase(dbName),
-		pg.WithUsername(dbUser),
-		pg.WithPassword(dbPassword),
+		postgres.WithDatabase(dbName),
+		postgres.WithUsername(dbUser),
+		postgres.WithPassword(dbPassword),
 		testcontainers.WithWaitStrategy(
 			wait.ForLog("database system is ready to accept connections").
 				WithOccurrence(2).
@@ -31,7 +31,7 @@ func NewPostgresContainer() (*pg.PostgresContainer, error) {
 	)
 }
 
-func NewDB(c *pg.PostgresContainer) (*sql.DB, error) {
+func NewDB(c *postgres.PostgresContainer) (*sql.DB, error) {
 	ctx := context.Background()
 	connStr, err := c.ConnectionString(ctx, "sslmode=disable")
 	if err != nil {

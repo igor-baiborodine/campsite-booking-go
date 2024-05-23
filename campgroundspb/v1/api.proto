@@ -91,6 +91,8 @@ message Campsite {
   bool picnic_table = 6;
   // Indicates if the campsite has a fire pit.
   bool fire_pit = 7;
+  // Indicates if the campsite is active.
+  bool active = 8;
 }
 
 // Message to define the structure of a booking.
@@ -107,4 +109,6 @@ message Booking {
   string start_date = 5;
   // End date of the booking in ISO-8601 format (YYYY-MM-DD).
   string end_date = 6;
+  // Indicates if the booking is active.
+  bool active = 8;
 }

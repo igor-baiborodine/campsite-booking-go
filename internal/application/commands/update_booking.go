@@ -2,8 +2,9 @@ package commands
 
 import (
 	"context"
-	"github.com/igor-baiborodine/campsite-booking-go/internal/domain"
 	"time"
+
+	"github.com/igor-baiborodine/campsite-booking-go/internal/domain"
 )
 
 type (
@@ -26,27 +27,37 @@ func NewUpdateBookingHandler(bookings domain.BookingRepository) UpdateBookingHan
 }
 
 func (h UpdateBookingHandler) UpdateBooking(ctx context.Context, cmd UpdateBooking) error {
-	_, err := h.bookings.Find(ctx, cmd.BookingID)
+	booking, err := h.bookings.Find(ctx, cmd.BookingID)
 	if err != nil {
 		return err
 	}
-	booking := domain.Booking{}
-	booking.BookingID = cmd.BookingID
-	booking.CampsiteID = cmd.CampsiteID
-	booking.Email = cmd.Email
-	booking.FullName = cmd.FullName
-
-	startDate, err := time.Parse(time.DateOnly, cmd.StartDate)
-	if err != nil {
-		return err
+	if !booking.Active {
+		return domain.ErrBookingAlreadyCancelled{BookingID: cmd.BookingID}
 	}
-	booking.StartDate = startDate
 
-	endDate, err := time.Parse(time.DateOnly, cmd.EndDate)
-	if err != nil {
-		return err
+	if cmd.CampsiteID != "" {
+		booking.CampsiteID = cmd.CampsiteID
 	}
-	booking.EndDate = endDate
+	if cmd.Email != "" {
+		booking.Email = cmd.Email
+	}
+	if cmd.FullName != "" {
+		booking.FullName = cmd.FullName
+	}
 
-	return h.bookings.Update(ctx, &booking)
+	if cmd.StartDate != "" && cmd.EndDate != "" {
+		startDate, err := time.Parse(time.DateOnly, cmd.StartDate)
+		if err != nil {
+			return err
+		}
+		booking.StartDate = startDate
+
+		endDate, err := time.Parse(time.DateOnly, cmd.EndDate)
+		if err != nil {
+			return err
+		}
+		booking.EndDate = endDate
+	}
+
+	return h.bookings.Update(ctx, booking)
 }

@@ -42,23 +42,22 @@ func (s server) GetCampsites(ctx context.Context, _ *api.GetCampsitesRequest) (*
 }
 
 func (s server) CreateCampsite(ctx context.Context, req *api.CreateCampsiteRequest) (*api.CreateCampsiteResponse, error) {
-	campsiteID := uuid.New().String()
-
-	err := s.app.CreateCampsite(ctx, commands.CreateCampsite{
-		CampsiteId:    campsiteID,
+	campsite := commands.CreateCampsite{
+		CampsiteID:    uuid.New().String(),
 		CampsiteCode:  req.CampsiteCode,
 		Capacity:      req.Capacity,
 		DrinkingWater: req.DrinkingWater,
 		Restrooms:     req.Restrooms,
 		PicnicTable:   req.PicnicTable,
 		FirePit:       req.FirePit,
-	})
+	}
+	err := s.app.CreateCampsite(ctx, campsite)
 	if err != nil {
 		return nil, err
 	}
 
 	return &api.CreateCampsiteResponse{
-		CampsiteId: campsiteID,
+		CampsiteId: campsite.CampsiteID,
 	}, nil
 }
 
@@ -74,34 +73,34 @@ func (s server) GetBooking(ctx context.Context, req *api.GetBookingRequest) (*ap
 }
 
 func (s server) CreateBooking(ctx context.Context, req *api.CreateBookingRequest) (*api.CreateBookingResponse, error) {
-	bookingID := uuid.New().String()
-
-	err := s.app.CreateBooking(ctx, commands.CreateBooking{
-		BookingID:  bookingID,
+	booking := commands.CreateBooking{
+		BookingID:  uuid.New().String(),
 		CampsiteID: req.CampsiteId,
 		Email:      req.Email,
 		FullName:   req.FullName,
 		StartDate:  req.StartDate,
 		EndDate:    req.EndDate,
-	})
+	}
+	err := s.app.CreateBooking(ctx, booking)
 	if err != nil {
 		return nil, err
 	}
 
 	return &api.CreateBookingResponse{
-		BookingId: bookingID,
+		BookingId: booking.BookingID,
 	}, nil
 }
 
 func (s server) UpdateBooking(ctx context.Context, req *api.UpdateBookingRequest) (*api.UpdateBookingResponse, error) {
-	err := s.app.UpdateBooking(ctx, commands.UpdateBooking{
+	booking := commands.UpdateBooking{
 		BookingID:  req.Booking.BookingId,
 		CampsiteID: req.Booking.CampsiteId,
 		Email:      req.Booking.Email,
 		FullName:   req.Booking.FullName,
 		StartDate:  req.Booking.StartDate,
 		EndDate:    req.Booking.EndDate,
-	})
+	}
+	err := s.app.UpdateBooking(ctx, booking)
 	if err != nil {
 		return nil, err
 	}
@@ -109,9 +108,10 @@ func (s server) UpdateBooking(ctx context.Context, req *api.UpdateBookingRequest
 }
 
 func (s server) CancelBooking(ctx context.Context, req *api.CancelBookingRequest) (*api.CancelBookingResponse, error) {
-	err := s.app.CancelBooking(ctx, commands.CancelBooking{
+	booking := commands.CancelBooking{
 		BookingID: req.GetBookingId(),
-	})
+	}
+	err := s.app.CancelBooking(ctx, booking)
 	if err != nil {
 		return nil, err
 	}
@@ -142,6 +142,7 @@ func (s server) campsiteFromDomain(campsite *domain.Campsite) *api.Campsite {
 		Restrooms:     campsite.Restrooms,
 		PicnicTable:   campsite.PicnicTable,
 		FirePit:       campsite.FirePit,
+		Active:        campsite.Active,
 	}
 }
 
@@ -153,5 +154,6 @@ func (s server) bookingFromDomain(booking *domain.Booking) *api.Booking {
 		FullName:   booking.FullName,
 		StartDate:  booking.StartDate.Format(time.DateOnly),
 		EndDate:    booking.EndDate.Format(time.DateOnly),
+		Active:     booking.Active,
 	}
 }

@@ -9,9 +9,9 @@ import (
 	"testing"
 	"time"
 
-	ct "github.com/igor-baiborodine/campsite-booking-go/internal/common_testing"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/domain"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/postgres"
+	"github.com/igor-baiborodine/campsite-booking-go/internal/testing/bootstrap"
 	"github.com/stackus/errors"
 
 	_ "github.com/jackc/pgx/v4/stdlib"
@@ -39,12 +39,12 @@ func TestBookingRepository(t *testing.T) {
 
 func (s *bookingSuite) SetupSuite() {
 	var err error
-	s.container, err = ct.NewPostgresContainer()
+	s.container, err = bootstrap.NewPostgresContainer()
 	if err != nil {
 		s.T().Fatal(err)
 	}
 
-	s.db, err = ct.NewDB(s.container)
+	s.db, err = bootstrap.NewDB(s.container)
 	if err != nil {
 		s.T().Fatal(err)
 	}
@@ -77,16 +77,16 @@ func (s *bookingSuite) TearDownTest() {
 
 func (s *bookingSuite) TestBookingRepository_Find_Success() {
 	// given
-	campsite, err := ct.FakeCampsite()
+	campsite, err := bootstrap.NewCampsite()
 	s.NoError(err)
 
-	err = ct.InsertCampsite(s.db, campsite)
+	err = bootstrap.InsertCampsite(s.db, campsite)
 	s.NoError(err)
 
-	booking, err := ct.FakeBooking(campsite.CampsiteID)
+	booking, err := bootstrap.NewBooking(campsite.CampsiteID)
 	s.NoError(err)
 
-	err = ct.InsertBooking(s.db, booking)
+	err = bootstrap.InsertBooking(s.db, booking)
 	s.NoError(err)
 	// when
 	result, err := s.repo.Find(context.Background(), booking.BookingID)
@@ -134,18 +134,18 @@ func (s *bookingSuite) TestBookingRepository_FindForDateRange_Success() {
 
 	for name, test := range tests {
 		s.T().Run(name, func(t *testing.T) {
-			campsite, err := ct.FakeCampsite()
+			campsite, err := bootstrap.NewCampsite()
 			s.NoError(err)
 
-			err = ct.InsertCampsite(s.db, campsite)
+			err = bootstrap.InsertCampsite(s.db, campsite)
 			s.NoError(err)
 
-			booking, err := ct.FakeBooking(campsite.CampsiteID)
+			booking, err := bootstrap.NewBooking(campsite.CampsiteID)
 			s.NoError(err)
 			booking.StartDate, _ = time.Parse(time.DateOnly, test.s)
 			booking.EndDate, _ = time.Parse(time.DateOnly, test.e)
 
-			err = ct.InsertBooking(s.db, booking)
+			err = bootstrap.InsertBooking(s.db, booking)
 			s.NoError(err)
 			start, _ := time.Parse(time.DateOnly, test.rs)
 			end, _ := time.Parse(time.DateOnly, test.re)
@@ -162,19 +162,19 @@ func (s *bookingSuite) TestBookingRepository_FindForDateRange_Success() {
 
 func (s *bookingSuite) TestBookingRepository_Insert_Success() {
 	// given
-	campsite, err := ct.FakeCampsite()
+	campsite, err := bootstrap.NewCampsite()
 	s.NoError(err)
 
-	err = ct.InsertCampsite(s.db, campsite)
+	err = bootstrap.InsertCampsite(s.db, campsite)
 	s.NoError(err)
 
-	booking, err := ct.FakeBooking(campsite.CampsiteID)
+	booking, err := bootstrap.NewBooking(campsite.CampsiteID)
 	s.NoError(err)
 	// when
 	err = s.repo.Insert(context.Background(), booking)
 	// then
 	if s.NoError(err) {
-		found, err := ct.FindBooking(s.db, booking.BookingID)
+		found, err := bootstrap.FindBooking(s.db, booking.BookingID)
 		s.NoError(err)
 		s.NotNil(found)
 		s.NotEqual(booking.ID, found.ID)
@@ -185,19 +185,19 @@ func (s *bookingSuite) TestBookingRepository_Insert_Success() {
 
 func (s *bookingSuite) TestBookingRepository_Insert_ErrBookingDatesNotAvailable() {
 	// given
-	campsite, err := ct.FakeCampsite()
+	campsite, err := bootstrap.NewCampsite()
 	s.NoError(err)
 
-	err = ct.InsertCampsite(s.db, campsite)
+	err = bootstrap.InsertCampsite(s.db, campsite)
 	s.NoError(err)
 
-	booking1, err := ct.FakeBooking(campsite.CampsiteID)
+	booking1, err := bootstrap.NewBooking(campsite.CampsiteID)
 	s.NoError(err)
 
-	err = ct.InsertBooking(s.db, booking1)
+	err = bootstrap.InsertBooking(s.db, booking1)
 	s.NoError(err)
 
-	booking2, err := ct.FakeBooking(campsite.CampsiteID)
+	booking2, err := bootstrap.NewBooking(campsite.CampsiteID)
 	s.NoError(err)
 	booking2.StartDate = booking1.StartDate
 	booking2.EndDate = booking1.EndDate
@@ -217,28 +217,28 @@ func (s *bookingSuite) TestBookingRepository_Insert_ErrBookingDatesNotAvailable(
 
 func (s *bookingSuite) TestBookingRepository_Update_Success() {
 	// given
-	campsite1, err := ct.FakeCampsite()
+	campsite1, err := bootstrap.NewCampsite()
 	s.NoError(err)
 
-	err = ct.InsertCampsite(s.db, campsite1)
+	err = bootstrap.InsertCampsite(s.db, campsite1)
 	s.NoError(err)
 
-	booking, err := ct.FakeBookingWithAddDays(campsite1.CampsiteID, 1, 2)
+	booking, err := bootstrap.NewBookingWithAddDays(campsite1.CampsiteID, 1, 2)
 	s.NoError(err)
 
-	err = ct.InsertBooking(s.db, booking)
+	err = bootstrap.InsertBooking(s.db, booking)
 	s.NoError(err)
 
-	campsite2, err := ct.FakeCampsite()
+	campsite2, err := bootstrap.NewCampsite()
 	s.NoError(err)
 
-	err = ct.InsertCampsite(s.db, campsite2)
+	err = bootstrap.InsertCampsite(s.db, campsite2)
 	s.NoError(err)
 
-	existingBooking, err := ct.FindBooking(s.db, booking.BookingID)
+	existingBooking, err := bootstrap.FindBooking(s.db, booking.BookingID)
 	s.NoError(err)
 
-	bookingToUpdate, err := ct.FakeBookingWithAddDays(campsite2.CampsiteID, 2, 3)
+	bookingToUpdate, err := bootstrap.NewBookingWithAddDays(campsite2.CampsiteID, 2, 3)
 	s.NoError(err)
 
 	bookingToUpdate.BookingID = existingBooking.BookingID
@@ -247,7 +247,7 @@ func (s *bookingSuite) TestBookingRepository_Update_Success() {
 	err = s.repo.Update(context.Background(), bookingToUpdate)
 	// then
 	if s.NoError(err) {
-		updatedBooking, err := ct.FindBooking(s.db, bookingToUpdate.BookingID)
+		updatedBooking, err := bootstrap.FindBooking(s.db, bookingToUpdate.BookingID)
 		s.NoError(err)
 		s.NotNil(updatedBooking)
 		s.Equal(existingBooking.ID, updatedBooking.ID)
@@ -263,22 +263,22 @@ func (s *bookingSuite) TestBookingRepository_Update_Success() {
 
 func (s *bookingSuite) TestBookingRepository_Update_ErrBookingDatesNotAvailable() {
 	// given
-	campsite, err := ct.FakeCampsite()
+	campsite, err := bootstrap.NewCampsite()
 	s.NoError(err)
 
-	err = ct.InsertCampsite(s.db, campsite)
+	err = bootstrap.InsertCampsite(s.db, campsite)
 	s.NoError(err)
 
-	booking1, err := ct.FakeBookingWithAddDays(campsite.CampsiteID, 1, 2)
+	booking1, err := bootstrap.NewBookingWithAddDays(campsite.CampsiteID, 1, 2)
 	s.NoError(err)
 
-	err = ct.InsertBooking(s.db, booking1)
+	err = bootstrap.InsertBooking(s.db, booking1)
 	s.NoError(err)
 
-	booking2, err := ct.FakeBookingWithAddDays(campsite.CampsiteID, 2, 3)
+	booking2, err := bootstrap.NewBookingWithAddDays(campsite.CampsiteID, 2, 3)
 	s.NoError(err)
 
-	err = ct.InsertBooking(s.db, booking2)
+	err = bootstrap.InsertBooking(s.db, booking2)
 	s.NoError(err)
 	booking2.StartDate = booking1.StartDate
 	booking2.EndDate = booking1.EndDate

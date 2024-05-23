@@ -1,4 +1,4 @@
-package common_testing
+package bootstrap
 
 import (
 	"context"
@@ -13,7 +13,7 @@ import (
 	"github.com/stackus/errors"
 )
 
-func FakeCampsite() (*domain.Campsite, error) {
+func NewCampsite() (*domain.Campsite, error) {
 	campsite := domain.Campsite{}
 	err := faker.FakeData(&campsite)
 
@@ -27,11 +27,11 @@ func FakeCampsite() (*domain.Campsite, error) {
 	return &campsite, nil
 }
 
-func FakeBooking(campsiteId string) (*domain.Booking, error) {
-	return FakeBookingWithAddDays(campsiteId, 1, 2)
+func NewBooking(campsiteID string) (*domain.Booking, error) {
+	return NewBookingWithAddDays(campsiteID, 1, 2)
 }
 
-func FakeBookingWithAddDays(campsiteId string, startAddDays int, endAddDays int) (*domain.Booking, error) {
+func NewBookingWithAddDays(campsiteID string, startAddDays int, endAddDays int) (*domain.Booking, error) {
 	booking := domain.Booking{}
 	err := faker.FakeData(&booking)
 
@@ -42,7 +42,7 @@ func FakeBookingWithAddDays(campsiteId string, startAddDays int, endAddDays int)
 
 	booking.ID = math.MaxInt64
 	booking.BookingID = uuid.New().String()
-	booking.CampsiteID = campsiteId
+	booking.CampsiteID = campsiteID
 	booking.StartDate = now.AddDate(0, 0, startAddDays)
 	booking.EndDate = now.AddDate(0, 0, endAddDays)
 	booking.Active = true
@@ -69,7 +69,7 @@ func InsertBooking(db *sql.DB, b *domain.Booking) error {
 func FindBooking(db *sql.DB, bookingID string) (*domain.Booking, error) {
 	booking := &domain.Booking{}
 	if err := db.QueryRowContext(
-		context.Background(), postgres.FindBookingByBookingIdQuery, bookingID,
+		context.Background(), postgres.FindBookingByBookingIDQuery, bookingID,
 	).Scan(
 		&booking.ID, &booking.BookingID, &booking.CampsiteID, &booking.Email,
 		&booking.FullName, &booking.StartDate, &booking.EndDate, &booking.Active,

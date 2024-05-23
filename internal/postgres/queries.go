@@ -31,7 +31,7 @@ const (
 		FROM campsites
 	`
 
-	FindBookingByBookingIdQuery = `
+	FindBookingByBookingIDQuery = `
 		SELECT 
 		    id,
 		    booking_id, 

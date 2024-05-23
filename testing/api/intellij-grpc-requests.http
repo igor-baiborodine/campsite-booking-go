@@ -1,0 +1,67 @@
+###
+GRPC localhost:8085/campgroundspb.v1.CampgroundsService/GetCampsites
+Content-Type: application/json
+
+{}
+
+###
+GRPC localhost:8085/campgroundspb.v1.CampgroundsService/CreateCampsite
+Content-Type: application/json
+
+{
+  "campsite_code": "CAMP09",
+  "capacity": 12,
+  "restrooms": true,
+  "drinking_water": true,
+  "picnic_table": true,
+  "fire_pit": true
+}
+
+###
+GRPC localhost:8085/campgroundspb.v1.CampgroundsService/GetBooking
+Content-Type: application/json
+
+{
+  "booking_id": "ddd1b17a-9baf-403a-98ac-ef36b643c04d"
+}
+
+###
+GRPC localhost:8085/campgroundspb.v1.CampgroundsService/CreateBooking
+Content-Type: application/json
+
+{
+  "campsite_id": "b5839e4a-1dab-4c0a-8aa5-6a4e6910ce46",
+  "email": "john.smith@example.com",
+  "full_name": "John Smith",
+  "start_date": "2024-05-30",
+  "end_date": "2024-05-31"
+}
+
+###
+GRPC localhost:8085/campgroundspb.v1.CampgroundsService/UpdateBooking
+Content-Type: application/json
+
+{
+  "booking": {
+    "booking_id": "ddd1b17a-9baf-403a-98ac-ef36b643c04d",
+    "full_name": "Ann Patterson"
+  }
+}
+
+###
+GRPC localhost:8085/campgroundspb.v1.CampgroundsService/CancelBooking
+Content-Type: application/json
+
+{
+  "booking_id": "ddd1b17a-9baf-403a-98ac-ef36b643c04d"
+}
+
+###
+GRPC localhost:8085/campgroundspb.v1.CampgroundsService/GetVacantDates
+Content-Type: application/json
+
+{
+  "campsite_id": "5bccd830-b78c-4a89-8f0b-022e53e0d7d0",
+  "start_date": "2024-05-23",
+  "end_date": "2024-05-27"
+}
