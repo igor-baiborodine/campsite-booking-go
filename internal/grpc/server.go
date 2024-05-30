@@ -11,6 +11,8 @@ import (
 	"github.com/igor-baiborodine/campsite-booking-go/internal/application/queries"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/domain"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type server struct {
@@ -33,7 +35,7 @@ func (s server) GetCampsites(ctx context.Context, _ *api.GetCampsitesRequest) (*
 
 	var protoCampsites []*api.Campsite
 	for _, campsite := range campsites {
-		protoCampsites = append(protoCampsites, s.campsiteFromDomain(campsite))
+		protoCampsites = append(protoCampsites, campsiteFromDomain(campsite))
 	}
 
 	return &api.GetCampsitesResponse{
@@ -64,11 +66,11 @@ func (s server) CreateCampsite(ctx context.Context, req *api.CreateCampsiteReque
 func (s server) GetBooking(ctx context.Context, req *api.GetBookingRequest) (*api.GetBookingResponse, error) {
 	booking, err := s.app.GetBooking(ctx, queries.GetBooking{BookingID: req.BookingId})
 	if err != nil {
-		return nil, err
+		return nil, handleDomainError(err)
 	}
 
 	return &api.GetBookingResponse{
-		Booking: s.bookingFromDomain(booking),
+		Booking: bookingFromDomain(booking),
 	}, nil
 }
 
@@ -81,13 +83,13 @@ func (s server) CreateBooking(ctx context.Context, req *api.CreateBookingRequest
 		StartDate:  req.StartDate,
 		EndDate:    req.EndDate,
 	}
-	err := s.app.CreateBooking(ctx, booking)
+	createdBooking, err := s.app.CreateBooking(ctx, booking)
 	if err != nil {
-		return nil, err
+		return nil, handleDomainError(err)
 	}
 
 	return &api.CreateBookingResponse{
-		BookingId: booking.BookingID,
+		BookingId: createdBooking.BookingID,
 	}, nil
 }
 
@@ -102,7 +104,7 @@ func (s server) UpdateBooking(ctx context.Context, req *api.UpdateBookingRequest
 	}
 	err := s.app.UpdateBooking(ctx, booking)
 	if err != nil {
-		return nil, err
+		return nil, handleDomainError(err)
 	}
 	return &api.UpdateBookingResponse{}, nil
 }
@@ -113,7 +115,7 @@ func (s server) CancelBooking(ctx context.Context, req *api.CancelBookingRequest
 	}
 	err := s.app.CancelBooking(ctx, booking)
 	if err != nil {
-		return nil, err
+		return nil, handleDomainError(err)
 	}
 	return &api.CancelBookingResponse{}, nil
 }
@@ -133,7 +135,7 @@ func (s server) GetVacantDates(ctx context.Context, req *api.GetVacantDatesReque
 	}, nil
 }
 
-func (s server) campsiteFromDomain(campsite *domain.Campsite) *api.Campsite {
+func campsiteFromDomain(campsite *domain.Campsite) *api.Campsite {
 	return &api.Campsite{
 		CampsiteId:    campsite.CampsiteID,
 		CampsiteCode:  campsite.CampsiteCode,
@@ -146,7 +148,7 @@ func (s server) campsiteFromDomain(campsite *domain.Campsite) *api.Campsite {
 	}
 }
 
-func (s server) bookingFromDomain(booking *domain.Booking) *api.Booking {
+func bookingFromDomain(booking *domain.Booking) *api.Booking {
 	return &api.Booking{
 		BookingId:  booking.BookingID,
 		CampsiteId: booking.CampsiteID,
@@ -155,5 +157,16 @@ func (s server) bookingFromDomain(booking *domain.Booking) *api.Booking {
 		StartDate:  booking.StartDate.Format(time.DateOnly),
 		EndDate:    booking.EndDate.Format(time.DateOnly),
 		Active:     booking.Active,
+	}
+}
+
+func handleDomainError(e error) error {
+	switch e.(type) {
+	case domain.ErrBookingNotFound:
+		return status.Error(codes.NotFound, e.Error())
+	case domain.ErrBookingAlreadyCancelled, domain.ErrBookingDatesNotAvailable:
+		return status.Error(codes.FailedPrecondition, e.Error())
+	default:
+		return e
 	}
 }

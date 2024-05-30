@@ -38,21 +38,33 @@ func (_m *MockApp) CancelBooking(ctx context.Context, cmd commands.CancelBooking
 }
 
 // CreateBooking provides a mock function with given fields: ctx, cmd
-func (_m *MockApp) CreateBooking(ctx context.Context, cmd commands.CreateBooking) error {
+func (_m *MockApp) CreateBooking(ctx context.Context, cmd commands.CreateBooking) (*domain.Booking, error) {
 	ret := _m.Called(ctx, cmd)
 
 	if len(ret) == 0 {
 		panic("no return value specified for CreateBooking")
 	}
 
-	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, commands.CreateBooking) error); ok {
+	var r0 *domain.Booking
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, commands.CreateBooking) (*domain.Booking, error)); ok {
+		return rf(ctx, cmd)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, commands.CreateBooking) *domain.Booking); ok {
 		r0 = rf(ctx, cmd)
 	} else {
-		r0 = ret.Error(0)
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*domain.Booking)
+		}
 	}
 
-	return r0
+	if rf, ok := ret.Get(1).(func(context.Context, commands.CreateBooking) error); ok {
+		r1 = rf(ctx, cmd)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
 }
 
 // CreateCampsite provides a mock function with given fields: ctx, cmd
