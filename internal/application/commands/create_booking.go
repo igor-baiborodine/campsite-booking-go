@@ -27,12 +27,12 @@ func NewCreateBookingHandler(bookings domain.BookingRepository) CreateBookingHan
 }
 
 func (h CreateBookingHandler) CreateBooking(ctx context.Context, cmd CreateBooking) (*domain.Booking, error) {
-	booking := domain.Booking{}
-	booking.BookingID = cmd.BookingID
-	booking.CampsiteID = cmd.CampsiteID
-	booking.Email = cmd.Email
-	booking.FullName = cmd.FullName
-
+	booking := domain.Booking{
+		BookingID:  cmd.BookingID,
+		CampsiteID: cmd.CampsiteID,
+		Email:      cmd.Email,
+		FullName:   cmd.FullName,
+	}
 	startDate, err := time.Parse(time.DateOnly, cmd.StartDate)
 	if err != nil {
 		return nil, err

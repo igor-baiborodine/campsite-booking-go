@@ -53,13 +53,13 @@ func (s server) CreateCampsite(ctx context.Context, req *api.CreateCampsiteReque
 		PicnicTable:   req.PicnicTable,
 		FirePit:       req.FirePit,
 	}
-	err := s.app.CreateCampsite(ctx, campsite)
+	createdCampsite, err := s.app.CreateCampsite(ctx, campsite)
 	if err != nil {
-		return nil, err
+		return nil, handleDomainError(err)
 	}
 
 	return &api.CreateCampsiteResponse{
-		CampsiteId: campsite.CampsiteID,
+		CampsiteId: createdCampsite.CampsiteID,
 	}, nil
 }
 

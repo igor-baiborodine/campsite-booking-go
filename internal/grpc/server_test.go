@@ -19,6 +19,63 @@ type mocks struct {
 	app *application.MockApp
 }
 
+func TestCreateCampsite(t *testing.T) {
+
+	type args struct {
+		ctx context.Context
+		req api.CreateCampsiteRequest
+	}
+
+	campsite, err := bootstrap.NewCampsite()
+	assert.NoError(t, err)
+
+	tests := map[string]struct {
+		args    args
+		on      func(f mocks)
+		want    *api.CreateCampsiteResponse
+		wantErr string
+	}{
+		"Success": {
+			args: args{
+				ctx: context.Background(),
+				req: api.CreateCampsiteRequest{
+					CampsiteCode:  campsite.CampsiteCode,
+					Capacity:      campsite.Capacity,
+					DrinkingWater: campsite.DrinkingWater,
+					Restrooms:     campsite.Restrooms,
+					PicnicTable:   campsite.PicnicTable,
+					FirePit:       campsite.FirePit,
+				},
+			},
+			on: func(f mocks) {
+				f.app.On(
+					"CreateCampsite", context.Background(), mock.Anything,
+				).Return(campsite, nil)
+			},
+			want:    &api.CreateCampsiteResponse{CampsiteId: campsite.CampsiteID},
+			wantErr: "",
+		},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			// given
+			m := mocks{app: application.NewMockApp(t)}
+			s := server{app: m.app}
+			if tc.on != nil {
+				tc.on(m)
+			}
+			// when
+			resp, err := s.CreateCampsite(tc.args.ctx, &tc.args.req)
+			// then
+			if tc.wantErr != "" {
+				assert.Containsf(t, err.Error(), tc.wantErr, "CreateCampsite() error=%v, wantErr %v", err, tc.wantErr)
+				return
+			}
+			assert.Equal(t, tc.want, resp)
+		})
+	}
+}
+
 func TestGetBooking(t *testing.T) {
 
 	type args struct {
@@ -72,9 +129,7 @@ func TestGetBooking(t *testing.T) {
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// given
-			m := mocks{
-				app: application.NewMockApp(t),
-			}
+			m := mocks{app: application.NewMockApp(t)}
 			s := server{app: m.app}
 			if tc.on != nil {
 				tc.on(m)
@@ -155,9 +210,7 @@ func TestCreateBooking(t *testing.T) {
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// given
-			m := mocks{
-				app: application.NewMockApp(t),
-			}
+			m := mocks{app: application.NewMockApp(t)}
 			s := server{app: m.app}
 			if tc.on != nil {
 				tc.on(m)

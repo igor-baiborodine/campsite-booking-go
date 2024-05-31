@@ -26,16 +26,16 @@ func NewCreateCampsiteHandler(campsites domain.CampsiteRepository) CreateCampsit
 	return CreateCampsiteHandler{campsites: campsites}
 }
 
-func (h CreateCampsiteHandler) CreateCampsite(ctx context.Context, cmd CreateCampsite) error {
-	campsite := domain.Campsite{}
-	campsite.CampsiteID = cmd.CampsiteID
-	campsite.CampsiteCode = cmd.CampsiteCode
-	campsite.Capacity = cmd.Capacity
-	campsite.DrinkingWater = cmd.DrinkingWater
-	campsite.Restrooms = cmd.Restrooms
-	campsite.PicnicTable = cmd.PicnicTable
-	campsite.FirePit = cmd.FirePit
-	campsite.Active = true
-
-	return h.campsites.Insert(ctx, &campsite)
+func (h CreateCampsiteHandler) CreateCampsite(ctx context.Context, cmd CreateCampsite) (*domain.Campsite, error) {
+	campsite := domain.Campsite{
+		CampsiteID:    cmd.CampsiteID,
+		CampsiteCode:  cmd.CampsiteCode,
+		Capacity:      cmd.Capacity,
+		DrinkingWater: cmd.DrinkingWater,
+		Restrooms:     cmd.Restrooms,
+		PicnicTable:   cmd.PicnicTable,
+		FirePit:       cmd.FirePit,
+		Active:        true,
+	}
+	return &campsite, h.campsites.Insert(ctx, &campsite)
 }
