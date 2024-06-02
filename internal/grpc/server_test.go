@@ -226,3 +226,187 @@ func TestCreateBooking(t *testing.T) {
 		})
 	}
 }
+
+func TestUpdateBooking(t *testing.T) {
+
+	type args struct {
+		ctx context.Context
+		req api.UpdateBookingRequest
+	}
+
+	booking, err := bootstrap.NewBooking("campsite-id")
+	assert.NoError(t, err)
+
+	tests := map[string]struct {
+		args    args
+		on      func(f mocks)
+		want    *api.UpdateBookingResponse
+		wantErr string
+	}{
+		"Success": {
+			args: args{
+				ctx: context.Background(),
+				req: api.UpdateBookingRequest{Booking: bookingFromDomain(booking)},
+			},
+			on: func(f mocks) {
+				f.app.On(
+					"UpdateBooking", context.Background(), mock.Anything,
+				).Return(nil)
+			},
+			want:    &api.UpdateBookingResponse{},
+			wantErr: "",
+		},
+		"BookingDatesNotAvailable": {
+			args: args{
+				ctx: context.Background(),
+				req: api.UpdateBookingRequest{Booking: bookingFromDomain(booking)},
+			},
+			on: func(f mocks) {
+				f.app.On(
+					"UpdateBooking", context.Background(), mock.Anything,
+				).Return(
+					domain.ErrBookingDatesNotAvailable{
+						StartDate: booking.StartDate,
+						EndDate:   booking.EndDate,
+					},
+				)
+			},
+			want:    nil,
+			wantErr: codes.FailedPrecondition.String(),
+		},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			// given
+			m := mocks{app: application.NewMockApp(t)}
+			s := server{app: m.app}
+			if tc.on != nil {
+				tc.on(m)
+			}
+			// when
+			resp, err := s.UpdateBooking(tc.args.ctx, &tc.args.req)
+			// then
+			if tc.wantErr != "" {
+				assert.Containsf(t, err.Error(), tc.wantErr, "UpdateBooking() error=%v, wantErr %v", err, tc.wantErr)
+				return
+			}
+			assert.Equal(t, tc.want, resp)
+		})
+	}
+}
+
+func TestCancelBooking(t *testing.T) {
+
+	type args struct {
+		ctx context.Context
+		req api.CancelBookingRequest
+	}
+
+	booking, err := bootstrap.NewBooking("campsite-id")
+	assert.NoError(t, err)
+
+	tests := map[string]struct {
+		args    args
+		on      func(f mocks)
+		want    *api.CancelBookingResponse
+		wantErr string
+	}{
+		"Success": {
+			args: args{
+				ctx: context.Background(),
+				req: api.CancelBookingRequest{BookingId: booking.BookingID},
+			},
+			on: func(f mocks) {
+				f.app.On(
+					"CancelBooking", context.Background(), mock.Anything,
+				).Return(nil)
+			},
+			want:    &api.CancelBookingResponse{},
+			wantErr: "",
+		},
+		"BookingAlreadyCancelled": {
+			args: args{
+				ctx: context.Background(),
+				req: api.CancelBookingRequest{BookingId: booking.BookingID},
+			},
+			on: func(f mocks) {
+				f.app.On(
+					"CancelBooking", context.Background(), mock.Anything,
+				).Return(
+					domain.ErrBookingAlreadyCancelled{BookingID: booking.BookingID},
+				)
+			},
+			want:    nil,
+			wantErr: codes.FailedPrecondition.String(),
+		},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			// given
+			m := mocks{app: application.NewMockApp(t)}
+			s := server{app: m.app}
+			if tc.on != nil {
+				tc.on(m)
+			}
+			// when
+			resp, err := s.CancelBooking(tc.args.ctx, &tc.args.req)
+			// then
+			if tc.wantErr != "" {
+				assert.Containsf(t, err.Error(), tc.wantErr, "CancelBooking() error=%v, wantErr %v", err, tc.wantErr)
+				return
+			}
+			assert.Equal(t, tc.want, resp)
+		})
+	}
+}
+
+func TestGetVacantDates(t *testing.T) {
+
+	type args struct {
+		ctx context.Context
+		req api.GetVacantDatesRequest
+	}
+
+	tests := map[string]struct {
+		args    args
+		on      func(f mocks)
+		want    *api.GetVacantDatesResponse
+		wantErr string
+	}{
+		"Success": {
+			args: args{
+				ctx: context.Background(),
+				req: api.GetVacantDatesRequest{
+					CampsiteId: "campsite-id",
+					StartDate:  "2006-01-02",
+					EndDate:    "2006-01-03",
+				},
+			},
+			on: func(f mocks) {
+				f.app.On(
+					"GetVacantDates", context.Background(), mock.Anything,
+				).Return([]string{"2006-01-02"}, nil)
+			},
+			want:    &api.GetVacantDatesResponse{VacantDates: []string{"2006-01-02"}},
+			wantErr: "",
+		},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			// given
+			m := mocks{app: application.NewMockApp(t)}
+			s := server{app: m.app}
+			if tc.on != nil {
+				tc.on(m)
+			}
+			// when
+			resp, err := s.GetVacantDates(tc.args.ctx, &tc.args.req)
+			// then
+			if tc.wantErr != "" {
+				assert.Containsf(t, err.Error(), tc.wantErr, "GetVacantDates() error=%v, wantErr %v", err, tc.wantErr)
+				return
+			}
+			assert.Equal(t, tc.want, resp)
+		})
+	}
+}
