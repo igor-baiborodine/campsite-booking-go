@@ -44,7 +44,9 @@ Content-Type: application/json
 {
   "booking": {
     "booking_id": "ddd1b17a-9baf-403a-98ac-ef36b643c04d",
-    "full_name": "Ann Patterson"
+    "campsite_id": "b5839e4a-1dab-4c0a-8aa5-6a4e6910ce46",
+    "start_date": "2024-05-30",
+    "end_date": "2024-05-31"
   }
 }
 
