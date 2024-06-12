@@ -4,7 +4,9 @@ import (
 	"context"
 	"time"
 
+	"github.com/bufbuild/protovalidate-go"
 	"github.com/google/uuid"
+	protovalidate_middleware "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/protovalidate"
 	api "github.com/igor-baiborodine/campsite-booking-go/campgroundspb/v1"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/application"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/application/commands"
@@ -21,6 +23,16 @@ type server struct {
 }
 
 var _ api.CampgroundsServiceServer = (*server)(nil)
+
+func NewServer() (*grpc.Server, error) {
+	validator, err := protovalidate.New()
+	if err != nil {
+		return nil, err
+	}
+	return grpc.NewServer(
+		grpc.UnaryInterceptor(protovalidate_middleware.UnaryServerInterceptor(validator)),
+	), nil
+}
 
 func RegisterServer(app application.App, registrar grpc.ServiceRegistrar) error {
 	api.RegisterCampgroundsServiceServer(registrar, server{app: app})

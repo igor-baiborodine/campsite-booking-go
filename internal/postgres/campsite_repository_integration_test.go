@@ -1,4 +1,4 @@
-//go:build integration || database
+//go:build integration
 
 package postgres_test
 
@@ -12,11 +12,6 @@ import (
 	_ "github.com/jackc/pgx/v4/stdlib"
 	"github.com/stretchr/testify/suite"
 	pg "github.com/testcontainers/testcontainers-go/modules/postgres"
-)
-
-const (
-	deleteCampsites    = "DELETE FROM campsites"
-	selectByCampsiteID = "SELECT campsite_code FROM campsites WHERE campsite_id = $1"
 )
 
 type campsiteSuite struct {
@@ -59,8 +54,9 @@ func (s *campsiteSuite) TearDownSuite() {
 func (s *campsiteSuite) SetupTest() {
 	s.repo = postgres.NewCampsiteRepository(s.db)
 }
+
 func (s *campsiteSuite) TearDownTest() {
-	_, err := s.db.ExecContext(context.Background(), deleteCampsites)
+	_, err := s.db.ExecContext(context.Background(), bootstrap.DeleteCampsites)
 	if err != nil {
 		s.T().Fatal(err)
 	}
@@ -91,7 +87,7 @@ func (s *campsiteSuite) TestCampsiteRepository_Insert() {
 	// when
 	s.NoError(s.repo.Insert(context.Background(), campsite))
 	// then
-	row := s.db.QueryRow(selectByCampsiteID, campsite.CampsiteID)
+	row := s.db.QueryRow(bootstrap.SelectByCampsiteID, campsite.CampsiteID)
 	if s.NoError(row.Err()) {
 		var campsiteCode string
 		s.NoError(row.Scan(&campsiteCode))

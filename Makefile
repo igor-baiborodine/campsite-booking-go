@@ -5,7 +5,6 @@ install-tools:
 	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
 	go install github.com/bufbuild/buf/cmd/buf@latest
 	go install github.com/vektra/mockery/v2@latest
-	go install github.com/fullstorydev/grpcurl/cmd/grpcurl@latest
 	echo done
 
 .PHONY: generate

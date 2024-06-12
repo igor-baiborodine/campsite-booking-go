@@ -37,7 +37,9 @@ func New(cfg config.AppConfig) (*Service, error) {
 	if err := s.initDB(); err != nil {
 		return nil, err
 	}
-	s.initRpc()
+	if err := s.initRpc(); err != nil {
+		return nil, err
+	}
 	s.initWaiter()
 	s.initLogger()
 
@@ -64,15 +66,20 @@ func (s *Service) Logger() *slog.Logger {
 	return s.logger
 }
 
-func (s *Service) initDB() error {
-	var err error
+func (s *Service) initDB() (err error) {
 	s.db, err = sql.Open("pgx", s.cfg.PG.Conn)
 	return err
 }
 
-func (s *Service) initRpc() {
-	s.rpc = grpc.NewServer()
+func (s *Service) initRpc() (err error) {
+	srv, err := rpc.NewServer()
+	if err != nil {
+		return err
+	}
+	s.rpc = srv
 	reflection.Register(s.rpc)
+
+	return nil
 }
 
 func (s *Service) initWaiter() {
