@@ -1,6 +1,4 @@
-//go:build integration
-
-package grpc_test
+package grpc
 
 import (
 	"context"
@@ -10,7 +8,7 @@ import (
 	api "github.com/igor-baiborodine/campsite-booking-go/campgroundspb/v1"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/application"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/domain"
-	rpc "github.com/igor-baiborodine/campsite-booking-go/internal/grpc"
+	"github.com/igor-baiborodine/campsite-booking-go/internal/testing/bootstrap"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
@@ -18,11 +16,6 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials/insecure"
 )
-
-type mocks struct {
-	campsites *domain.MockCampsiteRepository
-	bookings  *domain.MockBookingRepository
-}
 
 type serverSuite struct {
 	server *grpc.Server
@@ -43,7 +36,7 @@ func (s *serverSuite) SetupTest() {
 	const grpcTestPort = ":10912"
 	var err error
 
-	s.server, err = rpc.NewServer()
+	s.server, err = NewServer()
 	if err != nil {
 		s.T().Fatal(err)
 	}
@@ -60,7 +53,7 @@ func (s *serverSuite) SetupTest() {
 	}
 	app := application.New(s.mocks.campsites, s.mocks.bookings)
 
-	if err = rpc.RegisterServer(app, s.server); err != nil {
+	if err = RegisterServer(app, s.server); err != nil {
 		s.T().Fatal(err)
 	}
 	go func(listener net.Listener) {
@@ -82,8 +75,6 @@ func (s *serverSuite) TearDownTest() {
 }
 
 func (s *serverSuite) TestCampgroundsService_CreateCampsite() {
-	ctx := context.Background()
-
 	tests := map[string]struct {
 		req     *api.CreateCampsiteRequest
 		on      func(f mocks)
@@ -133,7 +124,7 @@ func (s *serverSuite) TestCampgroundsService_CreateCampsite() {
 				tc.on(s.mocks)
 			}
 			// when
-			resp, err := s.client.CreateCampsite(ctx, tc.req)
+			resp, err := s.client.CreateCampsite(context.Background(), tc.req)
 			// then
 			if tc.wantErr != "" {
 				s.Empty(resp)
@@ -141,6 +132,52 @@ func (s *serverSuite) TestCampgroundsService_CreateCampsite() {
 				return
 			}
 			s.NotEmpty(resp.CampsiteId)
+		})
+	}
+}
+
+func (s *serverSuite) TestCampgroundsService_GetBooking() {
+	booking, err := bootstrap.NewBooking("campsite-id")
+	s.NoError(err)
+
+	tests := map[string]struct {
+		req     *api.GetBookingRequest
+		on      func(f mocks)
+		want    *api.GetCampsitesResponse
+		wantErr string
+	}{
+		"Success": {
+			req: &api.GetBookingRequest{BookingId: "ddd1b17a-9baf-403a-98ac-ef36b643c04d"},
+			on: func(f mocks) {
+				s.mocks.bookings.On(
+					"Find", mock.Anything, mock.AnythingOfType("string"),
+				).Return(booking, nil)
+			},
+			want:    nil,
+			wantErr: "",
+		},
+		"InvalidArgument_BookingId": {
+			req:     &api.GetBookingRequest{BookingId: "invalid-uuid-booking-id"},
+			on:      nil,
+			want:    nil,
+			wantErr: codes.InvalidArgument.String(),
+		},
+	}
+	for name, tc := range tests {
+		s.T().Run(name, func(t *testing.T) {
+			// given
+			if tc.on != nil {
+				tc.on(s.mocks)
+			}
+			// when
+			resp, err := s.client.GetBooking(context.Background(), tc.req)
+			// then
+			if tc.wantErr != "" {
+				s.Empty(resp)
+				assert.Containsf(t, err.Error(), tc.wantErr, "CreateCampsite() error=%v, wantErr %v", err, tc.wantErr)
+				return
+			}
+			s.Assert().Equal(bookingFromDomain(booking), resp.Booking)
 		})
 	}
 }

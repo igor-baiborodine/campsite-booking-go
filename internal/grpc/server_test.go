@@ -15,10 +15,6 @@ import (
 	"google.golang.org/grpc/codes"
 )
 
-type mocks struct {
-	app *application.MockApp
-}
-
 func TestCreateCampsite(t *testing.T) {
 
 	type args struct {
