@@ -68,7 +68,7 @@ func TestCreateCampsite(t *testing.T) {
 			resp, err := s.CreateCampsite(tc.args.ctx, &tc.args.req)
 			// then
 			if tc.wantErr != "" {
-				assert.Containsf(t, err.Error(), tc.wantErr, "CreateCampsite() error=%v, wantErr %v", err, tc.wantErr)
+				assert.Containsf(t, err.Error(), tc.wantErr, "CreateCampsite() error = %v, wantErr %v", err, tc.wantErr)
 				return
 			}
 			assert.Equal(t, tc.want, resp)
@@ -138,7 +138,7 @@ func TestGetBooking(t *testing.T) {
 			resp, err := s.GetBooking(tc.args.ctx, &tc.args.req)
 			// then
 			if tc.wantErr != "" {
-				assert.Containsf(t, err.Error(), tc.wantErr, "GetBooking() error=%v, wantErr %v", err, tc.wantErr)
+				assert.Containsf(t, err.Error(), tc.wantErr, "GetBooking() error = %v, wantErr %v", err, tc.wantErr)
 				return
 			}
 			assert.Equal(t, tc.want, resp)
@@ -219,7 +219,7 @@ func TestCreateBooking(t *testing.T) {
 			resp, err := s.CreateBooking(tc.args.ctx, &tc.args.req)
 			// then
 			if tc.wantErr != "" {
-				assert.Containsf(t, err.Error(), tc.wantErr, "CreateBooking() error=%v, wantErr %v", err, tc.wantErr)
+				assert.Containsf(t, err.Error(), tc.wantErr, "CreateBooking() error = %v, wantErr %v", err, tc.wantErr)
 				return
 			}
 			assert.Equal(t, tc.want, resp)
@@ -287,7 +287,7 @@ func TestUpdateBooking(t *testing.T) {
 			resp, err := s.UpdateBooking(tc.args.ctx, &tc.args.req)
 			// then
 			if tc.wantErr != "" {
-				assert.Containsf(t, err.Error(), tc.wantErr, "UpdateBooking() error=%v, wantErr %v", err, tc.wantErr)
+				assert.Containsf(t, err.Error(), tc.wantErr, "UpdateBooking() error = %v, wantErr %v", err, tc.wantErr)
 				return
 			}
 			assert.Equal(t, tc.want, resp)
@@ -352,7 +352,7 @@ func TestCancelBooking(t *testing.T) {
 			resp, err := s.CancelBooking(tc.args.ctx, &tc.args.req)
 			// then
 			if tc.wantErr != "" {
-				assert.Containsf(t, err.Error(), tc.wantErr, "CancelBooking() error=%v, wantErr %v", err, tc.wantErr)
+				assert.Containsf(t, err.Error(), tc.wantErr, "CancelBooking() error = %v, wantErr %v", err, tc.wantErr)
 				return
 			}
 			assert.Equal(t, tc.want, resp)
@@ -403,7 +403,7 @@ func TestGetVacantDates(t *testing.T) {
 			resp, err := s.GetVacantDates(tc.args.ctx, &tc.args.req)
 			// then
 			if tc.wantErr != "" {
-				assert.Containsf(t, err.Error(), tc.wantErr, "GetVacantDates() error=%v, wantErr %v", err, tc.wantErr)
+				assert.Containsf(t, err.Error(), tc.wantErr, "GetVacantDates() error = %v, wantErr %v", err, tc.wantErr)
 				return
 			}
 			assert.Equal(t, tc.want, resp)

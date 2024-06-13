@@ -6,6 +6,7 @@ import (
 	"context"
 	"net"
 	"testing"
+	"time"
 
 	api "github.com/igor-baiborodine/campsite-booking-go/campgroundspb/v1"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/application"
@@ -78,6 +79,7 @@ func (s *serverSuite) SetupTest() {
 	}
 	s.client = api.NewCampgroundsServiceClient(conn)
 }
+
 func (s *serverSuite) TearDownTest() {
 	s.server.GracefulStop()
 }
@@ -136,7 +138,7 @@ func (s *serverSuite) TestCampgroundsService_CreateCampsite() {
 			// then
 			if tc.wantErr != "" {
 				s.Empty(resp)
-				assert.Containsf(t, err.Error(), tc.wantErr, "CreateCampsite() error=%v, wantErr %v", err, tc.wantErr)
+				assert.Containsf(t, err.Error(), tc.wantErr, "CreateCampsite() error = %v, wantErr %v", err, tc.wantErr)
 				return
 			}
 			s.NotEmpty(resp.CampsiteId)
@@ -182,7 +184,7 @@ func (s *serverSuite) TestCampgroundsService_GetBooking() {
 			// then
 			if tc.wantErr != "" {
 				s.Empty(resp)
-				assert.Containsf(t, err.Error(), tc.wantErr, "GetBooking() error=%v, wantErr %v", err, tc.wantErr)
+				assert.Containsf(t, err.Error(), tc.wantErr, "GetBooking() error = %v, wantErr %v", err, tc.wantErr)
 				return
 			}
 			s.Assert().Equal(rpc.BookingFromDomain(booking), resp.Booking)
@@ -191,6 +193,8 @@ func (s *serverSuite) TestCampgroundsService_GetBooking() {
 }
 
 func (s *serverSuite) TestCampgroundsService_CreateBooking() {
+	now := bootstrap.AsStartOfDayUTC(time.Now())
+
 	tests := map[string]struct {
 		req     *api.CreateBookingRequest
 		on      func(f mocks)
@@ -202,8 +206,8 @@ func (s *serverSuite) TestCampgroundsService_CreateBooking() {
 				CampsiteId: "b5839e4a-1dab-4c0a-8aa5-6a4e6910ce46",
 				Email:      "john.smith@example.com",
 				FullName:   "John Smith",
-				StartDate:  "2006-01-02",
-				EndDate:    "2006-01-03",
+				StartDate:  now.AddDate(0, 0, 1).Format(time.DateOnly),
+				EndDate:    now.AddDate(0, 0, 2).Format(time.DateOnly),
 			},
 			on: func(f mocks) {
 				s.mocks.bookings.On(
@@ -273,6 +277,18 @@ func (s *serverSuite) TestCampgroundsService_CreateBooking() {
 			want:    nil,
 			wantErr: codes.InvalidArgument.String(),
 		},
+		"InvalidArgument_BookingStartDateBeforeEndDateValidator": {
+			req: &api.CreateBookingRequest{
+				CampsiteId: "b5839e4a-1dab-4c0a-8aa5-6a4e6910ce46",
+				Email:      "john.smith@example.com",
+				FullName:   "John Smith",
+				StartDate:  now.AddDate(0, 0, 2).Format(time.DateOnly),
+				EndDate:    now.AddDate(0, 0, 1).Format(time.DateOnly),
+			},
+			on:      nil,
+			want:    nil,
+			wantErr: codes.InvalidArgument.String(),
+		},
 	}
 	for name, tc := range tests {
 		s.T().Run(name, func(t *testing.T) {
@@ -285,7 +301,7 @@ func (s *serverSuite) TestCampgroundsService_CreateBooking() {
 			// then
 			if tc.wantErr != "" {
 				s.Empty(resp)
-				assert.Containsf(t, err.Error(), tc.wantErr, "CreateBooking() error=%v, wantErr %v", err, tc.wantErr)
+				assert.Containsf(t, err.Error(), tc.wantErr, "CreateBooking() error = %v, wantErr %v", err, tc.wantErr)
 				return
 			}
 			s.NotEmpty(resp.BookingId)

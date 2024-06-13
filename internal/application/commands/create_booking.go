@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/igor-baiborodine/campsite-booking-go/internal/application/validators"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/domain"
 )
 
@@ -18,16 +19,24 @@ type (
 	}
 
 	CreateBookingHandler struct {
-		bookings domain.BookingRepository
+		bookings   domain.BookingRepository
+		validators []validators.BookingValidator
 	}
 )
 
 func NewCreateBookingHandler(bookings domain.BookingRepository) CreateBookingHandler {
-	return CreateBookingHandler{bookings: bookings}
+	return CreateBookingHandler{
+		bookings: bookings,
+		validators: []validators.BookingValidator{
+			&validators.BookingStartDateBeforeEndDateValidator{},
+			&validators.BookingAllowedStartDateValidator{},
+			&validators.BookingMaximumStayValidator{},
+		},
+	}
 }
 
 func (h CreateBookingHandler) CreateBooking(ctx context.Context, cmd CreateBooking) (*domain.Booking, error) {
-	booking := domain.Booking{
+	booking := &domain.Booking{
 		BookingID:  cmd.BookingID,
 		CampsiteID: cmd.CampsiteID,
 		Email:      cmd.Email,
@@ -46,5 +55,9 @@ func (h CreateBookingHandler) CreateBooking(ctx context.Context, cmd CreateBooki
 	booking.EndDate = endDate
 	booking.Active = true
 
-	return &booking, h.bookings.Insert(ctx, &booking)
+	err = validators.Apply(h.validators, booking)
+	if err != nil {
+		return nil, err
+	}
+	return booking, h.bookings.Insert(ctx, booking)
 }

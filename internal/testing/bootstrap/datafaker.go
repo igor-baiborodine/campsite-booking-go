@@ -38,7 +38,7 @@ func NewBookingWithAddDays(campsiteID string, startAddDays int, endAddDays int) 
 	if err != nil {
 		return nil, err
 	}
-	now := truncateToStartOfDayInUTC(time.Now())
+	now := AsStartOfDayUTC(time.Now())
 
 	booking.ID = math.MaxInt64
 	booking.BookingID = uuid.New().String()
@@ -82,6 +82,6 @@ func FindBooking(db *sql.DB, bookingID string) (*domain.Booking, error) {
 	return booking, nil
 }
 
-func truncateToStartOfDayInUTC(t time.Time) time.Time {
+func AsStartOfDayUTC(t time.Time) time.Time {
 	return time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, time.UTC)
 }
