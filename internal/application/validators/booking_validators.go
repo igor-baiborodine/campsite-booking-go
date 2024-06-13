@@ -28,7 +28,7 @@ func (e ErrBookingAllowedStartDate) Error() string {
 	return "start_date: must be from 1 day to up to 1 month ahead"
 }
 
-func Apply(booking *domain.Booking, validators []BookingValidator) error {
+func Apply(validators []BookingValidator, booking *domain.Booking) error {
 	var errs []error
 
 	for _, v := range validators {

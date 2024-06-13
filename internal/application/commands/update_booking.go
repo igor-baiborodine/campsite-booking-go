@@ -66,7 +66,7 @@ func (h UpdateBookingHandler) UpdateBooking(ctx context.Context, cmd UpdateBooki
 		booking.EndDate = endDate
 	}
 
-	err = validators.Apply(booking, h.validators)
+	err = validators.Apply(h.validators, booking)
 	if err != nil {
 		return err
 	}

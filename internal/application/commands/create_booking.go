@@ -53,7 +53,7 @@ func (h CreateBookingHandler) CreateBooking(ctx context.Context, cmd CreateBooki
 	booking.EndDate = endDate
 	booking.Active = true
 
-	err = validators.Apply(booking, h.validators)
+	err = validators.Apply(h.validators, booking)
 	if err != nil {
 		return nil, err
 	}
