@@ -133,7 +133,7 @@ func TestGetVacantDates(t *testing.T) {
 			vacantDates, err := h.GetVacantDates(tc.args.ctx, tc.args.qry)
 			// then
 			if tc.wantErr != "" {
-				assert.Containsf(t, err.Error(), tc.wantErr, "GetVacantDates() error=%v, wantErr %v", err, tc.wantErr)
+				assert.Containsf(t, err.Error(), tc.wantErr, "GetVacantDates() error = %v, wantErr %v", err, tc.wantErr)
 				return
 			}
 			assert.Equal(t, tc.want, vacantDates)

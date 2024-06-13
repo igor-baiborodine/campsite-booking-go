@@ -137,7 +137,7 @@ func (s *serverSuite) TestCampgroundsService_CreateCampsite() {
 			// then
 			if tc.wantErr != "" {
 				s.Empty(resp)
-				assert.Containsf(t, err.Error(), tc.wantErr, "CreateCampsite() error=%v, wantErr %v", err, tc.wantErr)
+				assert.Containsf(t, err.Error(), tc.wantErr, "CreateCampsite() error = %v, wantErr %v", err, tc.wantErr)
 				return
 			}
 			s.NotEmpty(resp.CampsiteId)
@@ -183,7 +183,7 @@ func (s *serverSuite) TestCampgroundsService_GetBooking() {
 			// then
 			if tc.wantErr != "" {
 				s.Empty(resp)
-				assert.Containsf(t, err.Error(), tc.wantErr, "GetBooking() error=%v, wantErr %v", err, tc.wantErr)
+				assert.Containsf(t, err.Error(), tc.wantErr, "GetBooking() error = %v, wantErr %v", err, tc.wantErr)
 				return
 			}
 			s.Assert().Equal(rpc.BookingFromDomain(booking), resp.Booking)
@@ -286,7 +286,7 @@ func (s *serverSuite) TestCampgroundsService_CreateBooking() {
 			// then
 			if tc.wantErr != "" {
 				s.Empty(resp)
-				assert.Containsf(t, err.Error(), tc.wantErr, "CreateBooking() error=%v, wantErr %v", err, tc.wantErr)
+				assert.Containsf(t, err.Error(), tc.wantErr, "CreateBooking() error = %v, wantErr %v", err, tc.wantErr)
 				return
 			}
 			s.NotEmpty(resp.BookingId)

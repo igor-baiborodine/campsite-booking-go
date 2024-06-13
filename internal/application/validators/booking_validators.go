@@ -18,10 +18,10 @@ type ErrBookingAllowedStartDate struct{}
 
 func (v *BookingAllowedStartDateValidator) Validate(b *domain.Booking) error {
 	now := time.Now()
-	if now.Before(b.StartDate) && b.StartDate.Before(now.AddDate(0, 1, 1)) {
-		return &ErrBookingAllowedStartDate{}
+	if b.StartDate.After(now) && b.StartDate.Before(now.AddDate(0, 1, 0)) {
+		return nil
 	}
-	return nil
+	return ErrBookingAllowedStartDate{}
 }
 
 func (e ErrBookingAllowedStartDate) Error() string {
