@@ -277,6 +277,18 @@ func (s *serverSuite) TestCampgroundsService_CreateBooking() {
 			want:    nil,
 			wantErr: codes.InvalidArgument.String(),
 		},
+		"InvalidArgument_BookingStartDateBeforeEndDateValidator": {
+			req: &api.CreateBookingRequest{
+				CampsiteId: "b5839e4a-1dab-4c0a-8aa5-6a4e6910ce46",
+				Email:      "john.smith@example.com",
+				FullName:   "John Smith",
+				StartDate:  now.AddDate(0, 0, 2).Format(time.DateOnly),
+				EndDate:    now.AddDate(0, 0, 1).Format(time.DateOnly),
+			},
+			on:      nil,
+			want:    nil,
+			wantErr: codes.InvalidArgument.String(),
+		},
 	}
 	for name, tc := range tests {
 		s.T().Run(name, func(t *testing.T) {

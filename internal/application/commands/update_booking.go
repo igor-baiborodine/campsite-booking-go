@@ -28,6 +28,7 @@ func NewUpdateBookingHandler(bookings domain.BookingRepository) UpdateBookingHan
 	return UpdateBookingHandler{
 		bookings: bookings,
 		validators: []validators.BookingValidator{
+			&validators.BookingStartDateBeforeEndDateValidator{},
 			&validators.BookingAllowedStartDateValidator{},
 			&validators.BookingMaximumStayValidator{},
 		},
