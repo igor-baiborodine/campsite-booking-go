@@ -1,4 +1,6 @@
-package grpc
+//go:build integration
+
+package grpc_test
 
 import (
 	"context"
@@ -8,6 +10,7 @@ import (
 	api "github.com/igor-baiborodine/campsite-booking-go/campgroundspb/v1"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/application"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/domain"
+	rpc "github.com/igor-baiborodine/campsite-booking-go/internal/grpc"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/testing/bootstrap"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -16,6 +19,11 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials/insecure"
 )
+
+type mocks struct {
+	campsites *domain.MockCampsiteRepository
+	bookings  *domain.MockBookingRepository
+}
 
 type serverSuite struct {
 	server *grpc.Server
@@ -36,7 +44,7 @@ func (s *serverSuite) SetupTest() {
 	const grpcTestPort = ":10912"
 	var err error
 
-	s.server, err = NewServer()
+	s.server, err = rpc.NewServer()
 	if err != nil {
 		s.T().Fatal(err)
 	}
@@ -53,7 +61,7 @@ func (s *serverSuite) SetupTest() {
 	}
 	app := application.New(s.mocks.campsites, s.mocks.bookings)
 
-	if err = RegisterServer(app, s.server); err != nil {
+	if err = rpc.RegisterServer(app, s.server); err != nil {
 		s.T().Fatal(err)
 	}
 	go func(listener net.Listener) {
@@ -174,10 +182,113 @@ func (s *serverSuite) TestCampgroundsService_GetBooking() {
 			// then
 			if tc.wantErr != "" {
 				s.Empty(resp)
-				assert.Containsf(t, err.Error(), tc.wantErr, "CreateCampsite() error=%v, wantErr %v", err, tc.wantErr)
+				assert.Containsf(t, err.Error(), tc.wantErr, "GetBooking() error=%v, wantErr %v", err, tc.wantErr)
 				return
 			}
-			s.Assert().Equal(bookingFromDomain(booking), resp.Booking)
+			s.Assert().Equal(rpc.BookingFromDomain(booking), resp.Booking)
+		})
+	}
+}
+
+func (s *serverSuite) TestCampgroundsService_CreateBooking() {
+	tests := map[string]struct {
+		req     *api.CreateBookingRequest
+		on      func(f mocks)
+		want    *api.CreateBookingResponse
+		wantErr string
+	}{
+		"Success": {
+			req: &api.CreateBookingRequest{
+				CampsiteId: "b5839e4a-1dab-4c0a-8aa5-6a4e6910ce46",
+				Email:      "john.smith@example.com",
+				FullName:   "John Smith",
+				StartDate:  "2006-01-02",
+				EndDate:    "2006-01-03",
+			},
+			on: func(f mocks) {
+				s.mocks.bookings.On(
+					"Insert", mock.Anything, mock.AnythingOfType("*domain.Booking"),
+				).Return(nil)
+			},
+			want:    nil,
+			wantErr: "",
+		},
+		"InvalidArgument_CampsiteId": {
+			req: &api.CreateBookingRequest{
+				CampsiteId: "invalid-uuid-campsite-id",
+				Email:      "john.smith@example.com",
+				FullName:   "John Smith",
+				StartDate:  "2006-01-02",
+				EndDate:    "2006-01-03",
+			},
+			on:      nil,
+			want:    nil,
+			wantErr: codes.InvalidArgument.String(),
+		},
+		"InvalidArgument_Email": {
+			req: &api.CreateBookingRequest{
+				CampsiteId: "b5839e4a-1dab-4c0a-8aa5-6a4e6910ce46",
+				Email:      "invalid-email",
+				FullName:   "John Smith",
+				StartDate:  "2006-01-02",
+				EndDate:    "2006-01-03",
+			},
+			on:      nil,
+			want:    nil,
+			wantErr: codes.InvalidArgument.String(),
+		},
+		"InvalidArgument_FullName": {
+			req: &api.CreateBookingRequest{
+				CampsiteId: "b5839e4a-1dab-4c0a-8aa5-6a4e6910ce46",
+				Email:      "john.smith@example.com",
+				FullName:   "",
+				StartDate:  "2006-01-02",
+				EndDate:    "2006-01-03",
+			},
+			on:      nil,
+			want:    nil,
+			wantErr: codes.InvalidArgument.String(),
+		},
+		"InvalidArgument_StartDate": {
+			req: &api.CreateBookingRequest{
+				CampsiteId: "b5839e4a-1dab-4c0a-8aa5-6a4e6910ce46",
+				Email:      "john.smith@example.com",
+				FullName:   "John Smith",
+				StartDate:  "9999-99-99",
+				EndDate:    "2006-01-03",
+			},
+			on:      nil,
+			want:    nil,
+			wantErr: codes.InvalidArgument.String(),
+		},
+		"InvalidArgument_EndDate": {
+			req: &api.CreateBookingRequest{
+				CampsiteId: "b5839e4a-1dab-4c0a-8aa5-6a4e6910ce46",
+				Email:      "john.smith@example.com",
+				FullName:   "",
+				StartDate:  "2006-01-02",
+				EndDate:    "9999-99-99",
+			},
+			on:      nil,
+			want:    nil,
+			wantErr: codes.InvalidArgument.String(),
+		},
+	}
+	for name, tc := range tests {
+		s.T().Run(name, func(t *testing.T) {
+			// given
+			if tc.on != nil {
+				tc.on(s.mocks)
+			}
+			// when
+			resp, err := s.client.CreateBooking(context.Background(), tc.req)
+			// then
+			if tc.wantErr != "" {
+				s.Empty(resp)
+				assert.Containsf(t, err.Error(), tc.wantErr, "CreateBooking() error=%v, wantErr %v", err, tc.wantErr)
+				return
+			}
+			s.NotEmpty(resp.BookingId)
 		})
 	}
 }

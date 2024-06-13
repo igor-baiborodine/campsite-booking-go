@@ -47,7 +47,7 @@ func (s server) GetCampsites(ctx context.Context, _ *api.GetCampsitesRequest) (*
 
 	var protoCampsites []*api.Campsite
 	for _, campsite := range campsites {
-		protoCampsites = append(protoCampsites, campsiteFromDomain(campsite))
+		protoCampsites = append(protoCampsites, CampsiteFromDomain(campsite))
 	}
 
 	return &api.GetCampsitesResponse{
@@ -82,7 +82,7 @@ func (s server) GetBooking(ctx context.Context, req *api.GetBookingRequest) (*ap
 	}
 
 	return &api.GetBookingResponse{
-		Booking: bookingFromDomain(booking),
+		Booking: BookingFromDomain(booking),
 	}, nil
 }
 
@@ -147,7 +147,7 @@ func (s server) GetVacantDates(ctx context.Context, req *api.GetVacantDatesReque
 	}, nil
 }
 
-func campsiteFromDomain(campsite *domain.Campsite) *api.Campsite {
+func CampsiteFromDomain(campsite *domain.Campsite) *api.Campsite {
 	return &api.Campsite{
 		CampsiteId:    campsite.CampsiteID,
 		CampsiteCode:  campsite.CampsiteCode,
@@ -160,7 +160,7 @@ func campsiteFromDomain(campsite *domain.Campsite) *api.Campsite {
 	}
 }
 
-func bookingFromDomain(booking *domain.Booking) *api.Booking {
+func BookingFromDomain(booking *domain.Booking) *api.Booking {
 	return &api.Booking{
 		BookingId:  booking.BookingID,
 		CampsiteId: booking.CampsiteID,
