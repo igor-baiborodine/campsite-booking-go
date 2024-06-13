@@ -78,6 +78,7 @@ func (s *serverSuite) SetupTest() {
 	}
 	s.client = api.NewCampgroundsServiceClient(conn)
 }
+
 func (s *serverSuite) TearDownTest() {
 	s.server.GracefulStop()
 }

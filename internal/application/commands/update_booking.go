@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/igor-baiborodine/campsite-booking-go/internal/application/validators"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/domain"
 )
 
@@ -18,12 +19,18 @@ type (
 	}
 
 	UpdateBookingHandler struct {
-		bookings domain.BookingRepository
+		bookings   domain.BookingRepository
+		validators []validators.BookingValidator
 	}
 )
 
 func NewUpdateBookingHandler(bookings domain.BookingRepository) UpdateBookingHandler {
-	return UpdateBookingHandler{bookings: bookings}
+	return UpdateBookingHandler{
+		bookings: bookings,
+		validators: []validators.BookingValidator{
+			&validators.BookingAllowedStartDateValidator{},
+		},
+	}
 }
 
 func (h UpdateBookingHandler) UpdateBooking(ctx context.Context, cmd UpdateBooking) error {
@@ -59,5 +66,9 @@ func (h UpdateBookingHandler) UpdateBooking(ctx context.Context, cmd UpdateBooki
 		booking.EndDate = endDate
 	}
 
+	err = validators.ApplyValidators(booking, h.validators)
+	if err != nil {
+		return err
+	}
 	return h.bookings.Update(ctx, booking)
 }
