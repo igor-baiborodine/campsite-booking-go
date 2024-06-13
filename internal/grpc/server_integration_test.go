@@ -6,6 +6,7 @@ import (
 	"context"
 	"net"
 	"testing"
+	"time"
 
 	api "github.com/igor-baiborodine/campsite-booking-go/campgroundspb/v1"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/application"
@@ -192,6 +193,8 @@ func (s *serverSuite) TestCampgroundsService_GetBooking() {
 }
 
 func (s *serverSuite) TestCampgroundsService_CreateBooking() {
+	now := bootstrap.AsStartOfDayUTC(time.Now())
+
 	tests := map[string]struct {
 		req     *api.CreateBookingRequest
 		on      func(f mocks)
@@ -203,8 +206,8 @@ func (s *serverSuite) TestCampgroundsService_CreateBooking() {
 				CampsiteId: "b5839e4a-1dab-4c0a-8aa5-6a4e6910ce46",
 				Email:      "john.smith@example.com",
 				FullName:   "John Smith",
-				StartDate:  "2006-01-02",
-				EndDate:    "2006-01-03",
+				StartDate:  now.AddDate(0, 0, 1).Format(time.DateOnly),
+				EndDate:    now.AddDate(0, 0, 2).Format(time.DateOnly),
 			},
 			on: func(f mocks) {
 				s.mocks.bookings.On(

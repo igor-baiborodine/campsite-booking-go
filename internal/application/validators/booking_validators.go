@@ -14,7 +14,11 @@ type BookingValidator interface {
 
 type BookingAllowedStartDateValidator struct{}
 
+type BookingMaximumStayValidator struct{}
+
 type ErrBookingAllowedStartDate struct{}
+
+type ErrBookingMaximumStay struct{}
 
 func (v *BookingAllowedStartDateValidator) Validate(b *domain.Booking) error {
 	now := time.Now()
@@ -24,8 +28,19 @@ func (v *BookingAllowedStartDateValidator) Validate(b *domain.Booking) error {
 	return ErrBookingAllowedStartDate{}
 }
 
+func (v *BookingMaximumStayValidator) Validate(b *domain.Booking) error {
+	if b.EndDate.Sub(b.StartDate).Hours()/24 <= 3 {
+		return nil
+	}
+	return ErrBookingMaximumStay{}
+}
+
 func (e ErrBookingAllowedStartDate) Error() string {
 	return "start_date: must be from 1 day to up to 1 month ahead"
+}
+
+func (e ErrBookingMaximumStay) Error() string {
+	return "maximum stay: must be less or equal to three days"
 }
 
 func Apply(validators []BookingValidator, booking *domain.Booking) error {
