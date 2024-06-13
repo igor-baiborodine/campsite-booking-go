@@ -1,3 +1,5 @@
+### Will not work, unless the 'buf/validate/validate.proto' file is present in your local dev file system.
+
 ###
 GRPC localhost:8085/campgroundspb.v1.CampgroundsService/GetCampsites
 Content-Type: application/json

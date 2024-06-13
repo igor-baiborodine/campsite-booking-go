@@ -1,4 +1,4 @@
-//go:build integration || database
+//go:build integration
 
 package postgres_test
 
@@ -17,10 +17,6 @@ import (
 	_ "github.com/jackc/pgx/v4/stdlib"
 	"github.com/stretchr/testify/suite"
 	pg "github.com/testcontainers/testcontainers-go/modules/postgres"
-)
-
-const (
-	deleteBookings = "DELETE FROM bookings"
 )
 
 type bookingSuite struct {
@@ -64,12 +60,12 @@ func (s *bookingSuite) SetupTest() {
 	s.repo = postgres.NewBookingRepository(s.db)
 }
 func (s *bookingSuite) TearDownTest() {
-	_, err := s.db.ExecContext(context.Background(), deleteBookings)
+	_, err := s.db.ExecContext(context.Background(), bootstrap.DeleteBookings)
 	if err != nil {
 		s.T().Fatal(err)
 	}
 
-	_, err = s.db.ExecContext(context.Background(), deleteCampsites)
+	_, err = s.db.ExecContext(context.Background(), bootstrap.DeleteCampsites)
 	if err != nil {
 		s.T().Fatal(err)
 	}

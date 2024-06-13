@@ -4,7 +4,9 @@ import (
 	"context"
 	"time"
 
+	"github.com/bufbuild/protovalidate-go"
 	"github.com/google/uuid"
+	protovalidate_middleware "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/protovalidate"
 	api "github.com/igor-baiborodine/campsite-booking-go/campgroundspb/v1"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/application"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/application/commands"
@@ -22,6 +24,16 @@ type server struct {
 
 var _ api.CampgroundsServiceServer = (*server)(nil)
 
+func NewServer() (*grpc.Server, error) {
+	validator, err := protovalidate.New()
+	if err != nil {
+		return nil, err
+	}
+	return grpc.NewServer(
+		grpc.UnaryInterceptor(protovalidate_middleware.UnaryServerInterceptor(validator)),
+	), nil
+}
+
 func RegisterServer(app application.App, registrar grpc.ServiceRegistrar) error {
 	api.RegisterCampgroundsServiceServer(registrar, server{app: app})
 	return nil
@@ -35,7 +47,7 @@ func (s server) GetCampsites(ctx context.Context, _ *api.GetCampsitesRequest) (*
 
 	var protoCampsites []*api.Campsite
 	for _, campsite := range campsites {
-		protoCampsites = append(protoCampsites, campsiteFromDomain(campsite))
+		protoCampsites = append(protoCampsites, CampsiteFromDomain(campsite))
 	}
 
 	return &api.GetCampsitesResponse{
@@ -70,7 +82,7 @@ func (s server) GetBooking(ctx context.Context, req *api.GetBookingRequest) (*ap
 	}
 
 	return &api.GetBookingResponse{
-		Booking: bookingFromDomain(booking),
+		Booking: BookingFromDomain(booking),
 	}, nil
 }
 
@@ -135,7 +147,7 @@ func (s server) GetVacantDates(ctx context.Context, req *api.GetVacantDatesReque
 	}, nil
 }
 
-func campsiteFromDomain(campsite *domain.Campsite) *api.Campsite {
+func CampsiteFromDomain(campsite *domain.Campsite) *api.Campsite {
 	return &api.Campsite{
 		CampsiteId:    campsite.CampsiteID,
 		CampsiteCode:  campsite.CampsiteCode,
@@ -148,7 +160,7 @@ func campsiteFromDomain(campsite *domain.Campsite) *api.Campsite {
 	}
 }
 
-func bookingFromDomain(booking *domain.Booking) *api.Booking {
+func BookingFromDomain(booking *domain.Booking) *api.Booking {
 	return &api.Booking{
 		BookingId:  booking.BookingID,
 		CampsiteId: booking.CampsiteID,

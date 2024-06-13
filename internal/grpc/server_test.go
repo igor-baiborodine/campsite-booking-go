@@ -106,7 +106,7 @@ func TestGetBooking(t *testing.T) {
 					queries.GetBooking{BookingID: booking.BookingID},
 				).Return(booking, nil)
 			},
-			want:    &api.GetBookingResponse{Booking: bookingFromDomain(booking)},
+			want:    &api.GetBookingResponse{Booking: BookingFromDomain(booking)},
 			wantErr: "",
 		},
 		"NotFound": {
@@ -122,7 +122,7 @@ func TestGetBooking(t *testing.T) {
 					queries.GetBooking{BookingID: nonExistingID},
 				).Return(nil, domain.ErrBookingNotFound{BookingID: nonExistingID})
 			},
-			want:    &api.GetBookingResponse{Booking: bookingFromDomain(booking)},
+			want:    &api.GetBookingResponse{Booking: BookingFromDomain(booking)},
 			wantErr: codes.NotFound.String(),
 		},
 	}
@@ -246,7 +246,7 @@ func TestUpdateBooking(t *testing.T) {
 		"Success": {
 			args: args{
 				ctx: context.Background(),
-				req: api.UpdateBookingRequest{Booking: bookingFromDomain(booking)},
+				req: api.UpdateBookingRequest{Booking: BookingFromDomain(booking)},
 			},
 			on: func(f mocks) {
 				f.app.On(
@@ -259,7 +259,7 @@ func TestUpdateBooking(t *testing.T) {
 		"BookingDatesNotAvailable": {
 			args: args{
 				ctx: context.Background(),
-				req: api.UpdateBookingRequest{Booking: bookingFromDomain(booking)},
+				req: api.UpdateBookingRequest{Booking: BookingFromDomain(booking)},
 			},
 			on: func(f mocks) {
 				f.app.On(

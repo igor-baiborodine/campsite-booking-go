@@ -44,8 +44,9 @@
 
 ### Technology Stack
 
-* [Go](https://github.com/golang/go), [gRPC](https://github.com/grpc/grpc-go)
+* [Go](https://github.com/golang/go), [gRPC](https://github.com/grpc/grpc-go), 
+* [protovalidate-go](https://github.com/bufbuild/protovalidate-go) (requests validation)
 * [PostgreSQL](https://www.postgresql.org/)  
-* [Docker](https://www.docker.com/)
+* [Docker](https://www.docker.com/), [Docker Compose](https://docs.docker.com/compose/)
 * [Goose](https://pressly.github.io/goose/) (DB migrations)
 * TODO

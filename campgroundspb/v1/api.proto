@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package campgroundspb.v1;
 
-option go_package = "campgroundspb/v1;campgroundspbv1";
+import "buf/validate/validate.proto";
 
 service CampgroundsService {
   rpc GetCampsites(GetCampsitesRequest) returns (GetCampsitesResponse) {};
@@ -21,8 +21,8 @@ message GetCampsitesResponse {
 }
 
 message CreateCampsiteRequest {
-  string campsite_code = 1;
-  int32 capacity = 2;
+  string campsite_code = 1 [(buf.validate.field).string.min_len = 1];
+  int32 capacity = 2 [(buf.validate.field).int32.gt = 0];
   bool drinking_water = 3;
   bool restrooms = 4;
   bool picnic_table = 5;
@@ -34,7 +34,7 @@ message CreateCampsiteResponse {
 }
 
 message GetBookingRequest {
-  string booking_id = 1;
+  string booking_id = 1 [(buf.validate.field).string.uuid = true];
 }
 
 message GetBookingResponse {
@@ -42,11 +42,11 @@ message GetBookingResponse {
 }
 
 message CreateBookingRequest {
-  string campsite_id = 1;
-  string email = 2;
-  string full_name = 3;
-  string start_date = 4;
-  string end_date = 5;
+  string campsite_id = 1 [(buf.validate.field).string.uuid = true];
+  string email = 2 [(buf.validate.field).string.email = true];
+  string full_name = 3 [(buf.validate.field).string.min_len = 1];
+  string start_date = 4 [(buf.validate.field).string.pattern = "^\\d{4}-([0][1-9]|1[0-2])-([0][1-9]|[1-2]\\d|3[01])$"];
+  string end_date = 5 [(buf.validate.field).string.pattern = "^\\d{4}-([0][1-9]|1[0-2])-([0][1-9]|[1-2]\\d|3[01])$"];
 }
 
 message CreateBookingResponse {
@@ -60,55 +60,53 @@ message UpdateBookingRequest {
 message UpdateBookingResponse {}
 
 message CancelBookingRequest {
-  string booking_id = 1;
+  string booking_id = 1 [(buf.validate.field).string.uuid = true];
 }
 
 message CancelBookingResponse {}
 
 message GetVacantDatesRequest {
-  string campsite_id = 1;
-  string start_date = 2;
-  string end_date = 3;
+  string campsite_id = 1 [(buf.validate.field).string.uuid = true];
+  string start_date = 2 [(buf.validate.field).string.pattern = "^\\d{4}-([0][1-9]|1[0-2])-([0][1-9]|[1-2]\\d|3[01])$"];
+  string end_date = 3 [(buf.validate.field).string.pattern = "^\\d{4}-([0][1-9]|1[0-2])-([0][1-9]|[1-2]\\d|3[01])$"];
 }
 
 message GetVacantDatesResponse {
   repeated string vacant_dates = 1;
 }
 
-// Message to define the structure of a campsite.
 message Campsite {
-  // Unique identifier of the campsite.
-  string campsite_id = 1;
-  // Unique code of the campsite.
-  string campsite_code = 2;
-  // Maximum number of people the campsite can accommodate.
-  int32 capacity = 3;
-  // Indicates if the campsite has drinking water.
+  // Unique identifier of campsite, must be in UUID format.
+  string campsite_id = 1 [(buf.validate.field).string.uuid = true];
+  // Unique code of campsite.
+  string campsite_code = 2 [(buf.validate.field).string.min_len = 1];
+  // Maximum number of people campsite can accommodate.
+  int32 capacity = 3 [(buf.validate.field).int32.gt = 0];
+  // Indicates if campsite has drinking water.
   bool drinking_water = 4;
-  // Indicates if the campsite has restrooms.
+  // Indicates if campsite has restrooms.
   bool restrooms = 5;
-  // Indicates if the campsite has a picnic table.
+  // Indicates if campsite has a picnic table.
   bool picnic_table = 6;
-  // Indicates if the campsite has a fire pit.
+  // Indicates if campsite has a fire pit.
   bool fire_pit = 7;
-  // Indicates if the campsite is active.
+  // Indicates if campsite is active.
   bool active = 8;
 }
 
-// Message to define the structure of a booking.
 message Booking {
-  // Unique identifier of the booking.
-  string booking_id = 1;
-  // Identifier of the campsite booked.
-  string campsite_id = 2;
-  // Email of the person who made the booking.
-  string email = 3;
-  // Full name of the person who made the booking.
-  string full_name = 4;
-  // Start date of the booking in ISO-8601 format (YYYY-MM-DD).
-  string start_date = 5;
-  // End date of the booking in ISO-8601 format (YYYY-MM-DD).
-  string end_date = 6;
-  // Indicates if the booking is active.
+  // Unique identifier of booking, must be in UUID format.
+  string booking_id = 1 [(buf.validate.field).string.uuid = true];
+  // Identifier of the campsite booked, must be in UUID format.
+  string campsite_id = 2 [(buf.validate.field).string.uuid = true];
+  // Email of person who made booking.
+  string email = 3 [(buf.validate.field).string.email = true];
+  // Full name of person who made booking.
+  string full_name = 4 [(buf.validate.field).string.min_len = 1];
+  // Start date of booking, must be in ISO-8601 format (YYYY-MM-DD).
+  string start_date = 5 [(buf.validate.field).string.pattern = "^\\d{4}-([0][1-9]|1[0-2])-([0][1-9]|[1-2]\\d|3[01])$"];
+  // End date of booking, must be in ISO-8601 format (YYYY-MM-DD).
+  string end_date = 6 [(buf.validate.field).string.pattern = "^\\d{4}-([0][1-9]|1[0-2])-([0][1-9]|[1-2]\\d|3[01])$"];
+  // Indicates if booking is active.
   bool active = 8;
 }
