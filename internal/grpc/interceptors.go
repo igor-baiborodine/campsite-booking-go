@@ -8,10 +8,12 @@ import (
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
 )
 
-const grpcCode = "grpc.code"
-const grpcTimeMs = "grpc.time_ms"
-const grpcService = "grpc.service"
-const grpcMethod = "grpc.method"
+const (
+	grpcCode    = "grpc.code"
+	grpcTimeMs  = "grpc.time_ms"
+	grpcService = "grpc.service"
+	grpcMethod  = "grpc.method"
+)
 
 func logServiceCalls(l *slog.Logger) logging.Logger {
 	return logging.LoggerFunc(func(ctx context.Context, lvl logging.Level, msg string, fields ...any) {
