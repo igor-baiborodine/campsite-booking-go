@@ -2,10 +2,12 @@ package grpc
 
 import (
 	"context"
+	"log/slog"
 	"time"
 
 	"github.com/bufbuild/protovalidate-go"
 	"github.com/google/uuid"
+	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
 	protovalidate_middleware "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/protovalidate"
 	api "github.com/igor-baiborodine/campsite-booking-go/campgroundspb/v1"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/application"
@@ -24,14 +26,18 @@ type server struct {
 
 var _ api.CampgroundsServiceServer = (*server)(nil)
 
-func NewServer() (*grpc.Server, error) {
+func NewServer(l *slog.Logger) (*grpc.Server, error) {
 	validator, err := protovalidate.New()
 	if err != nil {
 		return nil, err
 	}
-	return grpc.NewServer(
-		grpc.UnaryInterceptor(protovalidate_middleware.UnaryServerInterceptor(validator)),
-	), nil
+	opts := []grpc.ServerOption{
+		grpc.ChainUnaryInterceptor(
+			logging.UnaryServerInterceptor(logServiceCalls(l)),
+			protovalidate_middleware.UnaryServerInterceptor(validator),
+		),
+	}
+	return grpc.NewServer(opts...), nil
 }
 
 func RegisterServer(app application.App, registrar grpc.ServiceRegistrar) error {

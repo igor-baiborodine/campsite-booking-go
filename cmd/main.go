@@ -41,8 +41,8 @@ func run() (err error) {
 		return err
 	}
 
-	slog.Info("✅ started campgrounds app")
-	defer slog.Error("🚫 stopped campgrounds app")
+	s.Logger().Info("✅ campgrounds app starting...")
+	defer s.Logger().Info("🚫 stopped campgrounds app")
 
 	s.Waiter().Add(s.WaitForRPC)
 
