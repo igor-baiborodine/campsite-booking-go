@@ -33,6 +33,7 @@ type Service struct {
 
 func New(cfg config.AppConfig) (*Service, error) {
 	s := &Service{cfg: cfg}
+	s.initLogger()
 
 	if err := s.initDB(); err != nil {
 		return nil, err
@@ -41,7 +42,6 @@ func New(cfg config.AppConfig) (*Service, error) {
 		return nil, err
 	}
 	s.initWaiter()
-	s.initLogger()
 
 	return s, nil
 }
@@ -72,7 +72,7 @@ func (s *Service) initDB() (err error) {
 }
 
 func (s *Service) initRpc() (err error) {
-	srv, err := rpc.NewServer()
+	srv, err := rpc.NewServer(s.logger)
 	if err != nil {
 		return err
 	}
@@ -126,8 +126,8 @@ func (s *Service) WaitForRPC(ctx context.Context) error {
 	}
 	group, gCtx := errgroup.WithContext(ctx)
 	group.Go(func() error {
-		fmt.Println("rpc server started")
-		defer fmt.Println("rpc server shutdown")
+		s.logger.Info("✅ rpc server started")
+		defer s.logger.Info("🚫 rpc server shutdown")
 		if err := s.RPC().Serve(listener); err != nil && !errors.Is(err, grpc.ErrServerStopped) {
 			return err
 		}
@@ -136,7 +136,7 @@ func (s *Service) WaitForRPC(ctx context.Context) error {
 
 	group.Go(func() error {
 		<-gCtx.Done()
-		fmt.Println("rpc server to be shutdown")
+		s.logger.Info("rpc server to be shutdown")
 		stopped := make(chan struct{})
 		go func() {
 			s.RPC().GracefulStop()
