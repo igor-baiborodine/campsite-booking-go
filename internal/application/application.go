@@ -3,8 +3,8 @@ package application
 import (
 	"context"
 
-	"github.com/igor-baiborodine/campsite-booking-go/internal/application/commands"
-	"github.com/igor-baiborodine/campsite-booking-go/internal/application/queries"
+	"github.com/igor-baiborodine/campsite-booking-go/internal/application/command"
+	"github.com/igor-baiborodine/campsite-booking-go/internal/application/query"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/domain"
 )
 
@@ -15,16 +15,16 @@ type (
 	}
 
 	Commands interface {
-		CancelBooking(ctx context.Context, cmd commands.CancelBooking) error
-		CreateBooking(ctx context.Context, cmd commands.CreateBooking) (*domain.Booking, error)
-		CreateCampsite(ctx context.Context, cmd commands.CreateCampsite) (*domain.Campsite, error)
-		UpdateBooking(ctx context.Context, cmd commands.UpdateBooking) error
+		CancelBooking(ctx context.Context, cmd command.CancelBooking) error
+		CreateBooking(ctx context.Context, cmd command.CreateBooking) (*domain.Booking, error)
+		CreateCampsite(ctx context.Context, cmd command.CreateCampsite) (*domain.Campsite, error)
+		UpdateBooking(ctx context.Context, cmd command.UpdateBooking) error
 	}
 
 	Queries interface {
-		GetBooking(ctx context.Context, qry queries.GetBooking) (*domain.Booking, error)
-		GetCampsites(ctx context.Context, _ queries.GetCampsites) ([]*domain.Campsite, error)
-		GetVacantDates(ctx context.Context, qry queries.GetVacantDates) ([]string, error)
+		GetBooking(ctx context.Context, qry query.GetBooking) (*domain.Booking, error)
+		GetCampsites(ctx context.Context, _ query.GetCampsites) ([]*domain.Campsite, error)
+		GetVacantDates(ctx context.Context, qry query.GetVacantDates) ([]string, error)
 	}
 
 	CampsitesApp struct {
@@ -33,16 +33,16 @@ type (
 	}
 
 	CampsitesCommands struct {
-		commands.CreateCampsiteHandler
-		commands.CreateBookingHandler
-		commands.UpdateBookingHandler
-		commands.CancelBookingHandler
+		command.CreateCampsiteHandler
+		command.CreateBookingHandler
+		command.UpdateBookingHandler
+		command.CancelBookingHandler
 	}
 
 	CampsitesQueries struct {
-		queries.GetCampsitesHandler
-		queries.GetBookingHandler
-		queries.GetVacantDatesHandler
+		query.GetCampsitesHandler
+		query.GetBookingHandler
+		query.GetVacantDatesHandler
 	}
 )
 
@@ -51,15 +51,15 @@ var _ App = (*CampsitesApp)(nil)
 func New(campsites domain.CampsiteRepository, bookings domain.BookingRepository) *CampsitesApp {
 	return &CampsitesApp{
 		CampsitesCommands: CampsitesCommands{
-			CreateCampsiteHandler: commands.NewCreateCampsiteHandler(campsites),
-			CreateBookingHandler:  commands.NewCreateBookingHandler(bookings),
-			UpdateBookingHandler:  commands.NewUpdateBookingHandler(bookings),
-			CancelBookingHandler:  commands.NewCancelBookingHandler(bookings),
+			CreateCampsiteHandler: command.NewCreateCampsiteHandler(campsites),
+			CreateBookingHandler:  command.NewCreateBookingHandler(bookings),
+			UpdateBookingHandler:  command.NewUpdateBookingHandler(bookings),
+			CancelBookingHandler:  command.NewCancelBookingHandler(bookings),
 		},
 		CampsitesQueries: CampsitesQueries{
-			GetCampsitesHandler:   queries.NewGetCampsitesHandler(campsites),
-			GetBookingHandler:     queries.NewGetBookingHandler(bookings),
-			GetVacantDatesHandler: queries.NewGetVacantDatesHandler(bookings),
+			GetCampsitesHandler:   query.NewGetCampsitesHandler(campsites),
+			GetBookingHandler:     query.NewGetBookingHandler(bookings),
+			GetVacantDatesHandler: query.NewGetVacantDatesHandler(bookings),
 		},
 	}
 }
