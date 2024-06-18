@@ -12,6 +12,7 @@ import (
 	"github.com/igor-baiborodine/campsite-booking-go/internal/application"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/domain"
 	rpc "github.com/igor-baiborodine/campsite-booking-go/internal/grpc"
+	"github.com/igor-baiborodine/campsite-booking-go/internal/logger"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/testing/bootstrap"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -45,7 +46,12 @@ func (s *serverSuite) SetupTest() {
 	const grpcTestPort = ":10912"
 	var err error
 
-	s.server, err = rpc.NewServer()
+	l := logger.New(logger.LogConfig{
+		Environment: "integration",
+		LogLevel:    "DEBUG",
+	})
+
+	s.server, err = rpc.NewServer(l)
 	if err != nil {
 		s.T().Fatal(err)
 	}
