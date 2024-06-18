@@ -11,8 +11,8 @@ import (
 	protovalidate_middleware "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/protovalidate"
 	api "github.com/igor-baiborodine/campsite-booking-go/campgroundspb/v1"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/application"
-	"github.com/igor-baiborodine/campsite-booking-go/internal/application/commands"
-	"github.com/igor-baiborodine/campsite-booking-go/internal/application/queries"
+	"github.com/igor-baiborodine/campsite-booking-go/internal/application/command"
+	"github.com/igor-baiborodine/campsite-booking-go/internal/application/query"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/domain"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -46,7 +46,7 @@ func RegisterServer(app application.App, registrar grpc.ServiceRegistrar) error 
 }
 
 func (s server) GetCampsites(ctx context.Context, _ *api.GetCampsitesRequest) (*api.GetCampsitesResponse, error) {
-	campsites, err := s.app.GetCampsites(ctx, queries.GetCampsites{})
+	campsites, err := s.app.GetCampsites(ctx, query.GetCampsites{})
 	if err != nil {
 		return nil, err
 	}
@@ -62,7 +62,7 @@ func (s server) GetCampsites(ctx context.Context, _ *api.GetCampsitesRequest) (*
 }
 
 func (s server) CreateCampsite(ctx context.Context, req *api.CreateCampsiteRequest) (*api.CreateCampsiteResponse, error) {
-	campsite := commands.CreateCampsite{
+	campsite := command.CreateCampsite{
 		CampsiteID:    uuid.New().String(),
 		CampsiteCode:  req.CampsiteCode,
 		Capacity:      req.Capacity,
@@ -82,7 +82,7 @@ func (s server) CreateCampsite(ctx context.Context, req *api.CreateCampsiteReque
 }
 
 func (s server) GetBooking(ctx context.Context, req *api.GetBookingRequest) (*api.GetBookingResponse, error) {
-	booking, err := s.app.GetBooking(ctx, queries.GetBooking{BookingID: req.BookingId})
+	booking, err := s.app.GetBooking(ctx, query.GetBooking{BookingID: req.BookingId})
 	if err != nil {
 		return nil, handleDomainError(err)
 	}
@@ -93,7 +93,7 @@ func (s server) GetBooking(ctx context.Context, req *api.GetBookingRequest) (*ap
 }
 
 func (s server) CreateBooking(ctx context.Context, req *api.CreateBookingRequest) (*api.CreateBookingResponse, error) {
-	booking := commands.CreateBooking{
+	booking := command.CreateBooking{
 		BookingID:  uuid.New().String(),
 		CampsiteID: req.CampsiteId,
 		Email:      req.Email,
@@ -112,7 +112,7 @@ func (s server) CreateBooking(ctx context.Context, req *api.CreateBookingRequest
 }
 
 func (s server) UpdateBooking(ctx context.Context, req *api.UpdateBookingRequest) (*api.UpdateBookingResponse, error) {
-	booking := commands.UpdateBooking{
+	booking := command.UpdateBooking{
 		BookingID:  req.Booking.BookingId,
 		CampsiteID: req.Booking.CampsiteId,
 		Email:      req.Booking.Email,
@@ -128,7 +128,7 @@ func (s server) UpdateBooking(ctx context.Context, req *api.UpdateBookingRequest
 }
 
 func (s server) CancelBooking(ctx context.Context, req *api.CancelBookingRequest) (*api.CancelBookingResponse, error) {
-	booking := commands.CancelBooking{
+	booking := command.CancelBooking{
 		BookingID: req.GetBookingId(),
 	}
 	err := s.app.CancelBooking(ctx, booking)
@@ -139,7 +139,7 @@ func (s server) CancelBooking(ctx context.Context, req *api.CancelBookingRequest
 }
 
 func (s server) GetVacantDates(ctx context.Context, req *api.GetVacantDatesRequest) (*api.GetVacantDatesResponse, error) {
-	vacantDates, err := s.app.GetVacantDates(ctx, queries.GetVacantDates{
+	vacantDates, err := s.app.GetVacantDates(ctx, query.GetVacantDates{
 		CampsiteID: req.CampsiteId,
 		StartDate:  req.StartDate,
 		EndDate:    req.EndDate,

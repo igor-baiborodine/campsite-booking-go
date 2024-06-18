@@ -5,7 +5,7 @@ package application
 import (
 	context "context"
 
-	commands "github.com/igor-baiborodine/campsite-booking-go/internal/application/commands"
+	command "github.com/igor-baiborodine/campsite-booking-go/internal/application/command"
 
 	domain "github.com/igor-baiborodine/campsite-booking-go/internal/domain"
 
@@ -18,7 +18,7 @@ type MockCommands struct {
 }
 
 // CancelBooking provides a mock function with given fields: ctx, cmd
-func (_m *MockCommands) CancelBooking(ctx context.Context, cmd commands.CancelBooking) error {
+func (_m *MockCommands) CancelBooking(ctx context.Context, cmd command.CancelBooking) error {
 	ret := _m.Called(ctx, cmd)
 
 	if len(ret) == 0 {
@@ -26,7 +26,7 @@ func (_m *MockCommands) CancelBooking(ctx context.Context, cmd commands.CancelBo
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, commands.CancelBooking) error); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, command.CancelBooking) error); ok {
 		r0 = rf(ctx, cmd)
 	} else {
 		r0 = ret.Error(0)
@@ -36,7 +36,7 @@ func (_m *MockCommands) CancelBooking(ctx context.Context, cmd commands.CancelBo
 }
 
 // CreateBooking provides a mock function with given fields: ctx, cmd
-func (_m *MockCommands) CreateBooking(ctx context.Context, cmd commands.CreateBooking) (*domain.Booking, error) {
+func (_m *MockCommands) CreateBooking(ctx context.Context, cmd command.CreateBooking) (*domain.Booking, error) {
 	ret := _m.Called(ctx, cmd)
 
 	if len(ret) == 0 {
@@ -45,10 +45,10 @@ func (_m *MockCommands) CreateBooking(ctx context.Context, cmd commands.CreateBo
 
 	var r0 *domain.Booking
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, commands.CreateBooking) (*domain.Booking, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, command.CreateBooking) (*domain.Booking, error)); ok {
 		return rf(ctx, cmd)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, commands.CreateBooking) *domain.Booking); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, command.CreateBooking) *domain.Booking); ok {
 		r0 = rf(ctx, cmd)
 	} else {
 		if ret.Get(0) != nil {
@@ -56,7 +56,7 @@ func (_m *MockCommands) CreateBooking(ctx context.Context, cmd commands.CreateBo
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, commands.CreateBooking) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, command.CreateBooking) error); ok {
 		r1 = rf(ctx, cmd)
 	} else {
 		r1 = ret.Error(1)
@@ -66,7 +66,7 @@ func (_m *MockCommands) CreateBooking(ctx context.Context, cmd commands.CreateBo
 }
 
 // CreateCampsite provides a mock function with given fields: ctx, cmd
-func (_m *MockCommands) CreateCampsite(ctx context.Context, cmd commands.CreateCampsite) (*domain.Campsite, error) {
+func (_m *MockCommands) CreateCampsite(ctx context.Context, cmd command.CreateCampsite) (*domain.Campsite, error) {
 	ret := _m.Called(ctx, cmd)
 
 	if len(ret) == 0 {
@@ -75,10 +75,10 @@ func (_m *MockCommands) CreateCampsite(ctx context.Context, cmd commands.CreateC
 
 	var r0 *domain.Campsite
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, commands.CreateCampsite) (*domain.Campsite, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, command.CreateCampsite) (*domain.Campsite, error)); ok {
 		return rf(ctx, cmd)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, commands.CreateCampsite) *domain.Campsite); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, command.CreateCampsite) *domain.Campsite); ok {
 		r0 = rf(ctx, cmd)
 	} else {
 		if ret.Get(0) != nil {
@@ -86,7 +86,7 @@ func (_m *MockCommands) CreateCampsite(ctx context.Context, cmd commands.CreateC
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, commands.CreateCampsite) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, command.CreateCampsite) error); ok {
 		r1 = rf(ctx, cmd)
 	} else {
 		r1 = ret.Error(1)
@@ -96,7 +96,7 @@ func (_m *MockCommands) CreateCampsite(ctx context.Context, cmd commands.CreateC
 }
 
 // UpdateBooking provides a mock function with given fields: ctx, cmd
-func (_m *MockCommands) UpdateBooking(ctx context.Context, cmd commands.UpdateBooking) error {
+func (_m *MockCommands) UpdateBooking(ctx context.Context, cmd command.UpdateBooking) error {
 	ret := _m.Called(ctx, cmd)
 
 	if len(ret) == 0 {
@@ -104,7 +104,7 @@ func (_m *MockCommands) UpdateBooking(ctx context.Context, cmd commands.UpdateBo
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, commands.UpdateBooking) error); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, command.UpdateBooking) error); ok {
 		r0 = rf(ctx, cmd)
 	} else {
 		r0 = ret.Error(0)

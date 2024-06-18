@@ -7,7 +7,7 @@ import (
 
 	api "github.com/igor-baiborodine/campsite-booking-go/campgroundspb/v1"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/application"
-	"github.com/igor-baiborodine/campsite-booking-go/internal/application/queries"
+	"github.com/igor-baiborodine/campsite-booking-go/internal/application/query"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/domain"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/testing/bootstrap"
 	"github.com/stretchr/testify/assert"
@@ -103,7 +103,7 @@ func TestGetBooking(t *testing.T) {
 			on: func(f mocks) {
 				f.app.On(
 					"GetBooking", context.Background(),
-					queries.GetBooking{BookingID: booking.BookingID},
+					query.GetBooking{BookingID: booking.BookingID},
 				).Return(booking, nil)
 			},
 			want:    &api.GetBookingResponse{Booking: BookingFromDomain(booking)},
@@ -119,7 +119,7 @@ func TestGetBooking(t *testing.T) {
 			on: func(f mocks) {
 				f.app.On(
 					"GetBooking", context.Background(),
-					queries.GetBooking{BookingID: nonExistingID},
+					query.GetBooking{BookingID: nonExistingID},
 				).Return(nil, domain.ErrBookingNotFound{BookingID: nonExistingID})
 			},
 			want:    &api.GetBookingResponse{Booking: BookingFromDomain(booking)},

@@ -1,10 +1,10 @@
-package commands
+package command
 
 import (
 	"context"
 	"time"
 
-	"github.com/igor-baiborodine/campsite-booking-go/internal/application/validators"
+	"github.com/igor-baiborodine/campsite-booking-go/internal/application/validator"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/domain"
 )
 
@@ -20,17 +20,17 @@ type (
 
 	UpdateBookingHandler struct {
 		bookings   domain.BookingRepository
-		validators []validators.BookingValidator
+		validators []validator.BookingValidator
 	}
 )
 
 func NewUpdateBookingHandler(bookings domain.BookingRepository) UpdateBookingHandler {
 	return UpdateBookingHandler{
 		bookings: bookings,
-		validators: []validators.BookingValidator{
-			&validators.BookingStartDateBeforeEndDateValidator{},
-			&validators.BookingAllowedStartDateValidator{},
-			&validators.BookingMaximumStayValidator{},
+		validators: []validator.BookingValidator{
+			&validator.BookingStartDateBeforeEndDateValidator{},
+			&validator.BookingAllowedStartDateValidator{},
+			&validator.BookingMaximumStayValidator{},
 		},
 	}
 }
@@ -68,7 +68,7 @@ func (h UpdateBookingHandler) UpdateBooking(ctx context.Context, cmd UpdateBooki
 		booking.EndDate = endDate
 	}
 
-	err = validators.Apply(h.validators, booking)
+	err = validator.Apply(h.validators, booking)
 	if err != nil {
 		return err
 	}
