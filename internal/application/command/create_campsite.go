@@ -26,7 +26,7 @@ func NewCreateCampsiteHandler(campsites domain.CampsiteRepository) CreateCampsit
 	return CreateCampsiteHandler{campsites: campsites}
 }
 
-func (h CreateCampsiteHandler) CreateCampsite(ctx context.Context, cmd CreateCampsite) (*domain.Campsite, error) {
+func (h CreateCampsiteHandler) CreateCampsite(ctx context.Context, cmd CreateCampsite) error {
 	campsite := domain.Campsite{
 		CampsiteID:    cmd.CampsiteID,
 		CampsiteCode:  cmd.CampsiteCode,
@@ -37,5 +37,5 @@ func (h CreateCampsiteHandler) CreateCampsite(ctx context.Context, cmd CreateCam
 		FirePit:       cmd.FirePit,
 		Active:        true,
 	}
-	return &campsite, h.campsites.Insert(ctx, &campsite)
+	return h.campsites.Insert(ctx, &campsite)
 }

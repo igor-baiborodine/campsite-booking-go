@@ -16,8 +16,8 @@ type (
 
 	Commands interface {
 		CancelBooking(ctx context.Context, cmd command.CancelBooking) error
-		CreateBooking(ctx context.Context, cmd command.CreateBooking) (*domain.Booking, error)
-		CreateCampsite(ctx context.Context, cmd command.CreateCampsite) (*domain.Campsite, error)
+		CreateBooking(ctx context.Context, cmd command.CreateBooking) error
+		CreateCampsite(ctx context.Context, cmd command.CreateCampsite) error
 		UpdateBooking(ctx context.Context, cmd command.UpdateBooking) error
 	}
 

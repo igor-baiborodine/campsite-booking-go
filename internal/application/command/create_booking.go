@@ -35,7 +35,7 @@ func NewCreateBookingHandler(bookings domain.BookingRepository) CreateBookingHan
 	}
 }
 
-func (h CreateBookingHandler) CreateBooking(ctx context.Context, cmd CreateBooking) (*domain.Booking, error) {
+func (h CreateBookingHandler) CreateBooking(ctx context.Context, cmd CreateBooking) error {
 	booking := &domain.Booking{
 		BookingID:  cmd.BookingID,
 		CampsiteID: cmd.CampsiteID,
@@ -44,20 +44,20 @@ func (h CreateBookingHandler) CreateBooking(ctx context.Context, cmd CreateBooki
 	}
 	startDate, err := time.Parse(time.DateOnly, cmd.StartDate)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	booking.StartDate = startDate
 
 	endDate, err := time.Parse(time.DateOnly, cmd.EndDate)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	booking.EndDate = endDate
 	booking.Active = true
 
 	err = validator.Apply(h.validators, booking)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	return booking, h.bookings.Insert(ctx, booking)
+	return h.bookings.Insert(ctx, booking)
 }

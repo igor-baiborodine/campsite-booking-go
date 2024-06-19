@@ -30,10 +30,8 @@ func TestCreateCampsite(t *testing.T) {
 	assert.NoError(t, err)
 
 	tests := map[string]struct {
-		args    args
-		on      func(f mocks)
-		want    *api.CreateCampsiteResponse
-		wantErr string
+		args args
+		on   func(f mocks)
 	}{
 		"Success": {
 			args: args{
@@ -50,10 +48,8 @@ func TestCreateCampsite(t *testing.T) {
 			on: func(f mocks) {
 				f.app.On(
 					"CreateCampsite", context.Background(), mock.Anything,
-				).Return(campsite, nil)
+				).Return(nil)
 			},
-			want:    &api.CreateCampsiteResponse{CampsiteId: campsite.CampsiteID},
-			wantErr: "",
 		},
 	}
 	for name, tc := range tests {
@@ -67,11 +63,8 @@ func TestCreateCampsite(t *testing.T) {
 			// when
 			resp, err := s.CreateCampsite(tc.args.ctx, &tc.args.req)
 			// then
-			if tc.wantErr != "" {
-				assert.Containsf(t, err.Error(), tc.wantErr, "CreateCampsite() error = %v, wantErr %v", err, tc.wantErr)
-				return
-			}
-			assert.Equal(t, tc.want, resp)
+			assert.NoError(t, err)
+			assert.NotEmpty(t, resp.CampsiteId)
 		})
 	}
 }
@@ -159,7 +152,6 @@ func TestCreateBooking(t *testing.T) {
 	tests := map[string]struct {
 		args    args
 		on      func(f mocks)
-		want    *api.CreateBookingResponse
 		wantErr string
 	}{
 		"Success": {
@@ -176,9 +168,8 @@ func TestCreateBooking(t *testing.T) {
 			on: func(f mocks) {
 				f.app.On(
 					"CreateBooking", context.Background(), mock.Anything,
-				).Return(booking, nil)
+				).Return(nil)
 			},
-			want:    &api.CreateBookingResponse{BookingId: booking.BookingID},
 			wantErr: "",
 		},
 		"BookingDatesNotAvailable": {
@@ -196,14 +187,12 @@ func TestCreateBooking(t *testing.T) {
 				f.app.On(
 					"CreateBooking", context.Background(), mock.Anything,
 				).Return(
-					nil,
 					domain.ErrBookingDatesNotAvailable{
 						StartDate: booking.StartDate,
 						EndDate:   booking.EndDate,
 					},
 				)
 			},
-			want:    nil,
 			wantErr: codes.FailedPrecondition.String(),
 		},
 	}
@@ -222,7 +211,7 @@ func TestCreateBooking(t *testing.T) {
 				assert.Containsf(t, err.Error(), tc.wantErr, "CreateBooking() error = %v, wantErr %v", err, tc.wantErr)
 				return
 			}
-			assert.Equal(t, tc.want, resp)
+			assert.NotEmpty(t, resp.BookingId)
 		})
 	}
 }

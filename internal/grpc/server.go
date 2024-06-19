@@ -71,13 +71,13 @@ func (s server) CreateCampsite(ctx context.Context, req *api.CreateCampsiteReque
 		PicnicTable:   req.PicnicTable,
 		FirePit:       req.FirePit,
 	}
-	createdCampsite, err := s.app.CreateCampsite(ctx, campsite)
+	err := s.app.CreateCampsite(ctx, campsite)
 	if err != nil {
 		return nil, handleDomainError(err)
 	}
 
 	return &api.CreateCampsiteResponse{
-		CampsiteId: createdCampsite.CampsiteID,
+		CampsiteId: campsite.CampsiteID,
 	}, nil
 }
 
@@ -101,13 +101,13 @@ func (s server) CreateBooking(ctx context.Context, req *api.CreateBookingRequest
 		StartDate:  req.StartDate,
 		EndDate:    req.EndDate,
 	}
-	createdBooking, err := s.app.CreateBooking(ctx, booking)
+	err := s.app.CreateBooking(ctx, booking)
 	if err != nil {
 		return nil, handleDomainError(err)
 	}
 
 	return &api.CreateBookingResponse{
-		BookingId: createdBooking.BookingID,
+		BookingId: booking.BookingID,
 	}, nil
 }
 
