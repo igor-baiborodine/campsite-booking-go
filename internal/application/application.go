@@ -10,18 +10,10 @@ import (
 
 type (
 	App interface {
-		Commands
-		Queries
-	}
-
-	Commands interface {
 		CancelBooking(ctx context.Context, cmd command.CancelBooking) error
 		CreateBooking(ctx context.Context, cmd command.CreateBooking) error
 		CreateCampsite(ctx context.Context, cmd command.CreateCampsite) error
 		UpdateBooking(ctx context.Context, cmd command.UpdateBooking) error
-	}
-
-	Queries interface {
 		GetBooking(ctx context.Context, qry query.GetBooking) (*domain.Booking, error)
 		GetCampsites(ctx context.Context, _ query.GetCampsites) ([]*domain.Campsite, error)
 		GetVacantDates(ctx context.Context, qry query.GetVacantDates) ([]string, error)
