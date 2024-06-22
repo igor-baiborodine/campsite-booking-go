@@ -18,6 +18,6 @@ func NewGetCampsitesHandler(campsites domain.CampsiteRepository) GetCampsitesHan
 	return GetCampsitesHandler{campsites: campsites}
 }
 
-func (h GetCampsitesHandler) GetCampsites(ctx context.Context, _ GetCampsites) ([]*domain.Campsite, error) {
+func (h GetCampsitesHandler) Handle(ctx context.Context, _ GetCampsites) ([]*domain.Campsite, error) {
 	return h.campsites.FindAll(ctx)
 }

@@ -130,7 +130,7 @@ func TestGetVacantDates(t *testing.T) {
 				tc.on(m)
 			}
 			// when
-			vacantDates, err := h.GetVacantDates(tc.args.ctx, tc.args.qry)
+			vacantDates, err := h.Handle(tc.args.ctx, tc.args.qry)
 			// then
 			if tc.wantErr != "" {
 				assert.Containsf(t, err.Error(), tc.wantErr, "GetVacantDates() error = %v, wantErr %v", err, tc.wantErr)

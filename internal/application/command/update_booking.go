@@ -35,7 +35,7 @@ func NewUpdateBookingHandler(bookings domain.BookingRepository) UpdateBookingHan
 	}
 }
 
-func (h UpdateBookingHandler) UpdateBooking(ctx context.Context, cmd UpdateBooking) error {
+func (h UpdateBookingHandler) Handle(ctx context.Context, cmd UpdateBooking) error {
 	booking, err := h.bookings.Find(ctx, cmd.BookingID)
 	if err != nil {
 		return err
