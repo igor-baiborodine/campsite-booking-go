@@ -103,9 +103,9 @@ func (_m *MockApp) GetBooking(ctx context.Context, qry query.GetBooking) (*domai
 	return r0, r1
 }
 
-// GetCampsites provides a mock function with given fields: ctx, _a1
-func (_m *MockApp) GetCampsites(ctx context.Context, _a1 query.GetCampsites) ([]*domain.Campsite, error) {
-	ret := _m.Called(ctx, _a1)
+// GetCampsites provides a mock function with given fields: ctx, qry
+func (_m *MockApp) GetCampsites(ctx context.Context, qry query.GetCampsites) ([]*domain.Campsite, error) {
+	ret := _m.Called(ctx, qry)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetCampsites")
@@ -114,10 +114,10 @@ func (_m *MockApp) GetCampsites(ctx context.Context, _a1 query.GetCampsites) ([]
 	var r0 []*domain.Campsite
 	var r1 error
 	if rf, ok := ret.Get(0).(func(context.Context, query.GetCampsites) ([]*domain.Campsite, error)); ok {
-		return rf(ctx, _a1)
+		return rf(ctx, qry)
 	}
 	if rf, ok := ret.Get(0).(func(context.Context, query.GetCampsites) []*domain.Campsite); ok {
-		r0 = rf(ctx, _a1)
+		r0 = rf(ctx, qry)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).([]*domain.Campsite)
@@ -125,7 +125,7 @@ func (_m *MockApp) GetCampsites(ctx context.Context, _a1 query.GetCampsites) ([]
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context, query.GetCampsites) error); ok {
-		r1 = rf(ctx, _a1)
+		r1 = rf(ctx, qry)
 	} else {
 		r1 = ret.Error(1)
 	}

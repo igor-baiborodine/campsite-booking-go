@@ -24,7 +24,7 @@ func NewGetVacantDatesHandler(bookings domain.BookingRepository) GetVacantDatesH
 	return GetVacantDatesHandler{bookings: bookings}
 }
 
-func (h GetVacantDatesHandler) GetVacantDates(ctx context.Context, qry GetVacantDates) ([]string, error) {
+func (h GetVacantDatesHandler) Handle(ctx context.Context, qry GetVacantDates) ([]string, error) {
 	startDate, err := time.Parse(time.DateOnly, qry.StartDate)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to parse start date %s", qry.StartDate)

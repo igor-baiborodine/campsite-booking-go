@@ -20,6 +20,6 @@ func NewGetBookingHandler(bookings domain.BookingRepository) GetBookingHandler {
 	return GetBookingHandler{bookings: bookings}
 }
 
-func (h GetBookingHandler) GetBooking(ctx context.Context, qry GetBooking) (*domain.Booking, error) {
+func (h GetBookingHandler) Handle(ctx context.Context, qry GetBooking) (*domain.Booking, error) {
 	return h.bookings.Find(ctx, qry.BookingID)
 }

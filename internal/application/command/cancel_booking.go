@@ -20,7 +20,7 @@ func NewCancelBookingHandler(bookings domain.BookingRepository) CancelBookingHan
 	return CancelBookingHandler{bookings: bookings}
 }
 
-func (h CancelBookingHandler) CancelBooking(ctx context.Context, cmd CancelBooking) error {
+func (h CancelBookingHandler) Handle(ctx context.Context, cmd CancelBooking) error {
 	booking, err := h.bookings.Find(ctx, cmd.BookingID)
 	if err != nil {
 		return err

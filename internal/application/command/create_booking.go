@@ -35,7 +35,7 @@ func NewCreateBookingHandler(bookings domain.BookingRepository) CreateBookingHan
 	}
 }
 
-func (h CreateBookingHandler) CreateBooking(ctx context.Context, cmd CreateBooking) error {
+func (h CreateBookingHandler) Handle(ctx context.Context, cmd CreateBooking) error {
 	booking := &domain.Booking{
 		BookingID:  cmd.BookingID,
 		CampsiteID: cmd.CampsiteID,
