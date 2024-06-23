@@ -2,7 +2,10 @@ package command
 
 import (
 	"context"
+	"log/slog"
 
+	"github.com/igor-baiborodine/campsite-booking-go/internal/application/decorator"
+	"github.com/igor-baiborodine/campsite-booking-go/internal/application/handler"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/domain"
 )
 
@@ -11,16 +14,22 @@ type (
 		BookingID string
 	}
 
-	CancelBookingHandler struct {
+	// CancelBookingHandler is a logging decorator for the cancelBookingHandler struct.
+	CancelBookingHandler handler.Command[CancelBooking]
+
+	cancelBookingHandler struct {
 		bookings domain.BookingRepository
 	}
 )
 
-func NewCancelBookingHandler(bookings domain.BookingRepository) CancelBookingHandler {
-	return CancelBookingHandler{bookings: bookings}
+func NewCancelBookingHandler(bookings domain.BookingRepository, logger *slog.Logger) CancelBookingHandler {
+	return decorator.ApplyCommandDecorator[CancelBooking](
+		cancelBookingHandler{bookings: bookings},
+		logger,
+	)
 }
 
-func (h CancelBookingHandler) Handle(ctx context.Context, cmd CancelBooking) error {
+func (h cancelBookingHandler) Handle(ctx context.Context, cmd CancelBooking) error {
 	booking, err := h.bookings.Find(ctx, cmd.BookingID)
 	if err != nil {
 		return err

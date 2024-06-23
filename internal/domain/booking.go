@@ -1,6 +1,8 @@
 package domain
 
 import (
+	"encoding/json"
+	"fmt"
 	"time"
 )
 
@@ -23,4 +25,9 @@ func (b *Booking) BookingDates() []time.Time {
 		dates = append(dates, d)
 	}
 	return dates
+}
+
+func (b *Booking) String() string {
+	result, _ := json.Marshal(b)
+	return fmt.Sprintf("%s", result)
 }

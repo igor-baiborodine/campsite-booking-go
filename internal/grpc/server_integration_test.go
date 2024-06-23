@@ -4,7 +4,9 @@ package grpc_test
 
 import (
 	"context"
+	"log/slog"
 	"net"
+	"os"
 	"testing"
 	"time"
 
@@ -14,6 +16,7 @@ import (
 	rpc "github.com/igor-baiborodine/campsite-booking-go/internal/grpc"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/logger"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/testing/bootstrap"
+	"github.com/jba/slog/handlers/loghandler"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
@@ -66,7 +69,11 @@ func (s *serverSuite) SetupTest() {
 		campsites: domain.NewMockCampsiteRepository(s.T()),
 		bookings:  domain.NewMockBookingRepository(s.T()),
 	}
-	app := application.New(s.mocks.campsites, s.mocks.bookings)
+	app := application.New(
+		s.mocks.campsites,
+		s.mocks.bookings,
+		slog.New(loghandler.New(os.Stdout, nil)),
+	)
 
 	if err = rpc.RegisterServer(app, s.server); err != nil {
 		s.T().Fatal(err)
