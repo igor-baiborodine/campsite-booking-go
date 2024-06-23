@@ -2,8 +2,11 @@ package query
 
 import (
 	"context"
+	"log/slog"
 	"time"
 
+	"github.com/igor-baiborodine/campsite-booking-go/internal/application/decorator"
+	"github.com/igor-baiborodine/campsite-booking-go/internal/application/handler"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/domain"
 	"github.com/stackus/errors"
 )
@@ -15,16 +18,22 @@ type (
 		EndDate    string
 	}
 
-	GetVacantDatesHandler struct {
+	// GetVacantDatesHandler is a logging decorator for the getVacantDatesHandler struct.
+	GetVacantDatesHandler handler.Query[GetVacantDates, []string]
+
+	getVacantDatesHandler struct {
 		bookings domain.BookingRepository
 	}
 )
 
-func NewGetVacantDatesHandler(bookings domain.BookingRepository) GetVacantDatesHandler {
-	return GetVacantDatesHandler{bookings: bookings}
+func NewGetVacantDatesHandler(bookings domain.BookingRepository, logger *slog.Logger) GetVacantDatesHandler {
+	return decorator.ApplyQueryDecorator[GetVacantDates, []string](
+		getVacantDatesHandler{bookings: bookings},
+		logger,
+	)
 }
 
-func (h GetVacantDatesHandler) Handle(ctx context.Context, qry GetVacantDates) ([]string, error) {
+func (h getVacantDatesHandler) Handle(ctx context.Context, qry GetVacantDates) ([]string, error) {
 	startDate, err := time.Parse(time.DateOnly, qry.StartDate)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to parse start date %s", qry.StartDate)

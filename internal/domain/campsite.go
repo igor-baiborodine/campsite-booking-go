@@ -1,5 +1,10 @@
 package domain
 
+import (
+	"encoding/json"
+	"fmt"
+)
+
 type Campsite struct {
 	// Persistence ID
 	ID int64
@@ -12,4 +17,9 @@ type Campsite struct {
 	PicnicTable   bool
 	FirePit       bool
 	Active        bool
+}
+
+func (c *Campsite) String() string {
+	result, _ := json.Marshal(c)
+	return fmt.Sprintf("%s", result)
 }

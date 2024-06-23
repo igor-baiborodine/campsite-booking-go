@@ -2,7 +2,10 @@ package command
 
 import (
 	"context"
+	"log/slog"
 
+	"github.com/igor-baiborodine/campsite-booking-go/internal/application/decorator"
+	"github.com/igor-baiborodine/campsite-booking-go/internal/application/handler"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/domain"
 )
 
@@ -17,16 +20,22 @@ type (
 		FirePit       bool
 	}
 
-	CreateCampsiteHandler struct {
+	// CreateCampsiteHandler is a logging decorator for the createCampsiteHandler struct.
+	CreateCampsiteHandler handler.Command[CreateCampsite]
+
+	createCampsiteHandler struct {
 		campsites domain.CampsiteRepository
 	}
 )
 
-func NewCreateCampsiteHandler(campsites domain.CampsiteRepository) CreateCampsiteHandler {
-	return CreateCampsiteHandler{campsites: campsites}
+func NewCreateCampsiteHandler(campsites domain.CampsiteRepository, logger *slog.Logger) CreateCampsiteHandler {
+	return decorator.ApplyCommandDecorator[CreateCampsite](
+		createCampsiteHandler{campsites: campsites},
+		logger,
+	)
 }
 
-func (h CreateCampsiteHandler) Handle(ctx context.Context, cmd CreateCampsite) error {
+func (h createCampsiteHandler) Handle(ctx context.Context, cmd CreateCampsite) error {
 	campsite := domain.Campsite{
 		CampsiteID:    cmd.CampsiteID,
 		CampsiteCode:  cmd.CampsiteCode,

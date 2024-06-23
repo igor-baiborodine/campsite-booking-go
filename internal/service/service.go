@@ -111,7 +111,7 @@ func (s *Service) Startup() error {
 	campsites := postgres.NewCampsiteRepository(s.db)
 	bookings := postgres.NewBookingRepository(s.db)
 	// setup application
-	app := application.New(campsites, bookings)
+	app := application.New(campsites, bookings, s.logger)
 	// setup driver adapters
 	if err := rpc.RegisterServer(app, s.rpc); err != nil {
 		return err

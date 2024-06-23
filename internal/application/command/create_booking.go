@@ -2,8 +2,11 @@ package command
 
 import (
 	"context"
+	"log/slog"
 	"time"
 
+	"github.com/igor-baiborodine/campsite-booking-go/internal/application/decorator"
+	"github.com/igor-baiborodine/campsite-booking-go/internal/application/handler"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/application/validator"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/domain"
 )
@@ -18,24 +21,30 @@ type (
 		EndDate    string
 	}
 
-	CreateBookingHandler struct {
+	// CreateBookingHandler is a logging decorator for the createBookingHandler struct.
+	CreateBookingHandler handler.Command[CreateBooking]
+
+	createBookingHandler struct {
 		bookings   domain.BookingRepository
 		validators []validator.BookingValidator
 	}
 )
 
-func NewCreateBookingHandler(bookings domain.BookingRepository) CreateBookingHandler {
-	return CreateBookingHandler{
-		bookings: bookings,
-		validators: []validator.BookingValidator{
-			&validator.BookingStartDateBeforeEndDateValidator{},
-			&validator.BookingAllowedStartDateValidator{},
-			&validator.BookingMaximumStayValidator{},
+func NewCreateBookingHandler(bookings domain.BookingRepository, logger *slog.Logger) CreateBookingHandler {
+	return decorator.ApplyCommandDecorator[CreateBooking](
+		createBookingHandler{
+			bookings: bookings,
+			validators: []validator.BookingValidator{
+				&validator.BookingStartDateBeforeEndDateValidator{},
+				&validator.BookingAllowedStartDateValidator{},
+				&validator.BookingMaximumStayValidator{},
+			},
 		},
-	}
+		logger,
+	)
 }
 
-func (h CreateBookingHandler) Handle(ctx context.Context, cmd CreateBooking) error {
+func (h createBookingHandler) Handle(ctx context.Context, cmd CreateBooking) error {
 	booking := &domain.Booking{
 		BookingID:  cmd.BookingID,
 		CampsiteID: cmd.CampsiteID,
