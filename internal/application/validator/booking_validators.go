@@ -25,7 +25,7 @@ type ErrBookingMaximumStay struct{}
 type ErrBookingStartDateBeforeEndDate struct{}
 
 func (v *BookingAllowedStartDateValidator) Validate(b *domain.Booking) error {
-	now := time.Now()
+	now := time.Now().UTC()
 	if b.StartDate.After(now) && b.StartDate.Before(now.AddDate(0, 1, 0)) {
 		return nil
 	}
