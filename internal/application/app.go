@@ -55,21 +55,34 @@ func (a CampgroundsApp) CancelBooking(ctx context.Context, cmd command.CancelBoo
 	return a.commands.CancelBookingHandler.Handle(ctx, cmd)
 }
 
-func (a CampgroundsApp) GetCampsites(ctx context.Context, qry query.GetCampsites) ([]*domain.Campsite, error) {
+func (a CampgroundsApp) GetCampsites(
+	ctx context.Context,
+	qry query.GetCampsites,
+) ([]*domain.Campsite, error) {
 	return a.queries.GetCampsitesHandler.Handle(ctx, qry)
 }
 
-func (a CampgroundsApp) GetBooking(ctx context.Context, qry query.GetBooking) (*domain.Booking, error) {
+func (a CampgroundsApp) GetBooking(
+	ctx context.Context,
+	qry query.GetBooking,
+) (*domain.Booking, error) {
 	return a.queries.GetBookingHandler.Handle(ctx, qry)
 }
 
-func (a CampgroundsApp) GetVacantDates(ctx context.Context, qry query.GetVacantDates) ([]string, error) {
+func (a CampgroundsApp) GetVacantDates(
+	ctx context.Context,
+	qry query.GetVacantDates,
+) ([]string, error) {
 	return a.queries.GetVacantDatesHandler.Handle(ctx, qry)
 }
 
 var _ App = (*CampgroundsApp)(nil)
 
-func New(campsites domain.CampsiteRepository, bookings domain.BookingRepository, logger *slog.Logger) *CampgroundsApp {
+func New(
+	campsites domain.CampsiteRepository,
+	bookings domain.BookingRepository,
+	logger *slog.Logger,
+) *CampgroundsApp {
 	return &CampgroundsApp{
 		commands: commands{
 			CreateCampsiteHandler: command.NewCreateCampsiteHandler(campsites, logger),

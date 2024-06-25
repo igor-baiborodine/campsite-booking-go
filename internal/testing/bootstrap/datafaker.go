@@ -16,7 +16,6 @@ import (
 func NewCampsite() (*domain.Campsite, error) {
 	campsite := domain.Campsite{}
 	err := faker.FakeData(&campsite)
-
 	if err != nil {
 		return nil, err
 	}
@@ -31,10 +30,13 @@ func NewBooking(campsiteID string) (*domain.Booking, error) {
 	return NewBookingWithAddDays(campsiteID, 1, 2)
 }
 
-func NewBookingWithAddDays(campsiteID string, startAddDays int, endAddDays int) (*domain.Booking, error) {
+func NewBookingWithAddDays(
+	campsiteID string,
+	startAddDays int,
+	endAddDays int,
+) (*domain.Booking, error) {
 	booking := domain.Booking{}
 	err := faker.FakeData(&booking)
-
 	if err != nil {
 		return nil, err
 	}

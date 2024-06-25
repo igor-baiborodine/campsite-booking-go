@@ -22,7 +22,10 @@ type (
 	}
 )
 
-func NewCancelBookingHandler(bookings domain.BookingRepository, logger *slog.Logger) CancelBookingHandler {
+func NewCancelBookingHandler(
+	bookings domain.BookingRepository,
+	logger *slog.Logger,
+) CancelBookingHandler {
 	return decorator.ApplyCommandDecorator[CancelBooking](
 		cancelBookingHandler{bookings: bookings},
 		logger,

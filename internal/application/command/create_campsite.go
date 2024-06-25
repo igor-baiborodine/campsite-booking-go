@@ -28,7 +28,10 @@ type (
 	}
 )
 
-func NewCreateCampsiteHandler(campsites domain.CampsiteRepository, logger *slog.Logger) CreateCampsiteHandler {
+func NewCreateCampsiteHandler(
+	campsites domain.CampsiteRepository,
+	logger *slog.Logger,
+) CreateCampsiteHandler {
 	return decorator.ApplyCommandDecorator[CreateCampsite](
 		createCampsiteHandler{campsites: campsites},
 		logger,

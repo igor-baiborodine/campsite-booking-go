@@ -30,7 +30,10 @@ type (
 	}
 )
 
-func NewCreateBookingHandler(bookings domain.BookingRepository, logger *slog.Logger) CreateBookingHandler {
+func NewCreateBookingHandler(
+	bookings domain.BookingRepository,
+	logger *slog.Logger,
+) CreateBookingHandler {
 	return decorator.ApplyCommandDecorator[CreateBooking](
 		createBookingHandler{
 			bookings: bookings,

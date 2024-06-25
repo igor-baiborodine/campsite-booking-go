@@ -20,13 +20,19 @@ type (
 	}
 )
 
-func NewGetCampsitesHandler(campsites domain.CampsiteRepository, logger *slog.Logger) GetCampsitesHandler {
+func NewGetCampsitesHandler(
+	campsites domain.CampsiteRepository,
+	logger *slog.Logger,
+) GetCampsitesHandler {
 	return decorator.ApplyQueryDecorator[GetCampsites, []*domain.Campsite](
 		getCampsitesHandler{campsites: campsites},
 		logger,
 	)
 }
 
-func (h getCampsitesHandler) Handle(ctx context.Context, _ GetCampsites) ([]*domain.Campsite, error) {
+func (h getCampsitesHandler) Handle(
+	ctx context.Context,
+	_ GetCampsites,
+) ([]*domain.Campsite, error) {
 	return h.campsites.FindAll(ctx)
 }

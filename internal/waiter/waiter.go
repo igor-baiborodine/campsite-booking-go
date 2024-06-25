@@ -44,7 +44,13 @@ func New(options ...Option) Waiter {
 	}
 	w.ctx, w.cancel = context.WithCancel(cfg.parentCtx)
 	if cfg.catchSignals {
-		w.ctx, w.cancel = signal.NotifyContext(w.ctx, os.Interrupt, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
+		w.ctx, w.cancel = signal.NotifyContext(
+			w.ctx,
+			os.Interrupt,
+			syscall.SIGINT,
+			syscall.SIGTERM,
+			syscall.SIGQUIT,
+		)
 	}
 
 	return w

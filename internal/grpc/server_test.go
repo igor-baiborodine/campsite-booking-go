@@ -20,7 +20,6 @@ type mocks struct {
 }
 
 func TestCreateCampsite(t *testing.T) {
-
 	type args struct {
 		ctx context.Context
 		req api.CreateCampsiteRequest
@@ -70,7 +69,6 @@ func TestCreateCampsite(t *testing.T) {
 }
 
 func TestGetBooking(t *testing.T) {
-
 	type args struct {
 		ctx context.Context
 		req api.GetBookingRequest
@@ -131,7 +129,14 @@ func TestGetBooking(t *testing.T) {
 			resp, err := s.GetBooking(tc.args.ctx, &tc.args.req)
 			// then
 			if tc.wantErr != "" {
-				assert.Containsf(t, err.Error(), tc.wantErr, "GetBooking() error = %v, wantErr %v", err, tc.wantErr)
+				assert.Containsf(
+					t,
+					err.Error(),
+					tc.wantErr,
+					"GetBooking() error = %v, wantErr %v",
+					err,
+					tc.wantErr,
+				)
 				return
 			}
 			assert.Equal(t, tc.want, resp)
@@ -140,7 +145,6 @@ func TestGetBooking(t *testing.T) {
 }
 
 func TestCreateBooking(t *testing.T) {
-
 	type args struct {
 		ctx context.Context
 		req api.CreateBookingRequest
@@ -208,7 +212,14 @@ func TestCreateBooking(t *testing.T) {
 			resp, err := s.CreateBooking(tc.args.ctx, &tc.args.req)
 			// then
 			if tc.wantErr != "" {
-				assert.Containsf(t, err.Error(), tc.wantErr, "CreateBooking() error = %v, wantErr %v", err, tc.wantErr)
+				assert.Containsf(
+					t,
+					err.Error(),
+					tc.wantErr,
+					"CreateBooking() error = %v, wantErr %v",
+					err,
+					tc.wantErr,
+				)
 				return
 			}
 			assert.NotEmpty(t, resp.BookingId)
@@ -217,7 +228,6 @@ func TestCreateBooking(t *testing.T) {
 }
 
 func TestUpdateBooking(t *testing.T) {
-
 	type args struct {
 		ctx context.Context
 		req api.UpdateBookingRequest
@@ -276,7 +286,14 @@ func TestUpdateBooking(t *testing.T) {
 			resp, err := s.UpdateBooking(tc.args.ctx, &tc.args.req)
 			// then
 			if tc.wantErr != "" {
-				assert.Containsf(t, err.Error(), tc.wantErr, "UpdateBooking() error = %v, wantErr %v", err, tc.wantErr)
+				assert.Containsf(
+					t,
+					err.Error(),
+					tc.wantErr,
+					"UpdateBooking() error = %v, wantErr %v",
+					err,
+					tc.wantErr,
+				)
 				return
 			}
 			assert.Equal(t, tc.want, resp)
@@ -285,7 +302,6 @@ func TestUpdateBooking(t *testing.T) {
 }
 
 func TestCancelBooking(t *testing.T) {
-
 	type args struct {
 		ctx context.Context
 		req api.CancelBookingRequest
@@ -341,7 +357,14 @@ func TestCancelBooking(t *testing.T) {
 			resp, err := s.CancelBooking(tc.args.ctx, &tc.args.req)
 			// then
 			if tc.wantErr != "" {
-				assert.Containsf(t, err.Error(), tc.wantErr, "CancelBooking() error = %v, wantErr %v", err, tc.wantErr)
+				assert.Containsf(
+					t,
+					err.Error(),
+					tc.wantErr,
+					"CancelBooking() error = %v, wantErr %v",
+					err,
+					tc.wantErr,
+				)
 				return
 			}
 			assert.Equal(t, tc.want, resp)
@@ -350,7 +373,6 @@ func TestCancelBooking(t *testing.T) {
 }
 
 func TestGetVacantDates(t *testing.T) {
-
 	type args struct {
 		ctx context.Context
 		req api.GetVacantDatesRequest
@@ -392,7 +414,14 @@ func TestGetVacantDates(t *testing.T) {
 			resp, err := s.GetVacantDates(tc.args.ctx, &tc.args.req)
 			// then
 			if tc.wantErr != "" {
-				assert.Containsf(t, err.Error(), tc.wantErr, "GetVacantDates() error = %v, wantErr %v", err, tc.wantErr)
+				assert.Containsf(
+					t,
+					err.Error(),
+					tc.wantErr,
+					"GetVacantDates() error = %v, wantErr %v",
+					err,
+					tc.wantErr,
+				)
 				return
 			}
 			assert.Equal(t, tc.want, resp)

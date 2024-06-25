@@ -45,7 +45,10 @@ func RegisterServer(app application.App, registrar grpc.ServiceRegistrar) error 
 	return nil
 }
 
-func (s server) GetCampsites(ctx context.Context, _ *api.GetCampsitesRequest) (*api.GetCampsitesResponse, error) {
+func (s server) GetCampsites(
+	ctx context.Context,
+	_ *api.GetCampsitesRequest,
+) (*api.GetCampsitesResponse, error) {
 	campsites, err := s.app.GetCampsites(ctx, query.GetCampsites{})
 	if err != nil {
 		return nil, err
@@ -61,7 +64,10 @@ func (s server) GetCampsites(ctx context.Context, _ *api.GetCampsitesRequest) (*
 	}, nil
 }
 
-func (s server) CreateCampsite(ctx context.Context, req *api.CreateCampsiteRequest) (*api.CreateCampsiteResponse, error) {
+func (s server) CreateCampsite(
+	ctx context.Context,
+	req *api.CreateCampsiteRequest,
+) (*api.CreateCampsiteResponse, error) {
 	campsite := command.CreateCampsite{
 		CampsiteID:    uuid.New().String(),
 		CampsiteCode:  req.CampsiteCode,
@@ -81,7 +87,10 @@ func (s server) CreateCampsite(ctx context.Context, req *api.CreateCampsiteReque
 	}, nil
 }
 
-func (s server) GetBooking(ctx context.Context, req *api.GetBookingRequest) (*api.GetBookingResponse, error) {
+func (s server) GetBooking(
+	ctx context.Context,
+	req *api.GetBookingRequest,
+) (*api.GetBookingResponse, error) {
 	booking, err := s.app.GetBooking(ctx, query.GetBooking{BookingID: req.BookingId})
 	if err != nil {
 		return nil, handleDomainError(err)
@@ -92,7 +101,10 @@ func (s server) GetBooking(ctx context.Context, req *api.GetBookingRequest) (*ap
 	}, nil
 }
 
-func (s server) CreateBooking(ctx context.Context, req *api.CreateBookingRequest) (*api.CreateBookingResponse, error) {
+func (s server) CreateBooking(
+	ctx context.Context,
+	req *api.CreateBookingRequest,
+) (*api.CreateBookingResponse, error) {
 	booking := command.CreateBooking{
 		BookingID:  uuid.New().String(),
 		CampsiteID: req.CampsiteId,
@@ -111,7 +123,10 @@ func (s server) CreateBooking(ctx context.Context, req *api.CreateBookingRequest
 	}, nil
 }
 
-func (s server) UpdateBooking(ctx context.Context, req *api.UpdateBookingRequest) (*api.UpdateBookingResponse, error) {
+func (s server) UpdateBooking(
+	ctx context.Context,
+	req *api.UpdateBookingRequest,
+) (*api.UpdateBookingResponse, error) {
 	booking := command.UpdateBooking{
 		BookingID:  req.Booking.BookingId,
 		CampsiteID: req.Booking.CampsiteId,
@@ -127,7 +142,10 @@ func (s server) UpdateBooking(ctx context.Context, req *api.UpdateBookingRequest
 	return &api.UpdateBookingResponse{}, nil
 }
 
-func (s server) CancelBooking(ctx context.Context, req *api.CancelBookingRequest) (*api.CancelBookingResponse, error) {
+func (s server) CancelBooking(
+	ctx context.Context,
+	req *api.CancelBookingRequest,
+) (*api.CancelBookingResponse, error) {
 	booking := command.CancelBooking{
 		BookingID: req.GetBookingId(),
 	}
@@ -138,7 +156,10 @@ func (s server) CancelBooking(ctx context.Context, req *api.CancelBookingRequest
 	return &api.CancelBookingResponse{}, nil
 }
 
-func (s server) GetVacantDates(ctx context.Context, req *api.GetVacantDatesRequest) (*api.GetVacantDatesResponse, error) {
+func (s server) GetVacantDates(
+	ctx context.Context,
+	req *api.GetVacantDatesRequest,
+) (*api.GetVacantDatesResponse, error) {
 	vacantDates, err := s.app.GetVacantDates(ctx, query.GetVacantDates{
 		CampsiteID: req.CampsiteId,
 		StartDate:  req.StartDate,

@@ -71,7 +71,11 @@ func TestGetVacantDates(t *testing.T) {
 					"FindForDateRange", context.Background(), campsiteID,
 					parseDateStr(t, "2006-01-02"), parseDateStr(t, "2006-01-03"),
 				).Return([]*domain.Booking{
-					{StartDate: parseDateStr(t, "2006-01-02"), EndDate: parseDateStr(t, "2006-01-03")}}, nil)
+					{
+						StartDate: parseDateStr(t, "2006-01-02"),
+						EndDate:   parseDateStr(t, "2006-01-03"),
+					},
+				}, nil)
 			},
 			want:    nil,
 			wantErr: "",
@@ -139,7 +143,14 @@ func TestGetVacantDates(t *testing.T) {
 			vacantDates, err := h.Handle(tc.args.ctx, tc.args.qry)
 			// then
 			if tc.wantErr != "" {
-				assert.Containsf(t, err.Error(), tc.wantErr, "GetVacantDates() error = %v, wantErr %v", err, tc.wantErr)
+				assert.Containsf(
+					t,
+					err.Error(),
+					tc.wantErr,
+					"GetVacantDates() error = %v, wantErr %v",
+					err,
+					tc.wantErr,
+				)
 				return
 			}
 			assert.Equal(t, tc.want, vacantDates)

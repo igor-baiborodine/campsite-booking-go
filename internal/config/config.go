@@ -21,7 +21,7 @@ type (
 
 	AppConfig struct {
 		Environment     string
-		LogLevel        string `envconfig:"LOG_LEVEL" default:"DEBUG"`
+		LogLevel        string `envconfig:"LOG_LEVEL"        default:"DEBUG"`
 		PG              PGConfig
 		Rpc             RpcConfig
 		ShutdownTimeout time.Duration `envconfig:"SHUTDOWN_TIMEOUT" default:"30s"`

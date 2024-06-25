@@ -26,7 +26,10 @@ type (
 	}
 )
 
-func NewGetVacantDatesHandler(bookings domain.BookingRepository, logger *slog.Logger) GetVacantDatesHandler {
+func NewGetVacantDatesHandler(
+	bookings domain.BookingRepository,
+	logger *slog.Logger,
+) GetVacantDatesHandler {
 	return decorator.ApplyQueryDecorator[GetVacantDates, []string](
 		getVacantDatesHandler{bookings: bookings},
 		logger,

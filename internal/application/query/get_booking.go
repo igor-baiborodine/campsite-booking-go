@@ -22,7 +22,10 @@ type (
 	}
 )
 
-func NewGetBookingHandler(bookings domain.BookingRepository, logger *slog.Logger) GetBookingHandler {
+func NewGetBookingHandler(
+	bookings domain.BookingRepository,
+	logger *slog.Logger,
+) GetBookingHandler {
 	return decorator.ApplyQueryDecorator[GetBooking, *domain.Booking](
 		getBookingHandler{bookings: bookings},
 		logger,

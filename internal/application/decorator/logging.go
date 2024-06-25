@@ -14,7 +14,10 @@ type loggingCommandHandler[C any] struct {
 	logger *slog.Logger
 }
 
-func ApplyCommandDecorator[C any](handler handler.Command[C], logger *slog.Logger) handler.Command[C] {
+func ApplyCommandDecorator[C any](
+	handler handler.Command[C],
+	logger *slog.Logger,
+) handler.Command[C] {
 	return loggingCommandHandler[C]{
 		base:   handler,
 		logger: logger,
@@ -42,7 +45,10 @@ type loggingQueryHandler[C any, R any] struct {
 	logger *slog.Logger
 }
 
-func ApplyQueryDecorator[C any, R any](handler handler.Query[C, R], logger *slog.Logger) handler.Query[C, R] {
+func ApplyQueryDecorator[C any, R any](
+	handler handler.Query[C, R],
+	logger *slog.Logger,
+) handler.Query[C, R] {
 	return loggingQueryHandler[C, R]{
 		base:   handler,
 		logger: logger,

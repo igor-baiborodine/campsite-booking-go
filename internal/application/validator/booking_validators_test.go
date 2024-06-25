@@ -13,7 +13,7 @@ import (
 func TestBookingAllowedStartDateValidator_Validate(t *testing.T) {
 	now := bootstrap.AsStartOfDayUTC(time.Now())
 
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		booking *domain.Booking
 		wantErr error
 	}{
@@ -58,7 +58,7 @@ func TestBookingAllowedStartDateValidator_Validate(t *testing.T) {
 func TestBookingMaximumStayValidator_Validate(t *testing.T) {
 	now := bootstrap.AsStartOfDayUTC(time.Now())
 
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		booking *domain.Booking
 		wantErr error
 	}{
@@ -108,7 +108,7 @@ func TestBookingMaximumStayValidator_Validate(t *testing.T) {
 func TestBookingStartDateBeforeEndDateValidator_Validate(t *testing.T) {
 	now := bootstrap.AsStartOfDayUTC(time.Now())
 
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		booking *domain.Booking
 		wantErr error
 	}{
@@ -158,7 +158,7 @@ func TestBookingStartDateBeforeEndDateValidator_Validate(t *testing.T) {
 func TestApply(t *testing.T) {
 	now := bootstrap.AsStartOfDayUTC(time.Now())
 
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		booking  *domain.Booking
 		wantErrs []string
 	}{
@@ -207,7 +207,14 @@ func TestApply(t *testing.T) {
 			// then
 			if tc.wantErrs != nil {
 				for _, wantErr := range tc.wantErrs {
-					assert.Containsf(t, err.Error(), wantErr, "Apply() error = %v, wantErr %v", err, wantErr)
+					assert.Containsf(
+						t,
+						err.Error(),
+						wantErr,
+						"Apply() error = %v, wantErr %v",
+						err,
+						wantErr,
+					)
 				}
 				return
 			}
