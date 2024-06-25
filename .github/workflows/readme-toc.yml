@@ -2,7 +2,7 @@ name: Generate README TOC
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "main" ]
     paths: [ "readme/*.md" ]
 
 jobs:
