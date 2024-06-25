@@ -9,6 +9,7 @@
   - [System Requirements](#system-requirements)
 - [Implementation Details](#implementation-details)
   - [Technology Stack](#technology-stack)
+  - [Project Setup](#project-setup)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 

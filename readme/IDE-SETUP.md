@@ -1,7 +1,15 @@
 ## IntelliJ IDEA/GoLand Configuration
 
-<!-- START doctoc -->
-<!-- END doctoc -->
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [Plugins](#plugins)
+- [Line Length (Hard Wrap)](#line-length-hard-wrap)
+- [Imports](#imports)
+- [File Watchers](#file-watchers)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ### Plugins
 
