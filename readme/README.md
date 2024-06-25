@@ -46,7 +46,29 @@
 
 * [Go](https://github.com/golang/go), [gRPC](https://github.com/grpc/grpc-go), 
 * [protovalidate-go](https://github.com/bufbuild/protovalidate-go) (requests validation)
+* [goimports](https://pkg.go.dev/golang.org/x/tools/cmd/goimports), [golines](https://github.com/segmentio/golines), [gofumpt](https://github.com/mvdan/gofumpt) (code style & formatting)
 * [PostgreSQL](https://www.postgresql.org/)  
 * [Docker](https://www.docker.com/), [Docker Compose](https://docs.docker.com/compose/)
 * [Goose](https://pressly.github.io/goose/) (DB migrations)
 * TODO
+
+### Project Setup
+
+**Prerequisites**:
+1. [Git](https://git-scm.com/), see this [guide](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) on how to install Git.
+2. [Make](https://man7.org/linux/man-pages/man1/make.1.html) 
+3. [Go](https://go.dev/) (version >= 1.21) see this [guide](https://go.dev/doc/install) on how to install Go.
+
+* Clone the project: 
+
+```shell
+$ git clone https://github.com/igor-baiborodine/campsite-booking-go.git
+```
+
+* Install necessary tools executing the following command from the project's root:
+```shell
+$ make install-tools
+```
+
+If you use either [IntelliJ IDEA](https://www.jetbrains.com/idea/) or [GoLand](https://www.jetbrains.com/go/) IDEs, 
+follow this [guide](/readme/IDE-SETUP.md) to configure it. 
