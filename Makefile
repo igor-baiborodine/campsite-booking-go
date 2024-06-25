@@ -16,20 +16,20 @@ format:
 format-diff:
 	golines -w . && gofumpt -w . && git diff --exit-code
 
-.PHONY: tidy
-tidy:
+.PHONY: mod-tidy
+mod-tidy:
 	go mod tidy
 
-.PHONY: tidy-diff
-tidy-diff:
+.PHONY: mod-tidy-diff
+mod-tidy-diff:
 	go mod tidy && git diff --exit-code
 
-.PHONY: download
-download:
+.PHONY: mod-download
+mod-download:
 	go mod download
 
-.PHONY: verify
-verify:
+.PHONY: mod-verify
+mod-verify:
 	go mod verify
 
 .PHONY: generate

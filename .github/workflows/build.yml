@@ -30,14 +30,14 @@ jobs:
       - name: Install tools
         run: make install-tools
 
-      - name: Tidy
-        run: make tidy-diff
+      - name: Mod tidy
+        run: make mod-tidy-diff
 
-      - name: Download
-        run: make download
+      - name: Mod download
+        run: make mod-download
 
-      - name: Verify
-        run: make verify
+      - name: Mod verify
+        run: make mod-verify
 
       - name: Generate
         run: make generate-diff
