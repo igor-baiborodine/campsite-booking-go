@@ -77,7 +77,7 @@ follow this [guide](/readme/IDE-SETUP.md) to configure it.
 
 ### Run with IDE
 
-* Go to **Run | Edit Configurations...** and create a new `Run/Debug Configuration` as follows:
+* Go to **Run | Edit Configurations...** and create a new `Run/Debug` configuration as follows:
 
 ![Run with IDE Config](/readme/run-with-ide-config.png)
 
@@ -88,7 +88,7 @@ follow this [guide](/readme/IDE-SETUP.md) to configure it.
 $ docker compose -f docker/docker-compose.yml up -d postgres 
 ```
 
-* Once it's been verified that the database is up and running, launch the `Run/Debug Configuration`
+* Once it's been verified that the database is up and running, launch the `Run/Debug` configuration
   created in the previous steps.
 
 ### Run with Docker Compose
