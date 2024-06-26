@@ -43,7 +43,7 @@
 
 ## Implementation Details
 
-### Technology Stack
+**Technologies used**:
 
 * [Go](https://github.com/golang/go), [gRPC](https://github.com/grpc/grpc-go), 
 * [protovalidate-go](https://github.com/bufbuild/protovalidate-go) (requests validation)
@@ -53,23 +53,50 @@
 * [Goose](https://pressly.github.io/goose/) (DB migrations)
 * TODO
 
+TODO: elaborate on implementation details
+
+## Up & Running
+
 ### Project Setup
 
 **Prerequisites**:
 1. [Git](https://git-scm.com/), see this [guide](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) on how to install Git.
 2. [Make](https://man7.org/linux/man-pages/man1/make.1.html) 
-3. [Go](https://go.dev/) (version >= 1.21) see this [guide](https://go.dev/doc/install) on how to install Go.
+3. [Go](https://go.dev/) (version >= 1.21), see this [guide](https://go.dev/doc/install) on how to install Go.
 
-* Clone the project: 
+Clone the project and install the necessary tools: 
 
 ```shell
 $ git clone https://github.com/igor-baiborodine/campsite-booking-go.git
-```
-
-* Install necessary tools executing the following command from the project's root:
-```shell
+$ cd campsite-booking-go
 $ make install-tools
 ```
 
 If you use either [IntelliJ IDEA](https://www.jetbrains.com/idea/) or [GoLand](https://www.jetbrains.com/go/) IDEs, 
 follow this [guide](/readme/IDE-SETUP.md) to configure it. 
+
+### Run with IDE
+
+* Go to **Run | Edit Configurations...** and create a new `Run/Debug Configuration` as follows:
+
+![Run with IDE Config](/readme/run-with-ide-config.png)
+
+* Start a PostgreSQL instance using **Docker Compose** by executing the following command from the
+  project's root:
+
+```shell
+$ docker compose -f docker/docker-compose.yml up -d postgres 
+```
+
+* Once it's been verified that the database is up and running, launch the `Run/Debug Configuration`
+  created in the previous steps:
+
+![Run with IDE Running](/readme/run-with-ide-running.png)
+
+### Run with Docker Compose
+
+* TODO
+
+### Run with Kubernetes
+
+* TODO
