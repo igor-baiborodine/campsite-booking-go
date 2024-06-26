@@ -8,8 +8,11 @@
   - [Booking Constraints](#booking-constraints)
   - [System Requirements](#system-requirements)
 - [Implementation Details](#implementation-details)
-  - [Technology Stack](#technology-stack)
+- [Up & Running](#up--running)
   - [Project Setup](#project-setup)
+  - [Run with IDE](#run-with-ide)
+  - [Run with Docker Compose](#run-with-docker-compose)
+  - [Run with Kubernetes](#run-with-kubernetes)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
