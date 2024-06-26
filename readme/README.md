@@ -89,9 +89,7 @@ $ docker compose -f docker/docker-compose.yml up -d postgres
 ```
 
 * Once it's been verified that the database is up and running, launch the `Run/Debug Configuration`
-  created in the previous steps:
-
-![Run with IDE Running](/readme/run-with-ide-running.png)
+  created in the previous steps.
 
 ### Run with Docker Compose
 
