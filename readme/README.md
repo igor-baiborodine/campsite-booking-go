@@ -1,5 +1,9 @@
 # Campsite Bookings API (Go)
 
+![ci](https://github.com/igor-baiborodine/campsite-booking-go/workflows/ci/badge.svg)
+[![codecov](https://codecov.io/gh/igor-baiborodine/campsite-booking-go/graph/badge.svg?token=XTDH6MGEDJ)](https://codecov.io/gh/igor-baiborodine/campsite-booking-go)
+
+
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
