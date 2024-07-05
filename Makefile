@@ -1,53 +1,110 @@
+################################################################################
+# Variables                                                                    #
+################################################################################
+PROTOC_GEN_GO_VERSION = v1.34.2
+PROTOC_GEN_GO_GRPC_VERSION = v1.4.0
+MOCKERY_VERSION = v2.43.2
+GOIMPORTS_VERSION = v0.22.0
+GOLINES_VERSION = v0.12.2
+GOFUMPT_VERSION = v0.6.0
+
+################################################################################
+# Target: init-proto
+################################################################################
+.PHONY: init-proto
+init-proto:
+	go install google.golang.org/protobuf/cmd/protoc-gen-go@$(PROTOC_GEN_GO_VERSION)
+	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@$(PROTOC_GEN_GO_GRPC_VERSION)
+
+################################################################################
+# Target: init-test
+################################################################################
+.PHONY: init-test
+init-test:
+	go install github.com/vektra/mockery/v2@$(MOCKERY_VERSION)
+
+################################################################################
+# Target: init-format
+################################################################################
+.PHONY: init-format
+init-format:
+	go install golang.org/x/tools/cmd/goimports@$(GOIMPORTS_VERSION)
+	go install github.com/segmentio/golines@$(GOLINES_VERSION)
+	go install mvdan.cc/gofumpt@$(GOFUMPT_VERSION)
+
+################################################################################
+# Target: install-tolls
+################################################################################
 .PHONY: install-tools
-install-tools:
-	go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.34.2
-	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.4.0
-	go install github.com/bufbuild/buf/cmd/buf@v1.34.0
-	go install github.com/vektra/mockery/v2@v2.43.2
-	go install golang.org/x/tools/cmd/goimports@v0.22.0
-	go install github.com/segmentio/golines@v0.12.2
-	go install mvdan.cc/gofumpt@v0.6.0
+install-tools: init-proto init-test init-format
 
-.PHONY: format
-format:
-	golines -w . && gofumpt -w .
-
-.PHONY: format-diff
-format-diff:
-	golines -w . && gofumpt -w . && git diff --exit-code
-
+################################################################################
+# Target: mod-tidy
+################################################################################
 .PHONY: mod-tidy
 mod-tidy:
 	go mod tidy
 
-.PHONY: mod-tidy-diff
-mod-tidy-diff:
-	go mod tidy && git diff --exit-code
+################################################################################
+# Target: check-mod-diff                                                       #
+################################################################################
+.PHONY: check-mod-diff
+check-mod-diff:
+	git diff --exit-code ./go.mod
+	git diff --exit-code ./go.sum
 
-.PHONY: mod-download
-mod-download:
-	go mod download
+################################################################################
+# Target: format
+################################################################################
+.PHONY: format
+format:
+	golines -w --ignore-generated . && gofumpt -w .
 
-.PHONY: mod-verify
-mod-verify:
-	go mod verify
+################################################################################
+# Target: check-format-diff
+################################################################################
+.PHONY: check-format-diff
+check-format-diff:
+	git diff --exit-code . ':!campgroundspb' # not generated pb
 
-.PHONY: generate
-generate:
-	go generate ./...
+################################################################################
+# Target: format-proto
+################################################################################
+.PHONY: format-proto
+format-proto:
+	buf format -w
 
-.PHONY: generate-diff
-generate-diff:
-	go generate ./... && git diff --exit-code
+################################################################################
+# Target: lint-proto
+################################################################################
+.PHONY: lint-proto
+lint-proto:
+	buf lint
 
-.PHONY: build
-build:
-	go build -v ./...
+################################################################################
+# Target: gen-proto
+################################################################################
+.PHONY: gen-proto
+gen-proto:
+	buf generate
 
-.PHONY: unit-tests
-unit-tests:
-	go test -v ./...
+################################################################################
+# Target: check-proto-diff
+################################################################################
+.PHONY: check-proto-diff
+check-proto-diff:
+	git diff --exit-code ./campgroundspb # generated pb
 
-.PHONY: integration-tests
-integration-tests:
-	go test ./... -tags integration
+################################################################################
+# Target: test
+################################################################################
+.PHONY: test
+test:
+	go test -race $(COVERAGE_OPTS) ./cmd/... ./internal/...
+
+################################################################################
+# Target: test-integration
+################################################################################
+.PHONY: test-integration
+test-integration:
+	go test -tags=integration ./internal/...
