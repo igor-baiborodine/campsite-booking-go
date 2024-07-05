@@ -1,4 +1,4 @@
-name: Generate README TOC
+name: readme-toc
 
 on:
   push:

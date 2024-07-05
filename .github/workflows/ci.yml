@@ -1,0 +1,99 @@
+name: ci
+
+on:
+  push:
+    branches: [ "main" ]
+    tags: [ "v*"]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  lint:
+    name: Format, lint & proto validation
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        target_os: ["linux"]
+        target_arch: ["amd64"]
+    env:
+      GOOS: "${{ matrix.target_os }}"
+      GOARCH: "${{ matrix.target_arch }}"
+      GOPROXY: "https://proxy.golang.org"
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: "go.mod"
+      - name: Run mod tidy, check diff
+        run: make mod-tidy check-mod-diff
+      - name: Set up Buf
+        uses: bufbuild/buf-setup-action@v1.34.0
+      - name: Run format proto, check diff
+        run: make format-proto check-proto-diff
+      - name: Run lint proto, check diff
+        run: make lint-proto check-proto-diff
+      - name: Generate proto, check diff
+        run: make init-proto gen-proto check-proto-diff
+      - name: Run format, check diff
+        run: make init-format format check-format-diff
+      - name: Run golangci-lint
+        run: echo "TODO lint"
+  unit-tests:
+    name: Unit tests
+    needs: lint
+    runs-on: "${{ matrix.os }}"
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target_os: linux
+            target_arch: amd64
+    env:
+      GOOS: "${{ matrix.target_os }}"
+      GOARCH: "${{ matrix.target_arch }}"
+      GOPROXY: "https://proxy.golang.org"
+      TEST_REPORT_FILE_PREFIX: "test_report"
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: "go.mod"
+      - name: Run tests
+        env:
+          COVERAGE_OPTS: "-coverprofile=coverage.txt -covermode=atomic"
+        run: make test
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+  integration-tests:
+    name: Integration tests
+    needs: lint
+    runs-on: "${{ matrix.os }}"
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target_os: linux
+            target_arch: amd64
+    env:
+      GOOS: "${{ matrix.target_os }}"
+      GOARCH: "${{ matrix.target_arch }}"
+      GOPROXY: "https://proxy.golang.org"
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: "go.mod"
+      - name: Run integration tests
+        run: make test-integration
