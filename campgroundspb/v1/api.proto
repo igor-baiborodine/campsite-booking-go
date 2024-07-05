@@ -5,13 +5,13 @@ package campgroundspb.v1;
 import "buf/validate/validate.proto";
 
 service CampgroundsService {
-  rpc GetCampsites(GetCampsitesRequest) returns (GetCampsitesResponse) {};
-  rpc CreateCampsite(CreateCampsiteRequest) returns (CreateCampsiteResponse) {};
-  rpc GetBooking(GetBookingRequest) returns (GetBookingResponse) {};
-  rpc CreateBooking(CreateBookingRequest) returns (CreateBookingResponse) {};
-  rpc UpdateBooking(UpdateBookingRequest) returns (UpdateBookingResponse) {};
-  rpc CancelBooking(CancelBookingRequest) returns (CancelBookingResponse) {};
-  rpc GetVacantDates(GetVacantDatesRequest) returns (GetVacantDatesResponse) {};
+  rpc GetCampsites(GetCampsitesRequest) returns (GetCampsitesResponse) {}
+  rpc CreateCampsite(CreateCampsiteRequest) returns (CreateCampsiteResponse) {}
+  rpc GetBooking(GetBookingRequest) returns (GetBookingResponse) {}
+  rpc CreateBooking(CreateBookingRequest) returns (CreateBookingResponse) {}
+  rpc UpdateBooking(UpdateBookingRequest) returns (UpdateBookingResponse) {}
+  rpc CancelBooking(CancelBookingRequest) returns (CancelBookingResponse) {}
+  rpc GetVacantDates(GetVacantDatesRequest) returns (GetVacantDatesResponse) {}
 }
 
 message GetCampsitesRequest {}
