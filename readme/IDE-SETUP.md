@@ -34,4 +34,12 @@ to `goimports`:
 ### File Watchers
 
 Go to **File | Settings | Tools | File Watchers** and add watchers for `golines` and `gofumpt`; see
-this [guide](https://github.com/mvdan/gofumpt?tab=readme-ov-file#goland) for more details.
+this [guide](https://github.com/mvdan/gofumpt?tab=readme-ov-file#goland) for more details. Add a new scope to exclude proto and generated files:
+
+```text
+file[campsite-booking-go]:*/&&!file[campsite-booking-go]:campgroundspb/v1//*&&!file[campsite-booking-go]:*/mock_*.go
+```
+
+![IDE Setup File Watchers Scope](/readme/ide-setup-file-watchers-scope.png)
+
+![IDE Setup File Watchers](/readme/ide-setup-file-watchers.png)
