@@ -17,10 +17,10 @@ init-proto:
 	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@$(PROTOC_GEN_GO_GRPC_VERSION)
 
 ################################################################################
-# Target: init-test
+# Target: init-mock
 ################################################################################
-.PHONY: init-test
-init-test:
+.PHONY: init-mock
+init-mock:
 	go install github.com/vektra/mockery/v2@$(MOCKERY_VERSION)
 
 ################################################################################
@@ -36,7 +36,7 @@ init-format:
 # Target: install-tolls
 ################################################################################
 .PHONY: install-tools
-install-tools: init-proto init-test init-format
+install-tools: init-proto init-mock init-format
 
 ################################################################################
 # Target: mod-tidy
@@ -94,6 +94,19 @@ gen-proto:
 .PHONY: check-proto-diff
 check-proto-diff:
 	git diff --exit-code ./campgroundspb # generated pb
+
+################################################################################
+# Target: gen-mock
+################################################################################
+.PHONY: gen-mock
+gen-mock:
+	mockery --quiet --dir ./internal -r --all --inpackage --case underscore
+
+################################################################################
+# Target: check-mock-diff
+################################################################################
+.PHONY: check-mock-diff
+check-mock-diff: check-format-diff
 
 ################################################################################
 # Target: test
