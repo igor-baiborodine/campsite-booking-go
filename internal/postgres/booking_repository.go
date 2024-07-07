@@ -56,6 +56,9 @@ func (r BookingRepository) FindForDateRange(
 
 	bookings, err := r.findForDateRangeWithTx(
 		ctx, tx, FindAllBookingsForDateRangeQuery, campsiteID, startDate, endDate)
+	if err != nil {
+		return nil, err
+	}
 	if err = tx.Commit(); err != nil {
 		return nil, errors.Wrap(err, "commit transaction")
 	}
@@ -137,7 +140,7 @@ func (r BookingRepository) Update(ctx context.Context, booking *domain.Booking) 
 func (r BookingRepository) findForDateRangeWithTx(
 	ctx context.Context, tx *sql.Tx, query string, campsiteID string, startDate time.Time,
 	endDate time.Time,
-) ([]*domain.Booking, error) {
+) (bookings []*domain.Booking, err error) {
 	rows, err := tx.QueryContext(ctx, query, campsiteID, startDate, endDate)
 	if err != nil {
 		return nil, errors.Wrap(err, "query bookings for date range")
@@ -149,7 +152,6 @@ func (r BookingRepository) findForDateRangeWithTx(
 		}
 	}(rows)
 
-	var bookings []*domain.Booking
 	for rows.Next() {
 		booking := &domain.Booking{}
 		if err = rows.Scan(
