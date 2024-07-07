@@ -43,7 +43,7 @@ jobs:
         run: make init-format format check-format-diff
       - name: Run generate mock, check diff
         run: make init-mock gen-mock check-mock-diff
-      - name: golangci-lint
+      - name: Run golangci-lint
         uses: golangci/golangci-lint-action@v3.7.0
         with:
           version: ${{ env.GOLANGCILINT_VER }}
