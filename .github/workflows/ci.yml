@@ -36,10 +36,12 @@ jobs:
         run: make format-proto check-proto-diff
       - name: Run lint proto, check diff
         run: make lint-proto check-proto-diff
-      - name: Generate proto, check diff
+      - name: Run generate proto, check diff
         run: make init-proto gen-proto check-proto-diff
       - name: Run format, check diff
         run: make init-format format check-format-diff
+      - name: Run generate mock, check diff
+        run: make gen-mock check-mock-diff
       - name: Run golangci-lint
         run: echo "TODO lint"
   unit-tests:
