@@ -1,6 +1,7 @@
 # Campsite Bookings API (Go)
 
 ![ci](https://github.com/igor-baiborodine/campsite-booking-go/workflows/ci/badge.svg)
+[![Go Report Card](https://goreportcard.com/badge/github.com/igor-baiborodine/campsite-booking-go)](https://goreportcard.com/report/github.com/igor-baiborodine/campsite-booking-go)
 [![codecov](https://codecov.io/gh/igor-baiborodine/campsite-booking-go/graph/badge.svg?token=XTDH6MGEDJ)](https://codecov.io/gh/igor-baiborodine/campsite-booking-go)
 
 
