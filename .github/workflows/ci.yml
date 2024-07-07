@@ -41,7 +41,7 @@ jobs:
       - name: Run format, check diff
         run: make init-format format check-format-diff
       - name: Run generate mock, check diff
-        run: make gen-mock check-mock-diff
+        run: make init-mock gen-mock check-mock-diff
       - name: Run golangci-lint
         run: echo "TODO lint"
   unit-tests:
