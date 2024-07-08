@@ -2,7 +2,6 @@ package domain
 
 import (
 	"encoding/json"
-	"fmt"
 )
 
 type Campsite struct {
@@ -19,7 +18,10 @@ type Campsite struct {
 	Active        bool
 }
 
-func (c *Campsite) String() string {
-	result, _ := json.Marshal(c)
-	return fmt.Sprintf("%s", result)
+func (c *Campsite) String() (string, error) {
+	result, err := json.Marshal(c)
+	if err != nil {
+		return "", err
+	}
+	return string(result), nil
 }
