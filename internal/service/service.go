@@ -108,8 +108,8 @@ func (s *Service) MigrateDB(fs fs.FS) error {
 
 func (s *Service) Startup() error {
 	// setup driven adapters
-	campsites := postgres.NewCampsiteRepository(s.db)
-	bookings := postgres.NewBookingRepository(s.db)
+	campsites := postgres.NewCampsiteRepository(s.db, s.logger)
+	bookings := postgres.NewBookingRepository(s.db, s.logger)
 	// setup application
 	app := application.New(campsites, bookings, s.logger)
 	// setup driver adapters
