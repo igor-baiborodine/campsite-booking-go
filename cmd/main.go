@@ -12,7 +12,7 @@ import (
 
 func main() {
 	if err := run(); err != nil {
-		slog.Error("campgrounds exited abnormally:", err)
+		slog.Error("campgrounds exited abnormally:", slog.Any("error", err))
 		os.Exit(1)
 	}
 }
