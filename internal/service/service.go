@@ -38,7 +38,7 @@ func New(cfg config.AppConfig) (*Service, error) {
 	if err := s.initDB(); err != nil {
 		return nil, err
 	}
-	if err := s.initRpc(); err != nil {
+	if err := s.initRPC(); err != nil {
 		return nil, err
 	}
 	s.initWaiter()
@@ -71,7 +71,7 @@ func (s *Service) initDB() (err error) {
 	return err
 }
 
-func (s *Service) initRpc() (err error) {
+func (s *Service) initRPC() (err error) {
 	srv, err := rpc.NewServer(s.logger)
 	if err != nil {
 		return err
@@ -120,7 +120,7 @@ func (s *Service) Startup() error {
 }
 
 func (s *Service) WaitForRPC(ctx context.Context) error {
-	listener, err := net.Listen("tcp", s.cfg.Rpc.Address())
+	listener, err := net.Listen("tcp", s.cfg.RPC.Address())
 	if err != nil {
 		return err
 	}

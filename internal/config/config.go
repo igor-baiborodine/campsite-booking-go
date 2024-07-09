@@ -14,7 +14,7 @@ type (
 		Conn string `required:"true"`
 	}
 
-	RpcConfig struct {
+	RPCConfig struct {
 		Host string `default:"0.0.0.0"`
 		Port string `default:":8085"`
 	}
@@ -23,12 +23,12 @@ type (
 		Environment     string
 		LogLevel        string `envconfig:"LOG_LEVEL"        default:"DEBUG"`
 		PG              PGConfig
-		Rpc             RpcConfig
+		RPC             RPCConfig
 		ShutdownTimeout time.Duration `envconfig:"SHUTDOWN_TIMEOUT" default:"30s"`
 	}
 )
 
-func (c RpcConfig) Address() string {
+func (c RPCConfig) Address() string {
 	return fmt.Sprintf("%s%s", c.Host, c.Port)
 }
 
