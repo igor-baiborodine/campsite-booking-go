@@ -3,6 +3,7 @@ package postgres
 import (
 	"context"
 	"database/sql"
+	"log/slog"
 	"time"
 
 	"github.com/igor-baiborodine/campsite-booking-go/internal/domain"
@@ -10,13 +11,14 @@ import (
 )
 
 type BookingRepository struct {
-	db *sql.DB
+	db     *sql.DB
+	logger *slog.Logger
 }
 
 var _ domain.BookingRepository = (*BookingRepository)(nil)
 
-func NewBookingRepository(db *sql.DB) BookingRepository {
-	return BookingRepository{db: db}
+func NewBookingRepository(db *sql.DB, logger *slog.Logger) BookingRepository {
+	return BookingRepository{db, logger}
 }
 
 func (r BookingRepository) Find(ctx context.Context, bookingID string) (*domain.Booking, error) {
@@ -149,6 +151,7 @@ func (r BookingRepository) findForDateRangeWithTx(
 		err := rows.Close()
 		if err != nil {
 			err = errors.Wrap(err, "close booking rows")
+			r.logger.Error("failed to find for date range with tx", slog.Any("error", err))
 		}
 	}(rows)
 

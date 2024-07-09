@@ -3,6 +3,7 @@ package postgres
 import (
 	"context"
 	"database/sql"
+	"log/slog"
 	"time"
 
 	"github.com/igor-baiborodine/campsite-booking-go/internal/domain"
@@ -10,13 +11,14 @@ import (
 )
 
 type CampsiteRepository struct {
-	db *sql.DB
+	db     *sql.DB
+	logger *slog.Logger
 }
 
 var _ domain.CampsiteRepository = (*CampsiteRepository)(nil)
 
-func NewCampsiteRepository(db *sql.DB) CampsiteRepository {
-	return CampsiteRepository{db: db}
+func NewCampsiteRepository(db *sql.DB, logger *slog.Logger) CampsiteRepository {
+	return CampsiteRepository{db, logger}
 }
 
 func (r CampsiteRepository) FindAll(ctx context.Context) (campsites []*domain.Campsite, err error) {
@@ -34,6 +36,7 @@ func (r CampsiteRepository) FindAll(ctx context.Context) (campsites []*domain.Ca
 		err := rows.Close()
 		if err != nil {
 			err = errors.Wrap(err, "close campsite rows")
+			r.logger.Error("failed to find all", slog.Any("error", err))
 		}
 	}(rows)
 
