@@ -7,6 +7,7 @@ MOCKERY_VERSION = v2.43.2
 GOIMPORTS_VERSION = v0.22.0
 GOLINES_VERSION = v0.12.2
 GOFUMPT_VERSION = v0.6.0
+GOLANGCI_LINT_VERSION = v1.59.1
 
 ################################################################################
 # Target: init-proto
@@ -33,10 +34,18 @@ init-format:
 	go install mvdan.cc/gofumpt@$(GOFUMPT_VERSION)
 
 ################################################################################
+# Target: init-golangci-lint
+################################################################################
+.PHONY: init-golangci-lint
+init-golangci-lint:
+	sudo curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin $(GOLANGCI_LINT_VERSION)
+	golangci-lint --version
+
+################################################################################
 # Target: install-tolls
 ################################################################################
 .PHONY: install-tools
-install-tools: init-proto init-mock init-format
+install-tools: init-proto init-mock init-format init-golangci-lint
 
 ################################################################################
 # Target: mod-tidy
@@ -46,54 +55,11 @@ mod-tidy:
 	go mod tidy
 
 ################################################################################
-# Target: check-mod-diff                                                       #
-################################################################################
-.PHONY: check-mod-diff
-check-mod-diff:
-	git diff --exit-code ./go.mod
-	git diff --exit-code ./go.sum
-
-################################################################################
-# Target: format
-################################################################################
-.PHONY: format
-format:
-	golines -w --ignore-generated . && gofumpt -w .
-
-################################################################################
-# Target: check-format-diff
-################################################################################
-.PHONY: check-format-diff
-check-format-diff:
-	git diff --exit-code . ':!campgroundspb' # not generated pb
-
-################################################################################
-# Target: format-proto
-################################################################################
-.PHONY: format-proto
-format-proto:
-	buf format -w
-
-################################################################################
-# Target: lint-proto
-################################################################################
-.PHONY: lint-proto
-lint-proto:
-	buf lint
-
-################################################################################
 # Target: gen-proto
 ################################################################################
 .PHONY: gen-proto
 gen-proto:
 	buf generate
-
-################################################################################
-# Target: check-proto-diff
-################################################################################
-.PHONY: check-proto-diff
-check-proto-diff:
-	git diff --exit-code ./campgroundspb # generated pb
 
 ################################################################################
 # Target: gen-mock
@@ -103,10 +69,32 @@ gen-mock:
 	mockery --quiet --dir ./internal -r --all --inpackage --case underscore
 
 ################################################################################
-# Target: check-mock-diff
+# Target: format
 ################################################################################
-.PHONY: check-mock-diff
-check-mock-diff: check-format-diff
+.PHONY: format
+format:
+	golines -w --ignore-generated . && gofumpt -w .
+
+################################################################################
+# Target: format-proto
+################################################################################
+.PHONY: format-proto
+format-proto:
+	buf format -w
+
+################################################################################
+# Target: lint
+################################################################################
+.PHONY: lint
+lint:
+	golangci-lint run
+
+################################################################################
+# Target: lint-proto
+################################################################################
+.PHONY: lint-proto
+lint-proto:
+	buf lint
 
 ################################################################################
 # Target: test
@@ -121,3 +109,31 @@ test:
 .PHONY: test-integration
 test-integration:
 	go test -tags=integration ./internal/...
+
+################################################################################
+# Target: check-mod-diff                                                       #
+################################################################################
+.PHONY: check-mod-diff
+check-mod-diff:
+	git diff --exit-code ./go.mod
+	git diff --exit-code ./go.sum
+
+################################################################################
+# Target: check-proto-diff
+################################################################################
+.PHONY: check-proto-diff
+check-proto-diff:
+	git diff --exit-code ./campgroundspb # generated pb
+
+################################################################################
+# Target: check-mock-diff
+################################################################################
+.PHONY: check-mock-diff
+check-mock-diff: check-format-diff
+
+################################################################################
+# Target: check-format-diff
+################################################################################
+.PHONY: check-format-diff
+check-format-diff:
+	git diff --exit-code . ':!campgroundspb' # not generated pb
