@@ -4,8 +4,6 @@ services:
   postgres:
     image: postgres:15.2-alpine
     environment:
-      - POSTGRES_DB=postgres
-      - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
     ports:
       - "5432:5432"
