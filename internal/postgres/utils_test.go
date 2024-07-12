@@ -11,7 +11,6 @@ import (
 )
 
 func TestRollbackTx(t *testing.T) {
-
 	tests := map[string]struct {
 		err error
 	}{
