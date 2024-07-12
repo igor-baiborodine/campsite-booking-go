@@ -4,6 +4,7 @@ go 1.22.4
 
 require (
 	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.33.0-20240401165935-b983156c5e99.1
+	github.com/DATA-DOG/go-sqlmock v1.5.2
 	github.com/bufbuild/protovalidate-go v0.6.2
 	github.com/go-faker/faker/v4 v4.4.1
 	github.com/google/uuid v1.6.0
