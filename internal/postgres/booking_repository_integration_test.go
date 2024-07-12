@@ -53,7 +53,7 @@ func (s *bookingSuite) TearDownSuite() {
 		s.T().Fatal(err)
 	}
 	if err := s.container.Terminate(context.Background()); err != nil {
-		s.T().Fatal("failed to terminate postgres container", err)
+		s.T().Fatal("terminate postgres container", err)
 	}
 }
 
