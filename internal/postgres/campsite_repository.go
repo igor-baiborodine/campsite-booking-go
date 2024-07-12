@@ -36,6 +36,7 @@ func (r CampsiteRepository) FindAll(ctx context.Context) (campsites []*domain.Ca
 		err := rows.Close()
 		if err != nil {
 			err = errors.Wrap(err, "close campsite rows")
+			r.logger.Error("find all campsites", slog.Any("error", err))
 		}
 	}(rows)
 
