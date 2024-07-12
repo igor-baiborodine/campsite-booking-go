@@ -6,15 +6,13 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"log/slog"
-	"os"
 	"testing"
 	"time"
 
 	"github.com/igor-baiborodine/campsite-booking-go/internal/domain"
+	"github.com/igor-baiborodine/campsite-booking-go/internal/logger"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/postgres"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/testing/bootstrap"
-	"github.com/jba/slog/handlers/loghandler"
 	"github.com/stackus/errors"
 
 	_ "github.com/jackc/pgx/v4/stdlib"
@@ -55,12 +53,12 @@ func (s *bookingSuite) TearDownSuite() {
 		s.T().Fatal(err)
 	}
 	if err := s.container.Terminate(context.Background()); err != nil {
-		s.T().Fatal("failed to terminate postgres container", err)
+		s.T().Fatal("terminate postgres container", err)
 	}
 }
 
 func (s *bookingSuite) SetupTest() {
-	s.repo = postgres.NewBookingRepository(s.db, slog.New(loghandler.New(os.Stdout, nil)))
+	s.repo = postgres.NewBookingRepository(s.db, logger.NewStdout(nil))
 }
 
 func (s *bookingSuite) TearDownTest() {

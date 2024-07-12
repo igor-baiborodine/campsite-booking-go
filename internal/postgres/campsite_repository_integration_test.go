@@ -5,14 +5,12 @@ package postgres_test
 import (
 	"context"
 	"database/sql"
-	"log/slog"
-	"os"
 	"testing"
 
+	"github.com/igor-baiborodine/campsite-booking-go/internal/logger"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/postgres"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/testing/bootstrap"
 	_ "github.com/jackc/pgx/v4/stdlib"
-	"github.com/jba/slog/handlers/loghandler"
 	"github.com/stretchr/testify/suite"
 	pg "github.com/testcontainers/testcontainers-go/modules/postgres"
 )
@@ -50,12 +48,12 @@ func (s *campsiteSuite) TearDownSuite() {
 		s.T().Fatal(err)
 	}
 	if err := s.container.Terminate(context.Background()); err != nil {
-		s.T().Fatal("failed to terminate postgres container", err)
+		s.T().Fatal("terminate postgres container", err)
 	}
 }
 
 func (s *campsiteSuite) SetupTest() {
-	s.repo = postgres.NewCampsiteRepository(s.db, slog.New(loghandler.New(os.Stdout, nil)))
+	s.repo = postgres.NewCampsiteRepository(s.db, logger.NewStdout(nil))
 }
 
 func (s *campsiteSuite) TearDownTest() {

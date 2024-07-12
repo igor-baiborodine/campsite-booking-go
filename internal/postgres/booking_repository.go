@@ -26,7 +26,7 @@ func (r BookingRepository) Find(ctx context.Context, bookingID string) (*domain.
 	if err != nil {
 		return nil, errors.Wrap(err, "begin transaction")
 	}
-	defer tx.Rollback()
+	defer rollbackTx(tx, r.logger)
 
 	booking := &domain.Booking{}
 	if err = tx.QueryRowContext(
@@ -54,7 +54,7 @@ func (r BookingRepository) FindForDateRange(
 	if err != nil {
 		return nil, errors.Wrap(err, "begin transaction")
 	}
-	defer tx.Rollback()
+	defer rollbackTx(tx, r.logger)
 
 	bookings, err := r.findForDateRangeWithTx(
 		ctx, tx, FindAllBookingsForDateRangeQuery, campsiteID, startDate, endDate)
@@ -72,7 +72,7 @@ func (r BookingRepository) Insert(ctx context.Context, booking *domain.Booking) 
 	if err != nil {
 		return errors.Wrap(err, "begin transaction")
 	}
-	defer tx.Rollback()
+	defer rollbackTx(tx, r.logger)
 
 	query := FindAllBookingsForDateRangeQuery + " FOR UPDATE"
 	bookings, err := r.findForDateRangeWithTx(
@@ -107,7 +107,7 @@ func (r BookingRepository) Update(ctx context.Context, booking *domain.Booking) 
 	if err != nil {
 		return errors.Wrap(err, "begin transaction")
 	}
-	defer tx.Rollback()
+	defer rollbackTx(tx, r.logger)
 
 	query := FindAllBookingsForDateRangeQuery + "FOR UPDATE"
 	bookings, err := r.findForDateRangeWithTx(
@@ -151,7 +151,7 @@ func (r BookingRepository) findForDateRangeWithTx(
 		err := rows.Close()
 		if err != nil {
 			err = errors.Wrap(err, "close booking rows")
-			r.logger.Error("failed to find for date range with tx", slog.Any("error", err))
+			r.logger.Error("find bookings for date range with tx", slog.Any("error", err))
 		}
 	}(rows)
 

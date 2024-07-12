@@ -43,8 +43,12 @@ func New(cfg LogConfig) *slog.Logger {
 	case "production":
 		return slog.New(slog.NewJSONHandler(os.Stdout, opts))
 	default:
-		return slog.New(loghandler.New(os.Stdout, opts))
+		return NewStdout(opts)
 	}
+}
+
+func NewStdout(opts *slog.HandlerOptions) *slog.Logger {
+	return slog.New(loghandler.New(os.Stdout, opts))
 }
 
 func logLevelToSlog(level Level) slog.Level {
