@@ -26,7 +26,7 @@ func (r CampsiteRepository) FindAll(ctx context.Context) (campsites []*domain.Ca
 	if err != nil {
 		return nil, errors.Wrap(err, "begin transaction")
 	}
-	defer tx.Rollback()
+	defer rollbackTx(tx, r.logger)
 
 	rows, err := tx.QueryContext(ctx, FindAllCampsitesQuery)
 	if err != nil {
@@ -36,7 +36,6 @@ func (r CampsiteRepository) FindAll(ctx context.Context) (campsites []*domain.Ca
 		err := rows.Close()
 		if err != nil {
 			err = errors.Wrap(err, "close campsite rows")
-			r.logger.Error("failed to find all", slog.Any("error", err))
 		}
 	}(rows)
 
@@ -65,7 +64,7 @@ func (r CampsiteRepository) Insert(ctx context.Context, campsite *domain.Campsit
 	if err != nil {
 		return errors.Wrap(err, "begin transaction")
 	}
-	defer tx.Rollback()
+	defer rollbackTx(tx, r.logger)
 
 	createdAt := time.Now()
 	_, err = tx.ExecContext(ctx, InsertCampsiteQuery,
