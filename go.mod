@@ -12,7 +12,9 @@ require (
 	github.com/jackc/pgx/v4 v4.18.1
 	github.com/jba/slog v0.2.0
 	github.com/kelseyhightower/envconfig v1.4.0
+	github.com/neilotoole/slogt v1.1.0
 	github.com/pressly/goose/v3 v3.19.2
+	github.com/sirupsen/logrus v1.9.3
 	github.com/stackus/dotenv v0.0.0-20221206033122-02295762494b
 	github.com/stackus/errors v0.1.5
 	github.com/stretchr/testify v1.9.0
@@ -69,7 +71,6 @@ require (
 	github.com/sethvargo/go-retry v0.2.4 // indirect
 	github.com/shirou/gopsutil/v3 v3.24.3 // indirect
 	github.com/shoenig/go-m1cpu v0.1.6 // indirect
-	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/stoewer/go-strcase v1.3.0 // indirect
 	github.com/stretchr/objx v0.5.2 // indirect
 	github.com/tklauser/go-sysconf v0.3.13 // indirect

@@ -5,6 +5,7 @@ package postgres_test
 import (
 	"context"
 	"database/sql"
+	"os"
 	"testing"
 
 	"github.com/igor-baiborodine/campsite-booking-go/internal/logger"
@@ -53,7 +54,7 @@ func (s *campsiteSuite) TearDownSuite() {
 }
 
 func (s *campsiteSuite) SetupTest() {
-	s.repo = postgres.NewCampsiteRepository(s.db, logger.NewStdout(nil))
+	s.repo = postgres.NewCampsiteRepository(s.db, logger.NewDefault(os.Stdout, nil))
 }
 
 func (s *campsiteSuite) TearDownTest() {

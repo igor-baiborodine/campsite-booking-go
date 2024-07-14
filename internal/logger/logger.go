@@ -1,6 +1,7 @@
 package logger
 
 import (
+	"io"
 	std "log"
 	"log/slog"
 	"os"
@@ -43,12 +44,12 @@ func New(cfg LogConfig) *slog.Logger {
 	case "production":
 		return slog.New(slog.NewJSONHandler(os.Stdout, opts))
 	default:
-		return NewStdout(opts)
+		return NewDefault(os.Stdout, opts)
 	}
 }
 
-func NewStdout(opts *slog.HandlerOptions) *slog.Logger {
-	return slog.New(loghandler.New(os.Stdout, opts))
+func NewDefault(w io.Writer, opts *slog.HandlerOptions) *slog.Logger {
+	return slog.New(loghandler.New(w, opts))
 }
 
 func logLevelToSlog(level Level) slog.Level {
