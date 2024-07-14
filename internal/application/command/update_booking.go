@@ -67,15 +67,15 @@ func (h updateBookingHandler) Handle(ctx context.Context, cmd UpdateBooking) err
 	}
 
 	if cmd.StartDate != "" && cmd.EndDate != "" {
-		startDate, err := time.Parse(time.DateOnly, cmd.StartDate)
-		if err != nil {
-			return err
+		startDate, perr := time.Parse(time.DateOnly, cmd.StartDate)
+		if perr != nil {
+			return perr
 		}
 		booking.StartDate = startDate
 
-		endDate, err := time.Parse(time.DateOnly, cmd.EndDate)
-		if err != nil {
-			return err
+		endDate, perr := time.Parse(time.DateOnly, cmd.EndDate)
+		if perr != nil {
+			return perr
 		}
 		booking.EndDate = endDate
 	}
