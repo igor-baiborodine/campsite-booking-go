@@ -58,7 +58,7 @@ func (s *campsiteSuite) SetupTest() {
 }
 
 func (s *campsiteSuite) TearDownTest() {
-	_, err := s.db.ExecContext(context.Background(), bootstrap.DeleteCampsites)
+	err := bootstrap.DeleteCampsites(s.db)
 	if err != nil {
 		s.T().Fatal(err)
 	}
@@ -89,7 +89,8 @@ func (s *campsiteSuite) TestCampsiteRepository_Insert() {
 	// when
 	s.NoError(s.repo.Insert(context.Background(), campsite))
 	// then
-	row := s.db.QueryRow(bootstrap.SelectByCampsiteID, campsite.CampsiteID)
+	selectByCampsiteID := "SELECT campsite_code FROM campsites WHERE campsite_id = $1"
+	row := s.db.QueryRow(selectByCampsiteID, campsite.CampsiteID)
 	if s.NoError(row.Err()) {
 		var campsiteCode string
 		s.NoError(row.Scan(&campsiteCode))

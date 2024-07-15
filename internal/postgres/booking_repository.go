@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/igor-baiborodine/campsite-booking-go/internal/domain"
+	queries "github.com/igor-baiborodine/campsite-booking-go/internal/postgres/sql"
 	"github.com/stackus/errors"
 )
 
@@ -30,7 +31,7 @@ func (r BookingRepository) Find(ctx context.Context, bookingID string) (*domain.
 
 	booking := &domain.Booking{}
 	if err = tx.QueryRowContext(
-		ctx, FindBookingByBookingIDQuery, bookingID,
+		ctx, queries.FindBookingByBookingIDQuery, bookingID,
 	).Scan(
 		&booking.ID, &booking.BookingID, &booking.CampsiteID, &booking.Email,
 		&booking.FullName, &booking.StartDate, &booking.EndDate, &booking.Active,
@@ -57,7 +58,7 @@ func (r BookingRepository) FindForDateRange(
 	defer rollbackTx(tx, r.logger)
 
 	bookings, err := r.findForDateRangeWithTx(
-		ctx, tx, FindAllBookingsForDateRangeQuery, campsiteID, startDate, endDate)
+		ctx, tx, queries.FindAllBookingsForDateRangeQuery, campsiteID, startDate, endDate)
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +75,7 @@ func (r BookingRepository) Insert(ctx context.Context, booking *domain.Booking) 
 	}
 	defer rollbackTx(tx, r.logger)
 
-	query := FindAllBookingsForDateRangeQuery + " FOR UPDATE"
+	query := queries.FindAllBookingsForDateRangeQuery + " FOR UPDATE"
 	bookings, err := r.findForDateRangeWithTx(
 		ctx, tx, query, booking.CampsiteID, booking.StartDate, booking.EndDate)
 	if err != nil {
@@ -89,7 +90,7 @@ func (r BookingRepository) Insert(ctx context.Context, booking *domain.Booking) 
 
 	createdAt := time.Now()
 	_, err = tx.ExecContext(
-		ctx, InsertBookingQuery, booking.BookingID, booking.CampsiteID, booking.Email,
+		ctx, queries.InsertBookingQuery, booking.BookingID, booking.CampsiteID, booking.Email,
 		booking.FullName, booking.StartDate, booking.EndDate, booking.Active, createdAt, createdAt,
 	)
 	if err != nil {
@@ -109,7 +110,7 @@ func (r BookingRepository) Update(ctx context.Context, booking *domain.Booking) 
 	}
 	defer rollbackTx(tx, r.logger)
 
-	query := FindAllBookingsForDateRangeQuery + "FOR UPDATE"
+	query := queries.FindAllBookingsForDateRangeQuery + "FOR UPDATE"
 	bookings, err := r.findForDateRangeWithTx(
 		ctx, tx, query, booking.CampsiteID, booking.StartDate, booking.EndDate)
 	if err != nil {
@@ -126,7 +127,7 @@ func (r BookingRepository) Update(ctx context.Context, booking *domain.Booking) 
 	}
 	updatedAt := time.Now()
 	_, err = tx.ExecContext(
-		ctx, UpdateBookingQuery, booking.BookingID, booking.CampsiteID, booking.Email,
+		ctx, queries.UpdateBookingQuery, booking.BookingID, booking.CampsiteID, booking.Email,
 		booking.FullName, booking.StartDate, booking.EndDate, booking.Active, updatedAt,
 	)
 	if err != nil {

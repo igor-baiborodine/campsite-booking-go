@@ -1,3 +1,5 @@
+//go:build !integration
+
 package postgres
 
 import (
@@ -54,14 +56,14 @@ func TestRollbackTx(t *testing.T) {
 			err = mock.ExpectationsWereMet()
 			assert.NoError(t, err)
 
-			got := buf.String()
+			gotLog := buf.String()
 			if tc.wantLog != "" {
 				assert.Containsf(
 					t,
-					got,
+					gotLog,
 					tc.wantLog,
-					"rollbackTx() got = %s, wantLog %s",
-					got,
+					"rollbackTx() gotLog = %s, wantLog %s",
+					gotLog,
 					tc.wantLog,
 				)
 			}
@@ -109,14 +111,14 @@ func TestCloseRows(t *testing.T) {
 			err = mock.ExpectationsWereMet()
 			assert.NoError(t, err)
 
-			got := buf.String()
+			gotLog := buf.String()
 			if tc.wantLog != "" {
 				assert.Containsf(
 					t,
-					got,
+					gotLog,
 					tc.wantLog,
-					"closeRows() got = %s, wantLog %s",
-					got,
+					"closeRows() gotLog = %s, wantLog %s",
+					gotLog,
 					tc.wantLog,
 				)
 			}
