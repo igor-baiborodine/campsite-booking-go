@@ -8,6 +8,7 @@ import (
 	"github.com/igor-baiborodine/campsite-booking-go/db/migrations"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/config"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/service"
+	_ "github.com/jackc/pgx/v4/stdlib"
 )
 
 func main() {

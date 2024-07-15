@@ -16,7 +16,6 @@ import (
 	"github.com/igor-baiborodine/campsite-booking-go/internal/logger"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/postgres"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/waiter"
-	_ "github.com/jackc/pgx/v4/stdlib"
 	"github.com/pressly/goose/v3"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/grpc"
