@@ -42,12 +42,12 @@ func TestFindAll(t *testing.T) {
 	dbErr := errors.Wrap(errors.ErrUnknown, "unexpected error during db query")
 
 	tests := map[string]struct {
-		mockQuery     func(ctx context.Context, mock sqlmock.Sqlmock)
+		mockQuery     func(mock sqlmock.Sqlmock)
 		wantCampsites []*domain.Campsite
 		wantErr       error
 	}{
 		"Success": {
-			mockQuery: func(ctx context.Context, mock sqlmock.Sqlmock) {
+			mockQuery: func(mock sqlmock.Sqlmock) {
 				rows := sqlmock.NewRows(columnsRow).
 					AddRow(rowValues(campsites[0])...).
 					AddRow(rowValues(campsites[1])...).
@@ -60,7 +60,7 @@ func TestFindAll(t *testing.T) {
 			wantErr:       nil,
 		},
 		"NoCampsitesFound": {
-			mockQuery: func(ctx context.Context, mock sqlmock.Sqlmock) {
+			mockQuery: func(mock sqlmock.Sqlmock) {
 				rows := sqlmock.NewRows(columnsRow)
 				mock.ExpectBegin()
 				mock.ExpectQuery(queries.FindAllCampsitesQuery).WillReturnRows(rows)
@@ -69,7 +69,7 @@ func TestFindAll(t *testing.T) {
 			wantCampsites: nil,
 		},
 		"Error_Unexpected": {
-			mockQuery: func(ctx context.Context, mock sqlmock.Sqlmock) {
+			mockQuery: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
 				mock.ExpectQuery(queries.FindAllCampsitesQuery).WillReturnError(dbErr)
 				mock.ExpectRollback()
@@ -87,11 +87,10 @@ func TestFindAll(t *testing.T) {
 			}
 			defer db.Close()
 
-			ctx := context.TODO()
-			tc.mockQuery(ctx, mock)
+			tc.mockQuery(mock)
 			repo := NewCampsiteRepository(db, logger.NewDefault(os.Stdout, nil))
 			// when
-			campsites, err := repo.FindAll(ctx)
+			campsites, err := repo.FindAll(context.TODO())
 			// then
 			assert.Equal(t, tc.wantCampsites, campsites)
 			assert.ErrorIs(t, err, tc.wantErr, "FindAll() error = %v, wantErr %v",
