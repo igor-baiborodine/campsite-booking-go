@@ -13,3 +13,4 @@ coverage:
 ignore:
   # Configure what to ignore.
   - "campgroundspb/**/api*.go" # - generated files.
+  - "internal/testing/**/*"
