@@ -147,13 +147,7 @@ func (r BookingRepository) findForDateRangeWithTx(
 	if err != nil {
 		return nil, errors.Wrap(err, "query bookings for date range")
 	}
-	defer func(rows *sql.Rows) {
-		err := rows.Close()
-		if err != nil {
-			err = errors.Wrap(err, "close booking rows")
-			r.logger.Error("find bookings for date range with tx", slog.Any("error", err))
-		}
-	}(rows)
+	defer closeRows(rows, r.logger)
 
 	for rows.Next() {
 		booking := &domain.Booking{}
