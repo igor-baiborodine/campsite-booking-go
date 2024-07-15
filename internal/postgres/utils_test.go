@@ -13,20 +13,20 @@ import (
 
 func TestRollbackTx(t *testing.T) {
 	tests := map[string]struct {
-		err  error
-		want string
+		err     error
+		wantLog string
 	}{
 		"Success": {
-			err:  nil,
-			want: "",
+			err:     nil,
+			wantLog: "",
 		},
 		"Error_ErTxDone": {
-			err:  sql.ErrTxDone,
-			want: "",
+			err:     sql.ErrTxDone,
+			wantLog: "",
 		},
 		"Error_Unexpected": {
-			err:  errors.Wrap(errors.ErrUnknown, "unexpected error during rollback"),
-			want: "ERROR rollback transaction error=unexpected error during rollback",
+			err:     errors.Wrap(errors.ErrUnknown, "unexpected error during rollback"),
+			wantLog: "ERROR rollback transaction error=unexpected error during rollback",
 		},
 	}
 
@@ -55,8 +55,8 @@ func TestRollbackTx(t *testing.T) {
 			assert.NoError(t, err)
 
 			got := buf.String()
-			if tc.want != "" {
-				assert.Containsf(t, got, tc.want, "rollbackTx() got = %s, want %s", got, tc.want)
+			if tc.wantLog != "" {
+				assert.Containsf(t, got, tc.wantLog, "rollbackTx() got = %s, wantLog %s", got, tc.wantLog)
 			}
 		})
 	}
@@ -64,16 +64,16 @@ func TestRollbackTx(t *testing.T) {
 
 func TestCloseRows(t *testing.T) {
 	tests := map[string]struct {
-		err  error
-		want string
+		err     error
+		wantLog string
 	}{
 		"Success": {
-			err:  nil,
-			want: "",
+			err:     nil,
+			wantLog: "",
 		},
 		"Error_Unexpected": {
-			err:  errors.Wrap(errors.ErrUnknown, "unexpected error during close rows"),
-			want: "ERROR close rows error=unexpected error during close rows",
+			err:     errors.Wrap(errors.ErrUnknown, "unexpected error during close rows"),
+			wantLog: "ERROR close rows error=unexpected error during close rows",
 		},
 	}
 
@@ -103,8 +103,8 @@ func TestCloseRows(t *testing.T) {
 			assert.NoError(t, err)
 
 			got := buf.String()
-			if tc.want != "" {
-				assert.Containsf(t, got, tc.want, "closeRows() got = %s, want %s", got, tc.want)
+			if tc.wantLog != "" {
+				assert.Containsf(t, got, tc.wantLog, "closeRows() got = %s, wantLog %s", got, tc.wantLog)
 			}
 		})
 	}
