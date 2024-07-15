@@ -6,6 +6,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"os"
 	"testing"
 	"time"
 
@@ -58,7 +59,7 @@ func (s *bookingSuite) TearDownSuite() {
 }
 
 func (s *bookingSuite) SetupTest() {
-	s.repo = postgres.NewBookingRepository(s.db, logger.NewStdout(nil))
+	s.repo = postgres.NewBookingRepository(s.db, logger.NewDefault(os.Stdout, nil))
 }
 
 func (s *bookingSuite) TearDownTest() {

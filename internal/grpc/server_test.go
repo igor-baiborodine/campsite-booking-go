@@ -22,7 +22,7 @@ type mocks struct {
 func TestCreateCampsite(t *testing.T) {
 	type args struct {
 		ctx context.Context
-		req api.CreateCampsiteRequest
+		req *api.CreateCampsiteRequest
 	}
 
 	campsite, err := bootstrap.NewCampsite()
@@ -35,7 +35,7 @@ func TestCreateCampsite(t *testing.T) {
 		"Success": {
 			args: args{
 				ctx: context.Background(),
-				req: api.CreateCampsiteRequest{
+				req: &api.CreateCampsiteRequest{
 					CampsiteCode:  campsite.CampsiteCode,
 					Capacity:      campsite.Capacity,
 					DrinkingWater: campsite.DrinkingWater,
@@ -60,7 +60,7 @@ func TestCreateCampsite(t *testing.T) {
 				tc.on(m)
 			}
 			// when
-			resp, err := s.CreateCampsite(tc.args.ctx, &tc.args.req)
+			resp, err := s.CreateCampsite(tc.args.ctx, tc.args.req)
 			// then
 			assert.NoError(t, err)
 			assert.NotEmpty(t, resp.CampsiteId)
@@ -71,7 +71,7 @@ func TestCreateCampsite(t *testing.T) {
 func TestGetBooking(t *testing.T) {
 	type args struct {
 		ctx context.Context
-		req api.GetBookingRequest
+		req *api.GetBookingRequest
 	}
 
 	nonExistingID := "non-existing-id"
@@ -87,7 +87,7 @@ func TestGetBooking(t *testing.T) {
 		"Success": {
 			args: args{
 				ctx: context.Background(),
-				req: api.GetBookingRequest{
+				req: &api.GetBookingRequest{
 					BookingId: booking.BookingID,
 				},
 			},
@@ -103,7 +103,7 @@ func TestGetBooking(t *testing.T) {
 		"NotFound": {
 			args: args{
 				ctx: context.Background(),
-				req: api.GetBookingRequest{
+				req: &api.GetBookingRequest{
 					BookingId: nonExistingID,
 				},
 			},
@@ -126,7 +126,7 @@ func TestGetBooking(t *testing.T) {
 				tc.on(m)
 			}
 			// when
-			resp, err := s.GetBooking(tc.args.ctx, &tc.args.req)
+			resp, err := s.GetBooking(tc.args.ctx, tc.args.req)
 			// then
 			if tc.wantErr != "" {
 				assert.Containsf(
@@ -147,7 +147,7 @@ func TestGetBooking(t *testing.T) {
 func TestCreateBooking(t *testing.T) {
 	type args struct {
 		ctx context.Context
-		req api.CreateBookingRequest
+		req *api.CreateBookingRequest
 	}
 
 	booking, err := bootstrap.NewBooking("campsite-id")
@@ -161,7 +161,7 @@ func TestCreateBooking(t *testing.T) {
 		"Success": {
 			args: args{
 				ctx: context.Background(),
-				req: api.CreateBookingRequest{
+				req: &api.CreateBookingRequest{
 					CampsiteId: booking.CampsiteID,
 					Email:      booking.Email,
 					FullName:   booking.FullName,
@@ -179,7 +179,7 @@ func TestCreateBooking(t *testing.T) {
 		"BookingDatesNotAvailable": {
 			args: args{
 				ctx: context.Background(),
-				req: api.CreateBookingRequest{
+				req: &api.CreateBookingRequest{
 					CampsiteId: booking.CampsiteID,
 					Email:      booking.Email,
 					FullName:   booking.FullName,
@@ -209,7 +209,7 @@ func TestCreateBooking(t *testing.T) {
 				tc.on(m)
 			}
 			// when
-			resp, err := s.CreateBooking(tc.args.ctx, &tc.args.req)
+			resp, err := s.CreateBooking(tc.args.ctx, tc.args.req)
 			// then
 			if tc.wantErr != "" {
 				assert.Containsf(
@@ -230,7 +230,7 @@ func TestCreateBooking(t *testing.T) {
 func TestUpdateBooking(t *testing.T) {
 	type args struct {
 		ctx context.Context
-		req api.UpdateBookingRequest
+		req *api.UpdateBookingRequest
 	}
 
 	booking, err := bootstrap.NewBooking("campsite-id")
@@ -245,7 +245,7 @@ func TestUpdateBooking(t *testing.T) {
 		"Success": {
 			args: args{
 				ctx: context.Background(),
-				req: api.UpdateBookingRequest{Booking: BookingFromDomain(booking)},
+				req: &api.UpdateBookingRequest{Booking: BookingFromDomain(booking)},
 			},
 			on: func(f mocks) {
 				f.app.On(
@@ -258,7 +258,7 @@ func TestUpdateBooking(t *testing.T) {
 		"BookingDatesNotAvailable": {
 			args: args{
 				ctx: context.Background(),
-				req: api.UpdateBookingRequest{Booking: BookingFromDomain(booking)},
+				req: &api.UpdateBookingRequest{Booking: BookingFromDomain(booking)},
 			},
 			on: func(f mocks) {
 				f.app.On(
@@ -283,7 +283,7 @@ func TestUpdateBooking(t *testing.T) {
 				tc.on(m)
 			}
 			// when
-			resp, err := s.UpdateBooking(tc.args.ctx, &tc.args.req)
+			resp, err := s.UpdateBooking(tc.args.ctx, tc.args.req)
 			// then
 			if tc.wantErr != "" {
 				assert.Containsf(
@@ -304,7 +304,7 @@ func TestUpdateBooking(t *testing.T) {
 func TestCancelBooking(t *testing.T) {
 	type args struct {
 		ctx context.Context
-		req api.CancelBookingRequest
+		req *api.CancelBookingRequest
 	}
 
 	booking, err := bootstrap.NewBooking("campsite-id")
@@ -319,7 +319,7 @@ func TestCancelBooking(t *testing.T) {
 		"Success": {
 			args: args{
 				ctx: context.Background(),
-				req: api.CancelBookingRequest{BookingId: booking.BookingID},
+				req: &api.CancelBookingRequest{BookingId: booking.BookingID},
 			},
 			on: func(f mocks) {
 				f.app.On(
@@ -332,7 +332,7 @@ func TestCancelBooking(t *testing.T) {
 		"BookingAlreadyCancelled": {
 			args: args{
 				ctx: context.Background(),
-				req: api.CancelBookingRequest{BookingId: booking.BookingID},
+				req: &api.CancelBookingRequest{BookingId: booking.BookingID},
 			},
 			on: func(f mocks) {
 				f.app.On(
@@ -354,7 +354,7 @@ func TestCancelBooking(t *testing.T) {
 				tc.on(m)
 			}
 			// when
-			resp, err := s.CancelBooking(tc.args.ctx, &tc.args.req)
+			resp, err := s.CancelBooking(tc.args.ctx, tc.args.req)
 			// then
 			if tc.wantErr != "" {
 				assert.Containsf(
@@ -375,7 +375,7 @@ func TestCancelBooking(t *testing.T) {
 func TestGetVacantDates(t *testing.T) {
 	type args struct {
 		ctx context.Context
-		req api.GetVacantDatesRequest
+		req *api.GetVacantDatesRequest
 	}
 
 	tests := map[string]struct {
@@ -387,7 +387,7 @@ func TestGetVacantDates(t *testing.T) {
 		"Success": {
 			args: args{
 				ctx: context.Background(),
-				req: api.GetVacantDatesRequest{
+				req: &api.GetVacantDatesRequest{
 					CampsiteId: "campsite-id",
 					StartDate:  "2006-01-02",
 					EndDate:    "2006-01-03",
@@ -411,7 +411,7 @@ func TestGetVacantDates(t *testing.T) {
 				tc.on(m)
 			}
 			// when
-			resp, err := s.GetVacantDates(tc.args.ctx, &tc.args.req)
+			resp, err := s.GetVacantDates(tc.args.ctx, tc.args.req)
 			// then
 			if tc.wantErr != "" {
 				assert.Containsf(

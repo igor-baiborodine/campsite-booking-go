@@ -3,6 +3,7 @@ package query
 import (
 	"context"
 	"errors"
+	"os"
 	"testing"
 	"time"
 
@@ -132,7 +133,7 @@ func TestGetVacantDates(t *testing.T) {
 			}
 			h := NewGetVacantDatesHandler(
 				m.bookings,
-				logger.NewStdout(nil),
+				logger.NewDefault(os.Stdout, nil),
 			)
 			if tc.on != nil {
 				tc.on(m)
