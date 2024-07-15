@@ -63,12 +63,12 @@ func (s *bookingSuite) SetupTest() {
 }
 
 func (s *bookingSuite) TearDownTest() {
-	_, err := s.db.ExecContext(context.Background(), bootstrap.DeleteBookings)
+	err := bootstrap.DeleteBookings(s.db)
 	if err != nil {
 		s.T().Fatal(err)
 	}
 
-	_, err = s.db.ExecContext(context.Background(), bootstrap.DeleteCampsites)
+	err = bootstrap.DeleteCampsites(s.db)
 	if err != nil {
 		s.T().Fatal(err)
 	}

@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/igor-baiborodine/campsite-booking-go/internal/domain"
+	queries "github.com/igor-baiborodine/campsite-booking-go/internal/postgres/sql"
 	"github.com/stackus/errors"
 )
 
@@ -28,7 +29,7 @@ func (r CampsiteRepository) FindAll(ctx context.Context) (campsites []*domain.Ca
 	}
 	defer rollbackTx(tx, r.logger)
 
-	rows, err := tx.QueryContext(ctx, FindAllCampsitesQuery)
+	rows, err := tx.QueryContext(ctx, queries.FindAllCampsitesQuery)
 	if err != nil {
 		return nil, errors.Wrap(err, "query campsites")
 	}
@@ -62,7 +63,7 @@ func (r CampsiteRepository) Insert(ctx context.Context, campsite *domain.Campsit
 	defer rollbackTx(tx, r.logger)
 
 	createdAt := time.Now()
-	_, err = tx.ExecContext(ctx, InsertCampsiteQuery,
+	_, err = tx.ExecContext(ctx, queries.InsertCampsiteQuery,
 		campsite.CampsiteID, campsite.CampsiteCode, campsite.Capacity, campsite.Restrooms,
 		campsite.DrinkingWater, campsite.PicnicTable, campsite.FirePit, campsite.Active,
 		createdAt, createdAt)
