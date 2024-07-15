@@ -56,7 +56,14 @@ func TestRollbackTx(t *testing.T) {
 
 			got := buf.String()
 			if tc.wantLog != "" {
-				assert.Containsf(t, got, tc.wantLog, "rollbackTx() got = %s, wantLog %s", got, tc.wantLog)
+				assert.Containsf(
+					t,
+					got,
+					tc.wantLog,
+					"rollbackTx() got = %s, wantLog %s",
+					got,
+					tc.wantLog,
+				)
 			}
 		})
 	}
@@ -104,7 +111,14 @@ func TestCloseRows(t *testing.T) {
 
 			got := buf.String()
 			if tc.wantLog != "" {
-				assert.Containsf(t, got, tc.wantLog, "closeRows() got = %s, wantLog %s", got, tc.wantLog)
+				assert.Containsf(
+					t,
+					got,
+					tc.wantLog,
+					"closeRows() got = %s, wantLog %s",
+					got,
+					tc.wantLog,
+				)
 			}
 		})
 	}
