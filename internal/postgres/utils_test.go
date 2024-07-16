@@ -15,20 +15,20 @@ import (
 
 func TestRollbackTx(t *testing.T) {
 	tests := map[string]struct {
-		err     error
-		wantLog string
+		err  error
+		want string
 	}{
 		"Success": {
-			err:     nil,
-			wantLog: "",
+			err:  nil,
+			want: "",
 		},
 		"Error_ErTxDone": {
-			err:     sql.ErrTxDone,
-			wantLog: "",
+			err:  sql.ErrTxDone,
+			want: "",
 		},
 		"Error_Unexpected": {
-			err:     errors.Wrap(errors.ErrUnknown, "unexpected error during rollback"),
-			wantLog: "ERROR rollback transaction error=unexpected error during rollback",
+			err:  errors.Wrap(errors.ErrUnknown, "unexpected error during rollback"),
+			want: "ERROR rollback transaction error=unexpected error during rollback",
 		},
 	}
 
@@ -56,15 +56,10 @@ func TestRollbackTx(t *testing.T) {
 			err = mock.ExpectationsWereMet()
 			assert.NoError(t, err)
 
-			gotLog := buf.String()
-			if tc.wantLog != "" {
+			got := buf.String()
+			if tc.want != "" {
 				assert.Containsf(
-					t,
-					gotLog,
-					tc.wantLog,
-					"rollbackTx() gotLog = %s, wantLog %s",
-					gotLog,
-					tc.wantLog,
+					t, got, tc.want, "rollbackTx() got = %s, want %s", got, tc.want,
 				)
 			}
 		})
@@ -73,16 +68,16 @@ func TestRollbackTx(t *testing.T) {
 
 func TestCloseRows(t *testing.T) {
 	tests := map[string]struct {
-		err     error
-		wantLog string
+		err  error
+		want string
 	}{
 		"Success": {
-			err:     nil,
-			wantLog: "",
+			err:  nil,
+			want: "",
 		},
 		"Error_Unexpected": {
-			err:     errors.Wrap(errors.ErrUnknown, "unexpected error during close rows"),
-			wantLog: "ERROR close rows error=unexpected error during close rows",
+			err:  errors.Wrap(errors.ErrUnknown, "unexpected error during close rows"),
+			want: "ERROR close rows error=unexpected error during close rows",
 		},
 	}
 
@@ -111,15 +106,10 @@ func TestCloseRows(t *testing.T) {
 			err = mock.ExpectationsWereMet()
 			assert.NoError(t, err)
 
-			gotLog := buf.String()
-			if tc.wantLog != "" {
+			got := buf.String()
+			if tc.want != "" {
 				assert.Containsf(
-					t,
-					gotLog,
-					tc.wantLog,
-					"closeRows() gotLog = %s, wantLog %s",
-					gotLog,
-					tc.wantLog,
+					t, got, tc.want, "closeRows() got = %s, want %s", got, tc.want,
 				)
 			}
 		})
