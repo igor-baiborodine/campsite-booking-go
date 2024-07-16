@@ -39,6 +39,7 @@ func TestFindAll(t *testing.T) {
 		"fire_pit",
 		"active",
 	}
+	beginTxErr := errors.Wrap(errors.ErrUnknown, "unexpected begin transaction error")
 	queryErr := errors.Wrap(errors.ErrUnknown, "unexpected query error")
 	rowErr := errors.Wrap(errors.ErrUnknown, "unexpected rows error")
 	commitErr := errors.Wrap(errors.ErrUnknown, "unexpected commit error")
@@ -70,6 +71,13 @@ func TestFindAll(t *testing.T) {
 			},
 			want:    nil,
 			wantErr: nil,
+		},
+		"Error_BeginTx": {
+			mockQuery: func(mock sqlmock.Sqlmock) {
+				mock.ExpectBegin().WillReturnError(beginTxErr)
+			},
+			want:    nil,
+			wantErr: beginTxErr,
 		},
 		"Error_Query": {
 			mockQuery: func(mock sqlmock.Sqlmock) {
