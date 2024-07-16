@@ -116,7 +116,6 @@ func TestFindAll(t *testing.T) {
 			if err != nil {
 				t.Fatalf("open stub database connection error: %v", err)
 			}
-			db.Exec("SELECT 1")
 			defer db.Close()
 
 			tc.mockQuery(mock)
