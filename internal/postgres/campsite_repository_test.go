@@ -39,12 +39,14 @@ func TestFindAll(t *testing.T) {
 		"fire_pit",
 		"active",
 	}
-	dbErr := errors.Wrap(errors.ErrUnknown, "unexpected error during db query")
+	queryErr := errors.Wrap(errors.ErrUnknown, "unexpected query error")
+	rowErr := errors.Wrap(errors.ErrUnknown, "unexpected rows error")
+	commitErr := errors.Wrap(errors.ErrUnknown, "unexpected commit error")
 
 	tests := map[string]struct {
-		mockQuery     func(mock sqlmock.Sqlmock)
-		wantCampsites []*domain.Campsite
-		wantErr       error
+		mockQuery func(mock sqlmock.Sqlmock)
+		want      []*domain.Campsite
+		wantErr   error
 	}{
 		"Success": {
 			mockQuery: func(mock sqlmock.Sqlmock) {
@@ -56,8 +58,8 @@ func TestFindAll(t *testing.T) {
 				mock.ExpectQuery(queries.FindAllCampsitesQuery).WillReturnRows(rows)
 				mock.ExpectCommit()
 			},
-			wantCampsites: campsites,
-			wantErr:       nil,
+			want:    campsites,
+			wantErr: nil,
 		},
 		"NoCampsitesFound": {
 			mockQuery: func(mock sqlmock.Sqlmock) {
@@ -66,15 +68,44 @@ func TestFindAll(t *testing.T) {
 				mock.ExpectQuery(queries.FindAllCampsitesQuery).WillReturnRows(rows)
 				mock.ExpectCommit()
 			},
-			wantCampsites: nil,
+			want:    nil,
+			wantErr: nil,
 		},
-		"Error_Unexpected": {
+		"Error_Query": {
 			mockQuery: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
-				mock.ExpectQuery(queries.FindAllCampsitesQuery).WillReturnError(dbErr)
+				mock.ExpectQuery(queries.FindAllCampsitesQuery).WillReturnError(queryErr)
 				mock.ExpectRollback()
 			},
-			wantErr: dbErr,
+			want:    nil,
+			wantErr: queryErr,
+		},
+		"Error_Rows": {
+			mockQuery: func(mock sqlmock.Sqlmock) {
+				rows := sqlmock.NewRows(columnsRow).
+					AddRow(rowValues(campsites[0])...).
+					AddRow(rowValues(campsites[1])...).
+					AddRow(rowValues(campsites[2])...)
+				rows.RowError(2, rowErr)
+				mock.ExpectBegin()
+				mock.ExpectQuery(queries.FindAllCampsitesQuery).WillReturnRows(rows)
+				mock.ExpectRollback()
+			},
+			want:    nil,
+			wantErr: rowErr,
+		},
+		"Error_Commit": {
+			mockQuery: func(mock sqlmock.Sqlmock) {
+				rows := sqlmock.NewRows(columnsRow).
+					AddRow(rowValues(campsites[0])...).
+					AddRow(rowValues(campsites[1])...).
+					AddRow(rowValues(campsites[2])...)
+				mock.ExpectBegin()
+				mock.ExpectQuery(queries.FindAllCampsitesQuery).WillReturnRows(rows)
+				mock.ExpectCommit().WillReturnError(commitErr)
+			},
+			want:    nil,
+			wantErr: commitErr,
 		},
 	}
 
@@ -85,6 +116,7 @@ func TestFindAll(t *testing.T) {
 			if err != nil {
 				t.Fatalf("open stub database connection error: %v", err)
 			}
+			db.Exec("SELECT 1")
 			defer db.Close()
 
 			tc.mockQuery(mock)
@@ -92,7 +124,7 @@ func TestFindAll(t *testing.T) {
 			// when
 			campsites, err := repo.FindAll(context.TODO())
 			// then
-			assert.Equal(t, tc.wantCampsites, campsites)
+			assert.Equal(t, tc.want, campsites)
 			assert.ErrorIs(t, err, tc.wantErr, "FindAll() error = %v, wantErr %v",
 				err, tc.wantErr)
 
