@@ -3,7 +3,6 @@ package bootstrap
 import (
 	"context"
 	"database/sql"
-	"time"
 
 	"github.com/igor-baiborodine/campsite-booking-go/internal/domain"
 	queries "github.com/igor-baiborodine/campsite-booking-go/internal/postgres/sql"
@@ -20,18 +19,17 @@ const (
 )
 
 func InsertCampsite(db *sql.DB, c *domain.Campsite) error {
-	createdAt := time.Now()
 	_, err := db.ExecContext(context.Background(), queries.InsertCampsiteQuery,
 		c.CampsiteID, c.CampsiteCode, c.Capacity, c.Restrooms, c.DrinkingWater, c.PicnicTable,
-		c.FirePit, c.Active, createdAt, createdAt)
+		c.FirePit, c.Active,
+	)
 	return err
 }
 
 func InsertBooking(db *sql.DB, b *domain.Booking) error {
-	createdAt := time.Now()
 	_, err := db.ExecContext(context.Background(), queries.InsertBookingQuery,
-		b.BookingID, b.CampsiteID, b.Email, b.FullName, b.StartDate, b.EndDate, b.Active, createdAt,
-		createdAt)
+		b.BookingID, b.CampsiteID, b.Email, b.FullName, b.StartDate, b.EndDate, b.Active,
+	)
 	return err
 }
 

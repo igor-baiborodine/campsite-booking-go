@@ -7,6 +7,7 @@ import (
 	"database/sql"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/igor-baiborodine/campsite-booking-go/internal/logger"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/postgres"
@@ -89,11 +90,16 @@ func (s *campsiteSuite) TestCampsiteRepository_Insert() {
 	// when
 	s.NoError(s.repo.Insert(context.Background(), campsite))
 	// then
-	selectByCampsiteID := "SELECT campsite_code FROM campsites WHERE campsite_id = $1"
+	selectByCampsiteID := "SELECT campsite_code, created_at, updated_at FROM campsites WHERE campsite_id = $1"
 	row := s.db.QueryRow(selectByCampsiteID, campsite.CampsiteID)
+
 	if s.NoError(row.Err()) {
 		var campsiteCode string
-		s.NoError(row.Scan(&campsiteCode))
+		var createdAt time.Time
+		var updatedAt time.Time
+		s.NoError(row.Scan(&campsiteCode, &createdAt, &updatedAt))
 		s.Equal(campsite.CampsiteCode, campsiteCode)
+		s.NotNil(createdAt)
+		s.Equal(createdAt, updatedAt)
 	}
 }

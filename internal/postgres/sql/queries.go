@@ -10,11 +10,9 @@ const (
 			drinking_water, 
 			picnic_table, 
 			fire_pit, 
-			active, 
-			created_at, 
-			updated_at
+			active
 		) 
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 	`
 
 	FindAllCampsitesQuery = `
@@ -53,11 +51,9 @@ const (
 			full_name, 
 			start_date, 
 			end_date, 
-			active, 
-			created_at, 
-			updated_at
+			active
 		)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+		VALUES ($1, $2, $3, $4, $5, $6, $7)
 	`
 
 	FindAllBookingsForDateRangeQuery = `
@@ -86,8 +82,7 @@ const (
 		    full_name = $4, 
 		    start_date = $5,
 		    end_date = $6,
-		    active = $7,
-		    updated_at = $8
+		    active = $7
 		WHERE booking_id = $1
 	`
 )
