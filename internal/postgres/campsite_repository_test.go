@@ -143,11 +143,11 @@ func TestInsert(t *testing.T) {
 	}
 
 	tests := map[string]struct {
-		mockExec func(mock sqlmock.Sqlmock)
-		wantErr  error
+		mockTxPhases func(mock sqlmock.Sqlmock)
+		wantErr      error
 	}{
 		"Success": {
-			mockExec: func(mock sqlmock.Sqlmock) {
+			mockTxPhases: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
 				mock.ExpectExec(queries.InsertCampsiteQuery).
 					WithArgs(campsiteArgs(campsite)...).
@@ -157,13 +157,13 @@ func TestInsert(t *testing.T) {
 			wantErr: nil,
 		},
 		"Error_BeginTx": {
-			mockExec: func(mock sqlmock.Sqlmock) {
+			mockTxPhases: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin().WillReturnError(bootstrap.ErrBeginTx)
 			},
 			wantErr: bootstrap.ErrBeginTx,
 		},
 		"Error_Query": {
-			mockExec: func(mock sqlmock.Sqlmock) {
+			mockTxPhases: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
 				mock.ExpectExec(queries.InsertCampsiteQuery).
 					WithArgs(campsiteArgs(campsite)...).
@@ -173,7 +173,7 @@ func TestInsert(t *testing.T) {
 			wantErr: bootstrap.ErrExec,
 		},
 		"Error_Commit": {
-			mockExec: func(mock sqlmock.Sqlmock) {
+			mockTxPhases: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
 				mock.ExpectExec(queries.InsertCampsiteQuery).
 					WithArgs(campsiteArgs(campsite)...).
@@ -193,7 +193,7 @@ func TestInsert(t *testing.T) {
 			}
 			defer db.Close()
 
-			tc.mockExec(mock)
+			tc.mockTxPhases(mock)
 			repo := NewCampsiteRepository(db, logger.NewDefault(os.Stdout, nil))
 			// when
 			err = repo.Insert(context.TODO(), campsite)
