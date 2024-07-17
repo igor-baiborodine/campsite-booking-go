@@ -40,12 +40,12 @@ func TestFindAll(t *testing.T) {
 	}
 
 	tests := map[string]struct {
-		mockQuery func(mock sqlmock.Sqlmock)
-		want      []*domain.Campsite
-		wantErr   error
+		mockTxPhases func(mock sqlmock.Sqlmock)
+		want         []*domain.Campsite
+		wantErr      error
 	}{
 		"Success": {
-			mockQuery: func(mock sqlmock.Sqlmock) {
+			mockTxPhases: func(mock sqlmock.Sqlmock) {
 				rows := sqlmock.NewRows(columnsRow).
 					AddRow(campsiteRowValues(campsites[0])...).
 					AddRow(campsiteRowValues(campsites[1])...).
@@ -58,7 +58,7 @@ func TestFindAll(t *testing.T) {
 			wantErr: nil,
 		},
 		"NoCampsitesFound": {
-			mockQuery: func(mock sqlmock.Sqlmock) {
+			mockTxPhases: func(mock sqlmock.Sqlmock) {
 				rows := sqlmock.NewRows(columnsRow)
 				mock.ExpectBegin()
 				mock.ExpectQuery(queries.FindAllCampsitesQuery).WillReturnRows(rows)
@@ -68,14 +68,14 @@ func TestFindAll(t *testing.T) {
 			wantErr: nil,
 		},
 		"Error_BeginTx": {
-			mockQuery: func(mock sqlmock.Sqlmock) {
+			mockTxPhases: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin().WillReturnError(bootstrap.ErrBeginTx)
 			},
 			want:    nil,
 			wantErr: bootstrap.ErrBeginTx,
 		},
 		"Error_Query": {
-			mockQuery: func(mock sqlmock.Sqlmock) {
+			mockTxPhases: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
 				mock.ExpectQuery(queries.FindAllCampsitesQuery).WillReturnError(bootstrap.ErrQuery)
 				mock.ExpectRollback()
@@ -84,7 +84,7 @@ func TestFindAll(t *testing.T) {
 			wantErr: bootstrap.ErrQuery,
 		},
 		"Error_Rows": {
-			mockQuery: func(mock sqlmock.Sqlmock) {
+			mockTxPhases: func(mock sqlmock.Sqlmock) {
 				rows := sqlmock.NewRows(columnsRow).
 					AddRow(campsiteRowValues(campsites[0])...).
 					AddRow(campsiteRowValues(campsites[1])...).
@@ -98,7 +98,7 @@ func TestFindAll(t *testing.T) {
 			wantErr: bootstrap.ErrRow,
 		},
 		"Error_Commit": {
-			mockQuery: func(mock sqlmock.Sqlmock) {
+			mockTxPhases: func(mock sqlmock.Sqlmock) {
 				rows := sqlmock.NewRows(columnsRow).
 					AddRow(campsiteRowValues(campsites[0])...).
 					AddRow(campsiteRowValues(campsites[1])...).
@@ -121,7 +121,7 @@ func TestFindAll(t *testing.T) {
 			}
 			defer db.Close()
 
-			tc.mockQuery(mock)
+			tc.mockTxPhases(mock)
 			repo := NewCampsiteRepository(db, logger.NewDefault(os.Stdout, nil))
 			// when
 			got, err := repo.FindAll(context.TODO())
@@ -143,48 +143,45 @@ func TestInsert(t *testing.T) {
 	}
 
 	tests := map[string]struct {
-		mockQuery func(mock sqlmock.Sqlmock)
-		wantErr   error
+		mockExec func(mock sqlmock.Sqlmock)
+		wantErr  error
 	}{
-		// TODO: implement after fixing issue with created_at and updated_at
-		//"Success": {
-		//	mockQuery: func(mock sqlmock.Sqlmock) {
-		//		mock.ExpectBegin()
-		//		mock.ExpectExec(queries.InsertCampsiteQuery).
-		//			WithArgs(campsiteArgs(campsite)...).
-		//			WillReturnResult(sqlmock.NewResult(1, 1))
-		//		mock.ExpectCommit()
-		//	},
-		//	wantErr: nil,
-		//},
+		"Success": {
+			mockExec: func(mock sqlmock.Sqlmock) {
+				mock.ExpectBegin()
+				mock.ExpectExec(queries.InsertCampsiteQuery).
+					WithArgs(campsiteArgs(campsite)...).
+					WillReturnResult(sqlmock.NewResult(1, 1))
+				mock.ExpectCommit()
+			},
+			wantErr: nil,
+		},
 		"Error_BeginTx": {
-			mockQuery: func(mock sqlmock.Sqlmock) {
+			mockExec: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin().WillReturnError(bootstrap.ErrBeginTx)
 			},
 			wantErr: bootstrap.ErrBeginTx,
 		},
-		// TODO: implement after fixing issue with created_at and updated_at
-		//"Error_Query": {
-		//	mockQuery: func(mock sqlmock.Sqlmock) {
-		//		mock.ExpectBegin()
-		//		mock.ExpectExec(queries.InsertCampsiteQuery).
-		//			WithArgs(campsiteArgs(campsite)...).
-		//			WillReturnError(bootstrap.ErrQuery)
-		//		mock.ExpectRollback()
-		//	},
-		//	wantErr: bootstrap.ErrQuery,
-		//},
-		// TODO: implement after fixing issue with created_at and updated_at
-		//"Error_Commit": {
-		//	mockQuery: func(mock sqlmock.Sqlmock) {
-		//		mock.ExpectBegin()
-		//		mock.ExpectExec(queries.InsertCampsiteQuery).
-		//			WithArgs(campsiteArgs(campsite)...).
-		//			WillReturnResult(sqlmock.NewResult(1, 1))
-		//		mock.ExpectCommit().WillReturnError(bootstrap.ErrCommit)
-		//	},
-		//	wantErr: bootstrap.ErrCommit,
-		//},
+		"Error_Query": {
+			mockExec: func(mock sqlmock.Sqlmock) {
+				mock.ExpectBegin()
+				mock.ExpectExec(queries.InsertCampsiteQuery).
+					WithArgs(campsiteArgs(campsite)...).
+					WillReturnError(bootstrap.ErrExec)
+				mock.ExpectRollback()
+			},
+			wantErr: bootstrap.ErrExec,
+		},
+		"Error_Commit": {
+			mockExec: func(mock sqlmock.Sqlmock) {
+				mock.ExpectBegin()
+				mock.ExpectExec(queries.InsertCampsiteQuery).
+					WithArgs(campsiteArgs(campsite)...).
+					WillReturnResult(sqlmock.NewResult(1, 1))
+				mock.ExpectCommit().WillReturnError(bootstrap.ErrCommit)
+			},
+			wantErr: bootstrap.ErrCommit,
+		},
 	}
 
 	for name, tc := range tests {
@@ -196,7 +193,7 @@ func TestInsert(t *testing.T) {
 			}
 			defer db.Close()
 
-			tc.mockQuery(mock)
+			tc.mockExec(mock)
 			repo := NewCampsiteRepository(db, logger.NewDefault(os.Stdout, nil))
 			// when
 			err = repo.Insert(context.TODO(), campsite)
@@ -209,15 +206,9 @@ func TestInsert(t *testing.T) {
 	}
 }
 
-// TODO: implement after fixing issue with created_at and updated_at
-//func campsiteArgs(c *domain.Campsite) []driver.Value {
-//	args := campsiteRowValues(c)[1:] // remove ID
-//
-//	createdAt := time.Now()
-//	args = append(args, createdAt)
-//	args = append(args, createdAt) // updated_at
-//	return args
-//}
+func campsiteArgs(c *domain.Campsite) []driver.Value {
+	return campsiteRowValues(c)[1:] // remove ID
+}
 
 func campsiteRowValues(c *domain.Campsite) []driver.Value {
 	return []driver.Value{

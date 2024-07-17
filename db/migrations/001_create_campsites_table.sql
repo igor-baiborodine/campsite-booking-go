@@ -15,6 +15,12 @@ CREATE TABLE campsites
     CONSTRAINT pk_campsites PRIMARY KEY (id)
 );
 
+CREATE EXTENSION IF NOT EXISTS moddatetime;
+CREATE TRIGGER campsites_update_moddatetime_trigger
+    BEFORE UPDATE ON campsites
+    FOR EACH ROW
+    EXECUTE PROCEDURE moddatetime (updated_at);
+
 CREATE UNIQUE INDEX unique_campsites_campsite_id ON campsites (campsite_id);
 CREATE UNIQUE INDEX unique_campsites_campsite_code ON campsites (campsite_code);
 

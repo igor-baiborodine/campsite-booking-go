@@ -38,12 +38,12 @@ func TestFind(t *testing.T) {
 	errBookingNotFound := domain.ErrBookingNotFound{BookingID: booking.BookingID}
 
 	tests := map[string]struct {
-		mockQuery func(mock sqlmock.Sqlmock)
-		want      *domain.Booking
-		wantErr   error
+		mockTxPhases func(mock sqlmock.Sqlmock)
+		want         *domain.Booking
+		wantErr      error
 	}{
 		"Success": {
-			mockQuery: func(mock sqlmock.Sqlmock) {
+			mockTxPhases: func(mock sqlmock.Sqlmock) {
 				rows := sqlmock.NewRows(columnsRow).
 					AddRow(bookingRowValues(booking)...)
 				mock.ExpectBegin()
@@ -56,7 +56,7 @@ func TestFind(t *testing.T) {
 			wantErr: nil,
 		},
 		"NoBookingFound": {
-			mockQuery: func(mock sqlmock.Sqlmock) {
+			mockTxPhases: func(mock sqlmock.Sqlmock) {
 				rows := sqlmock.NewRows(columnsRow)
 				mock.ExpectBegin()
 				mock.ExpectQuery(queries.FindBookingByBookingIDQuery).
@@ -68,14 +68,14 @@ func TestFind(t *testing.T) {
 			wantErr: errBookingNotFound,
 		},
 		"Error_BeginTx": {
-			mockQuery: func(mock sqlmock.Sqlmock) {
+			mockTxPhases: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin().WillReturnError(bootstrap.ErrBeginTx)
 			},
 			want:    nil,
 			wantErr: bootstrap.ErrBeginTx,
 		},
 		"Error_Query": {
-			mockQuery: func(mock sqlmock.Sqlmock) {
+			mockTxPhases: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
 				mock.ExpectQuery(queries.FindBookingByBookingIDQuery).
 					WithArgs(booking.BookingID).
@@ -86,7 +86,7 @@ func TestFind(t *testing.T) {
 			wantErr: bootstrap.ErrQuery,
 		},
 		"Error_Rows": {
-			mockQuery: func(mock sqlmock.Sqlmock) {
+			mockTxPhases: func(mock sqlmock.Sqlmock) {
 				rows := sqlmock.NewRows(columnsRow).
 					AddRow(bookingRowValues(booking)...)
 				rows.RowError(0, bootstrap.ErrRow)
@@ -100,7 +100,7 @@ func TestFind(t *testing.T) {
 			wantErr: bootstrap.ErrRow,
 		},
 		"Error_Commit": {
-			mockQuery: func(mock sqlmock.Sqlmock) {
+			mockTxPhases: func(mock sqlmock.Sqlmock) {
 				rows := sqlmock.NewRows(columnsRow).
 					AddRow(bookingRowValues(booking)...)
 				mock.ExpectBegin()
@@ -123,7 +123,7 @@ func TestFind(t *testing.T) {
 			}
 			defer db.Close()
 
-			tc.mockQuery(mock)
+			tc.mockTxPhases(mock)
 			repo := NewBookingRepository(db, logger.NewDefault(os.Stdout, nil))
 			// when
 			got, err := repo.Find(context.TODO(), booking.BookingID)

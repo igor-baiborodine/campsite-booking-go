@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"log/slog"
-	"time"
 
 	"github.com/igor-baiborodine/campsite-booking-go/internal/domain"
 	queries "github.com/igor-baiborodine/campsite-booking-go/internal/postgres/sql"
@@ -62,11 +61,9 @@ func (r CampsiteRepository) Insert(ctx context.Context, campsite *domain.Campsit
 	}
 	defer rollbackTx(tx, r.logger)
 
-	createdAt := time.Now()
 	_, err = tx.ExecContext(ctx, queries.InsertCampsiteQuery,
 		campsite.CampsiteID, campsite.CampsiteCode, campsite.Capacity, campsite.Restrooms,
-		campsite.DrinkingWater, campsite.PicnicTable, campsite.FirePit, campsite.Active,
-		createdAt, createdAt)
+		campsite.DrinkingWater, campsite.PicnicTable, campsite.FirePit, campsite.Active)
 	if err != nil {
 		return errors.Wrap(err, "insert campsite")
 	}

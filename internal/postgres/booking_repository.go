@@ -88,10 +88,9 @@ func (r BookingRepository) Insert(ctx context.Context, booking *domain.Booking) 
 		}
 	}
 
-	createdAt := time.Now()
 	_, err = tx.ExecContext(
 		ctx, queries.InsertBookingQuery, booking.BookingID, booking.CampsiteID, booking.Email,
-		booking.FullName, booking.StartDate, booking.EndDate, booking.Active, createdAt, createdAt,
+		booking.FullName, booking.StartDate, booking.EndDate, booking.Active,
 	)
 	if err != nil {
 		return errors.Wrap(err, "insert booking")
@@ -125,10 +124,9 @@ func (r BookingRepository) Update(ctx context.Context, booking *domain.Booking) 
 			}
 		}
 	}
-	updatedAt := time.Now()
 	_, err = tx.ExecContext(
 		ctx, queries.UpdateBookingQuery, booking.BookingID, booking.CampsiteID, booking.Email,
-		booking.FullName, booking.StartDate, booking.EndDate, booking.Active, updatedAt,
+		booking.FullName, booking.StartDate, booking.EndDate, booking.Active,
 	)
 	if err != nil {
 		return errors.Wrap(err, "update booking")

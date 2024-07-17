@@ -12,8 +12,14 @@ CREATE TABLE bookings
     created_at  timestamptz                             NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at  timestamptz                             NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT pk_bookings PRIMARY KEY (id),
-    CONSTRAINT fk_bookings_campsite_id_campsites FOREIGN KEY(campsite_id) REFERENCES campsites(campsite_id)
+    CONSTRAINT fk_bookings_campsite_id_campsites FOREIGN KEY (campsite_id) REFERENCES campsites (campsite_id)
 );
+
+CREATE EXTENSION IF NOT EXISTS moddatetime;
+CREATE TRIGGER bookings_update_moddatetime_trigger
+    BEFORE UPDATE ON bookings
+    FOR EACH ROW
+EXECUTE PROCEDURE moddatetime(updated_at);
 
 CREATE UNIQUE INDEX unique_bookings_booking_id ON bookings (booking_id);
 
