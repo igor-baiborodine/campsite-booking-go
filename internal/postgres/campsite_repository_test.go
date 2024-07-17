@@ -162,7 +162,7 @@ func TestCampsiteRepository_Insert(t *testing.T) {
 			},
 			wantErr: bootstrap.ErrBeginTx,
 		},
-		"Error_Query": {
+		"Error_Exec": {
 			mockTxPhases: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
 				mock.ExpectExec(queries.InsertCampsite).

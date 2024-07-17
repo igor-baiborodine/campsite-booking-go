@@ -163,61 +163,50 @@ func TestBookingRepository_Insert(t *testing.T) {
 			},
 			wantErr: nil,
 		},
-
-		/*
-			func (r BookingRepository) findForDateRangeWithTx(
-				ctx context.Context, tx *sql.Tx, query string, campsiteID string, startDate time.Time,
-				endDate time.Time,
-			) (bookings []*domain.Booking, err error) {
-				rows, err := tx.QueryContext(ctx, query, campsiteID, startDate, endDate)
-				if err != nil {
-					return nil, errors.Wrap(err, "query bookings for date range")
-				}
-				defer closeRows(rows, r.logger)
-
-				for rows.Next() {
-					booking := &domain.Booking{}
-					if err = rows.Scan(
-						&booking.ID, &booking.BookingID, &booking.CampsiteID, &booking.Email,
-						&booking.FullName, &booking.StartDate, &booking.EndDate, &booking.Active,
-					); err != nil {
-						return nil, errors.Wrap(err, "scan booking row")
-					}
-					bookings = append(bookings, booking)
-				}
-
-				if err = rows.Err(); err != nil {
-					return nil, errors.Wrap(err, "finish booking rows")
-				}
-				return bookings, nil
-			}
-		*/
 		"Error_BeginTx": {
 			mockTxPhases: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin().WillReturnError(bootstrap.ErrBeginTx)
 			},
 			wantErr: bootstrap.ErrBeginTx,
 		},
-		//"Error_Query": {
-		//	mockTxPhases: func(mock sqlmock.Sqlmock) {
-		//		mock.ExpectBegin()
-		//		mock.ExpectExec(queries.InsertCampsite).
-		//			WithArgs(campsiteArgs(booking)...).
-		//			WillReturnError(bootstrap.ErrExec)
-		//		mock.ExpectRollback()
-		//	},
-		//	wantErr: bootstrap.ErrExec,
-		//},
-		//"Error_Commit": {
-		//	mockTxPhases: func(mock sqlmock.Sqlmock) {
-		//		mock.ExpectBegin()
-		//		mock.ExpectExec(queries.InsertCampsite).
-		//			WithArgs(campsiteArgs(booking)...).
-		//			WillReturnResult(sqlmock.NewResult(1, 1))
-		//		mock.ExpectCommit().WillReturnError(bootstrap.ErrCommit)
-		//	},
-		//	wantErr: bootstrap.ErrCommit,
-		//},
+		"Error_Query": {
+			mockTxPhases: func(mock sqlmock.Sqlmock) {
+				mock.ExpectBegin()
+				mock.ExpectQuery(queries.FindAllBookingsForDateRange+"FOR UPDATE").
+					WithArgs(booking.CampsiteID, booking.StartDate, booking.EndDate).
+					WillReturnError(bootstrap.ErrQuery)
+				mock.ExpectRollback()
+			},
+			wantErr: bootstrap.ErrQuery,
+		},
+		"Error_Exec": {
+			mockTxPhases: func(mock sqlmock.Sqlmock) {
+				rows := sqlmock.NewRows(columnsRow)
+				mock.ExpectBegin()
+				mock.ExpectQuery(queries.FindAllBookingsForDateRange+"FOR UPDATE").
+					WithArgs(booking.CampsiteID, booking.StartDate, booking.EndDate).
+					WillReturnRows(rows)
+				mock.ExpectExec(queries.InsertBooking).
+					WithArgs(bookingArgs(booking)...).
+					WillReturnError(bootstrap.ErrExec)
+				mock.ExpectRollback()
+			},
+			wantErr: bootstrap.ErrExec,
+		},
+		"Error_Commit": {
+			mockTxPhases: func(mock sqlmock.Sqlmock) {
+				rows := sqlmock.NewRows(columnsRow)
+				mock.ExpectBegin()
+				mock.ExpectQuery(queries.FindAllBookingsForDateRange+"FOR UPDATE").
+					WithArgs(booking.CampsiteID, booking.StartDate, booking.EndDate).
+					WillReturnRows(rows)
+				mock.ExpectExec(queries.InsertBooking).
+					WithArgs(bookingArgs(booking)...).
+					WillReturnResult(sqlmock.NewResult(1, 1))
+				mock.ExpectCommit().WillReturnError(bootstrap.ErrCommit)
+			},
+			wantErr: bootstrap.ErrCommit,
+		},
 	}
 
 	for name, tc := range tests {
@@ -241,6 +230,35 @@ func TestBookingRepository_Insert(t *testing.T) {
 		})
 	}
 }
+
+/*
+	func (r BookingRepository) findForDateRangeWithTx(
+		ctx context.Context, tx *sql.Tx, query string, campsiteID string, startDate time.Time,
+		endDate time.Time,
+	) (bookings []*domain.Booking, err error) {
+		rows, err := tx.QueryContext(ctx, query, campsiteID, startDate, endDate)
+		if err != nil {
+			return nil, errors.Wrap(err, "query bookings for date range")
+		}
+		defer closeRows(rows, r.logger)
+
+		for rows.Next() {
+			booking := &domain.Booking{}
+			if err = rows.Scan(
+				&booking.ID, &booking.BookingID, &booking.CampsiteID, &booking.Email,
+				&booking.FullName, &booking.StartDate, &booking.EndDate, &booking.Active,
+			); err != nil {
+				return nil, errors.Wrap(err, "scan booking row")
+			}
+			bookings = append(bookings, booking)
+		}
+
+		if err = rows.Err(); err != nil {
+			return nil, errors.Wrap(err, "finish booking rows")
+		}
+		return bookings, nil
+	}
+*/
 
 func bookingArgs(b *domain.Booking) []driver.Value {
 	return bookingRowValues(b)[1:] // remove ID
