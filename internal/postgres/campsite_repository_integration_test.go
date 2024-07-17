@@ -73,13 +73,13 @@ func (s *campsiteSuite) TestCampsiteRepository_FindAll() {
 	err = bootstrap.InsertCampsite(s.db, campsite)
 	s.NoError(err)
 	// when
-	result, err := s.repo.FindAll(context.Background())
+	got, err := s.repo.FindAll(context.Background())
 	// then
 	if s.NoError(err) {
-		s.Equal(1, len(result))
-		s.NotEqual(campsite.ID, result[0].ID)
-		campsite.ID = result[0].ID
-		s.Equal(campsite, result[0])
+		s.Equal(1, len(got))
+		s.NotEqual(campsite.ID, got[0].ID)
+		campsite.ID = got[0].ID
+		s.Equal(campsite, got[0])
 	}
 }
 
@@ -90,13 +90,12 @@ func (s *campsiteSuite) TestCampsiteRepository_Insert() {
 	// when
 	s.NoError(s.repo.Insert(context.Background(), campsite))
 	// then
-	selectByCampsiteID := "SELECT campsite_code, created_at, updated_at FROM campsites WHERE campsite_id = $1"
-	row := s.db.QueryRow(selectByCampsiteID, campsite.CampsiteID)
+	query := "SELECT campsite_code, created_at, updated_at FROM campsites WHERE campsite_id = $1"
+	row := s.db.QueryRow(query, campsite.CampsiteID)
 
 	if s.NoError(row.Err()) {
 		var campsiteCode string
-		var createdAt time.Time
-		var updatedAt time.Time
+		var createdAt, updatedAt time.Time
 		s.NoError(row.Scan(&campsiteCode, &createdAt, &updatedAt))
 		s.Equal(campsite.CampsiteCode, campsiteCode)
 		s.NotNil(createdAt)

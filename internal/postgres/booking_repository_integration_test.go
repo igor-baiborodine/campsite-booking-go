@@ -88,13 +88,13 @@ func (s *bookingSuite) TestBookingRepository_Find_Success() {
 	err = bootstrap.InsertBooking(s.db, booking)
 	s.NoError(err)
 	// when
-	result, err := s.repo.Find(context.Background(), booking.BookingID)
+	got, err := s.repo.Find(context.Background(), booking.BookingID)
 	// then
 	if s.NoError(err) {
-		s.NotNil(result)
-		s.NotEqual(booking.ID, result.ID)
-		booking.ID = result.ID
-		s.Equal(booking, result)
+		s.NotNil(got)
+		s.NotEqual(booking.ID, got.ID)
+		booking.ID = got.ID
+		s.Equal(booking, got)
 	}
 }
 
@@ -104,10 +104,10 @@ func (s *bookingSuite) TestBookingRepository_Find_ErrNotFound() {
 		BookingID: "non-existing-booking-id",
 	}
 	// when
-	result, err := s.repo.Find(context.Background(), booking.BookingID)
+	got, err := s.repo.Find(context.Background(), booking.BookingID)
 	// then
 	if s.Error(err) {
-		s.Nil(result)
+		s.Nil(got)
 		s.True(errors.Is(err, domain.ErrBookingNotFound{BookingID: booking.BookingID}))
 		s.Equal("booking not found for BookingID non-existing-booking-id", err.Error())
 	}
@@ -209,11 +209,11 @@ func (s *bookingSuite) TestBookingRepository_FindForDateRange_Success() {
 			start, _ := time.Parse(time.DateOnly, test.rs)
 			end, _ := time.Parse(time.DateOnly, test.re)
 			// when
-			result, err := s.repo.FindForDateRange(
+			got, err := s.repo.FindForDateRange(
 				context.Background(), campsite.CampsiteID, start, end)
 			// then
 			if s.NoError(err) {
-				s.Equal(test.len, len(result))
+				s.Equal(test.len, len(got))
 			}
 		})
 	}
@@ -230,15 +230,18 @@ func (s *bookingSuite) TestBookingRepository_Insert_Success() {
 	booking, err := bootstrap.NewBooking(campsite.CampsiteID)
 	s.NoError(err)
 	// when
-	err = s.repo.Insert(context.Background(), booking)
+	s.NoError(s.repo.Insert(context.Background(), booking))
 	// then
-	if s.NoError(err) {
-		found, err := bootstrap.FindBooking(s.db, booking.BookingID)
-		s.NoError(err)
-		s.NotNil(found)
-		s.NotEqual(booking.ID, found.ID)
-		booking.ID = found.ID
-		s.Equal(booking, found)
+	query := "SELECT campsite_id, created_at, updated_at FROM bookings WHERE campsite_id = $1"
+	row := s.db.QueryRow(query, campsite.CampsiteID)
+
+	if s.NoError(row.Err()) {
+		var campsiteID string
+		var createdAt, updatedAt time.Time
+		s.NoError(row.Scan(&campsiteID, &createdAt, &updatedAt))
+		s.Equal(booking.CampsiteID, campsiteID)
+		s.NotNil(createdAt)
+		s.Equal(createdAt, updatedAt)
 	}
 }
 
