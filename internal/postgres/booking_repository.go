@@ -31,7 +31,7 @@ func (r BookingRepository) Find(ctx context.Context, bookingID string) (*domain.
 
 	booking := &domain.Booking{}
 	if err = tx.QueryRowContext(
-		ctx, queries.FindBookingByBookingIDQuery, bookingID,
+		ctx, queries.FindBookingByBookingID, bookingID,
 	).Scan(
 		&booking.ID, &booking.BookingID, &booking.CampsiteID, &booking.Email,
 		&booking.FullName, &booking.StartDate, &booking.EndDate, &booking.Active,
@@ -58,7 +58,7 @@ func (r BookingRepository) FindForDateRange(
 	defer rollbackTx(tx, r.logger)
 
 	bookings, err := r.findForDateRangeWithTx(
-		ctx, tx, queries.FindAllBookingsForDateRangeQuery, campsiteID, startDate, endDate)
+		ctx, tx, queries.FindAllBookingsForDateRange, campsiteID, startDate, endDate)
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +75,7 @@ func (r BookingRepository) Insert(ctx context.Context, booking *domain.Booking) 
 	}
 	defer rollbackTx(tx, r.logger)
 
-	query := queries.FindAllBookingsForDateRangeQuery + " FOR UPDATE"
+	query := queries.FindAllBookingsForDateRange + " FOR UPDATE"
 	bookings, err := r.findForDateRangeWithTx(
 		ctx, tx, query, booking.CampsiteID, booking.StartDate, booking.EndDate)
 	if err != nil {
@@ -89,7 +89,7 @@ func (r BookingRepository) Insert(ctx context.Context, booking *domain.Booking) 
 	}
 
 	_, err = tx.ExecContext(
-		ctx, queries.InsertBookingQuery, booking.BookingID, booking.CampsiteID, booking.Email,
+		ctx, queries.InsertBooking, booking.BookingID, booking.CampsiteID, booking.Email,
 		booking.FullName, booking.StartDate, booking.EndDate, booking.Active,
 	)
 	if err != nil {
@@ -109,7 +109,7 @@ func (r BookingRepository) Update(ctx context.Context, booking *domain.Booking) 
 	}
 	defer rollbackTx(tx, r.logger)
 
-	query := queries.FindAllBookingsForDateRangeQuery + "FOR UPDATE"
+	query := queries.FindAllBookingsForDateRange + "FOR UPDATE"
 	bookings, err := r.findForDateRangeWithTx(
 		ctx, tx, query, booking.CampsiteID, booking.StartDate, booking.EndDate)
 	if err != nil {
@@ -125,7 +125,7 @@ func (r BookingRepository) Update(ctx context.Context, booking *domain.Booking) 
 		}
 	}
 	_, err = tx.ExecContext(
-		ctx, queries.UpdateBookingQuery, booking.BookingID, booking.CampsiteID, booking.Email,
+		ctx, queries.UpdateBooking, booking.BookingID, booking.CampsiteID, booking.Email,
 		booking.FullName, booking.StartDate, booking.EndDate, booking.Active,
 	)
 	if err != nil {

@@ -16,7 +16,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestFindAll(t *testing.T) {
+func TestCampsiteRepository_FindAll(t *testing.T) {
 	var campsites []*domain.Campsite
 	for i := 1; i < 4; i++ {
 		campsite, err := bootstrap.NewCampsite()
@@ -51,7 +51,7 @@ func TestFindAll(t *testing.T) {
 					AddRow(campsiteRowValues(campsites[1])...).
 					AddRow(campsiteRowValues(campsites[2])...)
 				mock.ExpectBegin()
-				mock.ExpectQuery(queries.FindAllCampsitesQuery).WillReturnRows(rows)
+				mock.ExpectQuery(queries.FindAllCampsites).WillReturnRows(rows)
 				mock.ExpectCommit()
 			},
 			want:    campsites,
@@ -61,7 +61,7 @@ func TestFindAll(t *testing.T) {
 			mockTxPhases: func(mock sqlmock.Sqlmock) {
 				rows := sqlmock.NewRows(columnsRow)
 				mock.ExpectBegin()
-				mock.ExpectQuery(queries.FindAllCampsitesQuery).WillReturnRows(rows)
+				mock.ExpectQuery(queries.FindAllCampsites).WillReturnRows(rows)
 				mock.ExpectCommit()
 			},
 			want:    nil,
@@ -77,7 +77,7 @@ func TestFindAll(t *testing.T) {
 		"Error_Query": {
 			mockTxPhases: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
-				mock.ExpectQuery(queries.FindAllCampsitesQuery).WillReturnError(bootstrap.ErrQuery)
+				mock.ExpectQuery(queries.FindAllCampsites).WillReturnError(bootstrap.ErrQuery)
 				mock.ExpectRollback()
 			},
 			want:    nil,
@@ -91,7 +91,7 @@ func TestFindAll(t *testing.T) {
 					AddRow(campsiteRowValues(campsites[2])...)
 				rows.RowError(2, bootstrap.ErrRow)
 				mock.ExpectBegin()
-				mock.ExpectQuery(queries.FindAllCampsitesQuery).WillReturnRows(rows)
+				mock.ExpectQuery(queries.FindAllCampsites).WillReturnRows(rows)
 				mock.ExpectRollback()
 			},
 			want:    nil,
@@ -104,7 +104,7 @@ func TestFindAll(t *testing.T) {
 					AddRow(campsiteRowValues(campsites[1])...).
 					AddRow(campsiteRowValues(campsites[2])...)
 				mock.ExpectBegin()
-				mock.ExpectQuery(queries.FindAllCampsitesQuery).WillReturnRows(rows)
+				mock.ExpectQuery(queries.FindAllCampsites).WillReturnRows(rows)
 				mock.ExpectCommit().WillReturnError(bootstrap.ErrCommit)
 			},
 			want:    nil,
@@ -136,20 +136,20 @@ func TestFindAll(t *testing.T) {
 	}
 }
 
-func TestInsert(t *testing.T) {
+func TestCampsiteRepository_Insert(t *testing.T) {
 	campsite, err := bootstrap.NewCampsite()
 	if err != nil {
 		t.Fatalf("create campsite error: %v", err)
 	}
 
 	tests := map[string]struct {
-		mockExec func(mock sqlmock.Sqlmock)
-		wantErr  error
+		mockTxPhases func(mock sqlmock.Sqlmock)
+		wantErr      error
 	}{
 		"Success": {
-			mockExec: func(mock sqlmock.Sqlmock) {
+			mockTxPhases: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
-				mock.ExpectExec(queries.InsertCampsiteQuery).
+				mock.ExpectExec(queries.InsertCampsite).
 					WithArgs(campsiteArgs(campsite)...).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				mock.ExpectCommit()
@@ -157,15 +157,15 @@ func TestInsert(t *testing.T) {
 			wantErr: nil,
 		},
 		"Error_BeginTx": {
-			mockExec: func(mock sqlmock.Sqlmock) {
+			mockTxPhases: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin().WillReturnError(bootstrap.ErrBeginTx)
 			},
 			wantErr: bootstrap.ErrBeginTx,
 		},
-		"Error_Query": {
-			mockExec: func(mock sqlmock.Sqlmock) {
+		"Error_Exec": {
+			mockTxPhases: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
-				mock.ExpectExec(queries.InsertCampsiteQuery).
+				mock.ExpectExec(queries.InsertCampsite).
 					WithArgs(campsiteArgs(campsite)...).
 					WillReturnError(bootstrap.ErrExec)
 				mock.ExpectRollback()
@@ -173,9 +173,9 @@ func TestInsert(t *testing.T) {
 			wantErr: bootstrap.ErrExec,
 		},
 		"Error_Commit": {
-			mockExec: func(mock sqlmock.Sqlmock) {
+			mockTxPhases: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
-				mock.ExpectExec(queries.InsertCampsiteQuery).
+				mock.ExpectExec(queries.InsertCampsite).
 					WithArgs(campsiteArgs(campsite)...).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				mock.ExpectCommit().WillReturnError(bootstrap.ErrCommit)
@@ -193,7 +193,7 @@ func TestInsert(t *testing.T) {
 			}
 			defer db.Close()
 
-			tc.mockExec(mock)
+			tc.mockTxPhases(mock)
 			repo := NewCampsiteRepository(db, logger.NewDefault(os.Stdout, nil))
 			// when
 			err = repo.Insert(context.TODO(), campsite)
