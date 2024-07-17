@@ -144,6 +144,10 @@ func TestBookingRepository_Insert(t *testing.T) {
 	if err != nil {
 		t.Fatalf("create booking error: %v", err)
 	}
+	errBookingDatesNotAvailable := domain.ErrBookingDatesNotAvailable{
+		StartDate: booking.StartDate,
+		EndDate:   booking.EndDate,
+	}
 
 	tests := map[string]struct {
 		mockTxPhases func(mock sqlmock.Sqlmock)
@@ -162,6 +166,18 @@ func TestBookingRepository_Insert(t *testing.T) {
 				mock.ExpectCommit()
 			},
 			wantErr: nil,
+		},
+		"Error_BookingDatesNotAvailable": {
+			mockTxPhases: func(mock sqlmock.Sqlmock) {
+				rows := sqlmock.NewRows(columnsRow).
+					AddRow(bookingRowValues(booking)...)
+				mock.ExpectBegin()
+				mock.ExpectQuery(queries.FindAllBookingsForDateRange+"FOR UPDATE").
+					WithArgs(booking.CampsiteID, booking.StartDate, booking.EndDate).
+					WillReturnRows(rows)
+				mock.ExpectRollback()
+			},
+			wantErr: errBookingDatesNotAvailable,
 		},
 		"Error_BeginTx": {
 			mockTxPhases: func(mock sqlmock.Sqlmock) {
