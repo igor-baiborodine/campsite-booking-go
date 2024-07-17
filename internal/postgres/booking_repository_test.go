@@ -346,6 +346,135 @@ func TestBookingRepository_Insert(t *testing.T) {
 	}
 }
 
+func TestBookingRepository_Update(t *testing.T) {
+	campsiteID := uuid.New().String()
+	booking, err := bootstrap.NewBooking(campsiteID)
+	if err != nil {
+		t.Fatalf("create booking error: %v", err)
+	}
+	startDate := booking.StartDate
+	endDate := booking.EndDate
+
+	otherBooking, err := bootstrap.NewBooking(campsiteID)
+	if err != nil {
+		t.Fatalf("create other booking error: %v", err)
+	}
+	errBookingDatesNotAvailable := domain.ErrBookingDatesNotAvailable{
+		StartDate: startDate,
+		EndDate:   endDate,
+	}
+
+	tests := map[string]struct {
+		mockTxPhases func(mock sqlmock.Sqlmock)
+		wantErr      error
+	}{
+		"Success": {
+			mockTxPhases: func(mock sqlmock.Sqlmock) {
+				rows := sqlmock.NewRows(columnsRow)
+				mock.ExpectBegin()
+				mock.ExpectQuery(queries.FindAllBookingsForDateRange+"FOR UPDATE").
+					WithArgs(booking.CampsiteID, booking.StartDate, booking.EndDate).
+					WillReturnRows(rows)
+				mock.ExpectExec(queries.UpdateBooking).
+					WithArgs(bookingArgs(booking)...).
+					WillReturnResult(sqlmock.NewResult(1, 1))
+				mock.ExpectCommit()
+			},
+			wantErr: nil,
+		},
+		"Error_BookingDatesNotAvailable": {
+			mockTxPhases: func(mock sqlmock.Sqlmock) {
+				rows := sqlmock.NewRows(columnsRow).
+					AddRow(bookingRowValues(otherBooking)...)
+				mock.ExpectBegin()
+				mock.ExpectQuery(queries.FindAllBookingsForDateRange+"FOR UPDATE").
+					WithArgs(booking.CampsiteID, booking.StartDate, booking.EndDate).
+					WillReturnRows(rows)
+				mock.ExpectRollback()
+			},
+			wantErr: errBookingDatesNotAvailable,
+		},
+		"Error_BeginTx": {
+			mockTxPhases: func(mock sqlmock.Sqlmock) {
+				mock.ExpectBegin().WillReturnError(bootstrap.ErrBeginTx)
+			},
+			wantErr: bootstrap.ErrBeginTx,
+		},
+		"Error_Query": {
+			mockTxPhases: func(mock sqlmock.Sqlmock) {
+				mock.ExpectBegin()
+				mock.ExpectQuery(queries.FindAllBookingsForDateRange+"FOR UPDATE").
+					WithArgs(campsiteID, startDate, endDate).
+					WillReturnError(bootstrap.ErrQuery)
+				mock.ExpectRollback()
+			},
+			wantErr: bootstrap.ErrQuery,
+		},
+		"Error_Exec": {
+			mockTxPhases: func(mock sqlmock.Sqlmock) {
+				rows := sqlmock.NewRows(columnsRow)
+				mock.ExpectBegin()
+				mock.ExpectQuery(queries.FindAllBookingsForDateRange+"FOR UPDATE").
+					WithArgs(campsiteID, startDate, endDate).
+					WillReturnRows(rows)
+				mock.ExpectExec(queries.UpdateBooking).
+					WithArgs(bookingArgs(booking)...).
+					WillReturnError(bootstrap.ErrExec)
+				mock.ExpectRollback()
+			},
+			wantErr: bootstrap.ErrExec,
+		},
+		"Error_Rows": {
+			mockTxPhases: func(mock sqlmock.Sqlmock) {
+				rows := sqlmock.NewRows(columnsRow).
+					AddRow(bookingRowValues(booking)...)
+				rows.RowError(0, bootstrap.ErrRow)
+				mock.ExpectBegin()
+				mock.ExpectQuery(queries.FindAllBookingsForDateRange+"FOR UPDATE").
+					WithArgs(campsiteID, startDate, endDate).
+					WillReturnRows(rows)
+				mock.ExpectRollback()
+			},
+			wantErr: bootstrap.ErrRow,
+		},
+		"Error_Commit": {
+			mockTxPhases: func(mock sqlmock.Sqlmock) {
+				rows := sqlmock.NewRows(columnsRow)
+				mock.ExpectBegin()
+				mock.ExpectQuery(queries.FindAllBookingsForDateRange+"FOR UPDATE").
+					WithArgs(campsiteID, startDate, endDate).
+					WillReturnRows(rows)
+				mock.ExpectExec(queries.UpdateBooking).
+					WithArgs(bookingArgs(booking)...).
+					WillReturnResult(sqlmock.NewResult(1, 1))
+				mock.ExpectCommit().WillReturnError(bootstrap.ErrCommit)
+			},
+			wantErr: bootstrap.ErrCommit,
+		},
+	}
+
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			// given
+			db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+			if err != nil {
+				t.Fatalf("open stub database connection error: %v", err)
+			}
+			defer db.Close()
+
+			tc.mockTxPhases(mock)
+			repo := NewBookingRepository(db, logger.NewDefault(os.Stdout, nil))
+			// when
+			err = repo.Update(context.TODO(), booking)
+			// then
+			assert.ErrorIs(t, err, tc.wantErr, "Update() error = %v, wantErr %v",
+				err, tc.wantErr)
+			err = mock.ExpectationsWereMet()
+			assert.NoError(t, err)
+		})
+	}
+}
+
 func bookingArgs(b *domain.Booking) []driver.Value {
 	return bookingRowValues(b)[1:] // remove ID
 }
