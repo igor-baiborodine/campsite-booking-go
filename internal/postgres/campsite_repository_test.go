@@ -16,7 +16,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestFindAll(t *testing.T) {
+func TestCampsiteRepository_FindAll(t *testing.T) {
 	var campsites []*domain.Campsite
 	for i := 1; i < 4; i++ {
 		campsite, err := bootstrap.NewCampsite()
@@ -136,7 +136,7 @@ func TestFindAll(t *testing.T) {
 	}
 }
 
-func TestInsert(t *testing.T) {
+func TestCampsiteRepository_Insert(t *testing.T) {
 	campsite, err := bootstrap.NewCampsite()
 	if err != nil {
 		t.Fatalf("create campsite error: %v", err)
