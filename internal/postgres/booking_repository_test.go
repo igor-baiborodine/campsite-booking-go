@@ -17,24 +17,24 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestFind(t *testing.T) {
+var columnsRow = []string{
+	"id",
+	"booking_id",
+	"campsite_id",
+	"email",
+	"full_name",
+	"start_date",
+	"end_date",
+	"active",
+}
+
+func TestBookingRepository_Find(t *testing.T) {
 	campsiteID := uuid.New().String()
 	booking, err := bootstrap.NewBooking(campsiteID)
 	if err != nil {
 		t.Fatalf("create booking error: %v", err)
 	}
 	booking.ID = 1
-
-	columnsRow := []string{
-		"id",
-		"booking_id",
-		"campsite_id",
-		"email",
-		"full_name",
-		"start_date",
-		"end_date",
-		"active",
-	}
 	errBookingNotFound := domain.ErrBookingNotFound{BookingID: booking.BookingID}
 
 	tests := map[string]struct {
@@ -47,7 +47,7 @@ func TestFind(t *testing.T) {
 				rows := sqlmock.NewRows(columnsRow).
 					AddRow(bookingRowValues(booking)...)
 				mock.ExpectBegin()
-				mock.ExpectQuery(queries.FindBookingByBookingIDQuery).
+				mock.ExpectQuery(queries.FindBookingByBookingID).
 					WithArgs(booking.BookingID).
 					WillReturnRows(rows)
 				mock.ExpectCommit()
@@ -59,7 +59,7 @@ func TestFind(t *testing.T) {
 			mockTxPhases: func(mock sqlmock.Sqlmock) {
 				rows := sqlmock.NewRows(columnsRow)
 				mock.ExpectBegin()
-				mock.ExpectQuery(queries.FindBookingByBookingIDQuery).
+				mock.ExpectQuery(queries.FindBookingByBookingID).
 					WithArgs(booking.BookingID).
 					WillReturnRows(rows)
 				mock.ExpectRollback()
@@ -77,7 +77,7 @@ func TestFind(t *testing.T) {
 		"Error_Query": {
 			mockTxPhases: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
-				mock.ExpectQuery(queries.FindBookingByBookingIDQuery).
+				mock.ExpectQuery(queries.FindBookingByBookingID).
 					WithArgs(booking.BookingID).
 					WillReturnError(bootstrap.ErrQuery)
 				mock.ExpectRollback()
@@ -91,7 +91,7 @@ func TestFind(t *testing.T) {
 					AddRow(bookingRowValues(booking)...)
 				rows.RowError(0, bootstrap.ErrRow)
 				mock.ExpectBegin()
-				mock.ExpectQuery(queries.FindBookingByBookingIDQuery).
+				mock.ExpectQuery(queries.FindBookingByBookingID).
 					WithArgs(booking.BookingID).
 					WillReturnRows(rows)
 				mock.ExpectRollback()
@@ -104,7 +104,7 @@ func TestFind(t *testing.T) {
 				rows := sqlmock.NewRows(columnsRow).
 					AddRow(bookingRowValues(booking)...)
 				mock.ExpectBegin()
-				mock.ExpectQuery(queries.FindBookingByBookingIDQuery).
+				mock.ExpectQuery(queries.FindBookingByBookingID).
 					WithArgs(booking.BookingID).
 					WillReturnRows(rows)
 				mock.ExpectCommit().WillReturnError(bootstrap.ErrCommit)
@@ -136,6 +136,114 @@ func TestFind(t *testing.T) {
 			assert.NoError(t, err)
 		})
 	}
+}
+
+func TestBookingRepository_Insert(t *testing.T) {
+	campsiteID := uuid.New().String()
+	booking, err := bootstrap.NewBooking(campsiteID)
+	if err != nil {
+		t.Fatalf("create booking error: %v", err)
+	}
+
+	tests := map[string]struct {
+		mockTxPhases func(mock sqlmock.Sqlmock)
+		wantErr      error
+	}{
+		"Success": {
+			mockTxPhases: func(mock sqlmock.Sqlmock) {
+				rows := sqlmock.NewRows(columnsRow)
+				mock.ExpectBegin()
+				mock.ExpectQuery(queries.FindAllBookingsForDateRange+"FOR UPDATE").
+					WithArgs(booking.CampsiteID, booking.StartDate, booking.EndDate).
+					WillReturnRows(rows)
+				mock.ExpectExec(queries.InsertBooking).
+					WithArgs(bookingArgs(booking)...).
+					WillReturnResult(sqlmock.NewResult(1, 1))
+				mock.ExpectCommit()
+			},
+			wantErr: nil,
+		},
+
+		/*
+			func (r BookingRepository) findForDateRangeWithTx(
+				ctx context.Context, tx *sql.Tx, query string, campsiteID string, startDate time.Time,
+				endDate time.Time,
+			) (bookings []*domain.Booking, err error) {
+				rows, err := tx.QueryContext(ctx, query, campsiteID, startDate, endDate)
+				if err != nil {
+					return nil, errors.Wrap(err, "query bookings for date range")
+				}
+				defer closeRows(rows, r.logger)
+
+				for rows.Next() {
+					booking := &domain.Booking{}
+					if err = rows.Scan(
+						&booking.ID, &booking.BookingID, &booking.CampsiteID, &booking.Email,
+						&booking.FullName, &booking.StartDate, &booking.EndDate, &booking.Active,
+					); err != nil {
+						return nil, errors.Wrap(err, "scan booking row")
+					}
+					bookings = append(bookings, booking)
+				}
+
+				if err = rows.Err(); err != nil {
+					return nil, errors.Wrap(err, "finish booking rows")
+				}
+				return bookings, nil
+			}
+		*/
+		"Error_BeginTx": {
+			mockTxPhases: func(mock sqlmock.Sqlmock) {
+				mock.ExpectBegin().WillReturnError(bootstrap.ErrBeginTx)
+			},
+			wantErr: bootstrap.ErrBeginTx,
+		},
+		//"Error_Query": {
+		//	mockTxPhases: func(mock sqlmock.Sqlmock) {
+		//		mock.ExpectBegin()
+		//		mock.ExpectExec(queries.InsertCampsite).
+		//			WithArgs(campsiteArgs(booking)...).
+		//			WillReturnError(bootstrap.ErrExec)
+		//		mock.ExpectRollback()
+		//	},
+		//	wantErr: bootstrap.ErrExec,
+		//},
+		//"Error_Commit": {
+		//	mockTxPhases: func(mock sqlmock.Sqlmock) {
+		//		mock.ExpectBegin()
+		//		mock.ExpectExec(queries.InsertCampsite).
+		//			WithArgs(campsiteArgs(booking)...).
+		//			WillReturnResult(sqlmock.NewResult(1, 1))
+		//		mock.ExpectCommit().WillReturnError(bootstrap.ErrCommit)
+		//	},
+		//	wantErr: bootstrap.ErrCommit,
+		//},
+	}
+
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			// given
+			db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+			if err != nil {
+				t.Fatalf("open stub database connection error: %v", err)
+			}
+			defer db.Close()
+
+			tc.mockTxPhases(mock)
+			repo := NewBookingRepository(db, logger.NewDefault(os.Stdout, nil))
+			// when
+			err = repo.Insert(context.TODO(), booking)
+			// then
+			assert.ErrorIs(t, err, tc.wantErr, "Insert() error = %v, wantErr %v",
+				err, tc.wantErr)
+			err = mock.ExpectationsWereMet()
+			assert.NoError(t, err)
+		})
+	}
+}
+
+func bookingArgs(b *domain.Booking) []driver.Value {
+	return bookingRowValues(b)[1:] // remove ID
 }
 
 func bookingRowValues(b *domain.Booking) []driver.Value {
