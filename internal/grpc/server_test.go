@@ -21,38 +21,48 @@ type mocks struct {
 	app *application.MockApp
 }
 
-func TestCreateCampsite(t *testing.T) {
+func TestServer_CreateCampsite(t *testing.T) {
 	type args struct {
 		ctx context.Context
 		req *api.CreateCampsiteRequest
 	}
-
 	campsite, err := bootstrap.NewCampsite()
 	assert.NoError(t, err)
 
+	req := &api.CreateCampsiteRequest{
+		CampsiteCode:  campsite.CampsiteCode,
+		Capacity:      campsite.Capacity,
+		DrinkingWater: campsite.DrinkingWater,
+		Restrooms:     campsite.Restrooms,
+		PicnicTable:   campsite.PicnicTable,
+		FirePit:       campsite.FirePit,
+	}
+
 	tests := map[string]struct {
-		args args
-		on   func(f mocks)
+		args    args
+		on      func(f mocks)
+		wantErr error
 	}{
 		"Success": {
-			args: args{
-				ctx: context.Background(),
-				req: &api.CreateCampsiteRequest{
-					CampsiteCode:  campsite.CampsiteCode,
-					Capacity:      campsite.Capacity,
-					DrinkingWater: campsite.DrinkingWater,
-					Restrooms:     campsite.Restrooms,
-					PicnicTable:   campsite.PicnicTable,
-					FirePit:       campsite.FirePit,
-				},
-			},
+			args: args{ctx: context.Background(), req: req},
 			on: func(f mocks) {
 				f.app.On(
 					"CreateCampsite", context.Background(), mock.Anything,
 				).Return(nil)
 			},
+			wantErr: nil,
+		},
+		"Error_CommitTx": {
+			args: args{ctx: context.Background(), req: req},
+			on: func(f mocks) {
+				f.app.On(
+					"CreateCampsite", context.Background(), mock.Anything,
+				).Return(bootstrap.ErrCommitTx)
+			},
+			wantErr: bootstrap.ErrCommitTx,
 		},
 	}
+
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// given
@@ -62,20 +72,25 @@ func TestCreateCampsite(t *testing.T) {
 				tc.on(m)
 			}
 			// when
-			resp, err := s.CreateCampsite(tc.args.ctx, tc.args.req)
+			got, err := s.CreateCampsite(tc.args.ctx, tc.args.req)
 			// then
-			assert.NoError(t, err)
-			assert.NotEmpty(t, resp.CampsiteId)
+			mock.AssertExpectationsForObjects(t, m.app)
+
+			if tc.wantErr != nil {
+				assert.ErrorIs(t, err, tc.wantErr, "CreateCampsite() error = %v, wantErr %v",
+					err, tc.wantErr)
+				return
+			}
+			assert.NotEmpty(t, got.CampsiteId)
 		})
 	}
 }
 
-func TestGetBooking(t *testing.T) {
+func TestServer_GetBooking(t *testing.T) {
 	type args struct {
 		ctx context.Context
 		req *api.GetBookingRequest
 	}
-
 	nonExistingID := "non-existing-id"
 	booking, err := bootstrap.NewBooking("campsite-id")
 	assert.NoError(t, err)
@@ -102,7 +117,7 @@ func TestGetBooking(t *testing.T) {
 			want:    &api.GetBookingResponse{Booking: BookingFromDomain(booking)},
 			wantErr: "",
 		},
-		"NotFound": {
+		"Error_NotFound": {
 			args: args{
 				ctx: context.Background(),
 				req: &api.GetBookingRequest{
@@ -119,6 +134,7 @@ func TestGetBooking(t *testing.T) {
 			wantErr: codes.NotFound.String(),
 		},
 	}
+
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// given
@@ -128,30 +144,26 @@ func TestGetBooking(t *testing.T) {
 				tc.on(m)
 			}
 			// when
-			resp, err := s.GetBooking(tc.args.ctx, tc.args.req)
+			got, err := s.GetBooking(tc.args.ctx, tc.args.req)
 			// then
+			mock.AssertExpectationsForObjects(t, m.app)
+
 			if tc.wantErr != "" {
-				assert.Containsf(
-					t,
-					err.Error(),
-					tc.wantErr,
-					"GetBooking() error = %v, wantErr %v",
-					err,
-					tc.wantErr,
+				assert.Containsf(t, err.Error(),
+					tc.wantErr, "GetBooking() error = %v, wantErr %v", err, tc.wantErr,
 				)
 				return
 			}
-			assert.Equal(t, tc.want, resp)
+			assert.Equal(t, tc.want, got)
 		})
 	}
 }
 
-func TestCreateBooking(t *testing.T) {
+func TestServer_CreateBooking(t *testing.T) {
 	type args struct {
 		ctx context.Context
 		req *api.CreateBookingRequest
 	}
-
 	booking, err := bootstrap.NewBooking("campsite-id")
 	assert.NoError(t, err)
 
@@ -178,7 +190,7 @@ func TestCreateBooking(t *testing.T) {
 			},
 			wantErr: "",
 		},
-		"BookingDatesNotAvailable": {
+		"Error_FailedPrecondition_BookingDatesNotAvailable": {
 			args: args{
 				ctx: context.Background(),
 				req: &api.CreateBookingRequest{
@@ -202,6 +214,7 @@ func TestCreateBooking(t *testing.T) {
 			wantErr: codes.FailedPrecondition.String(),
 		},
 	}
+
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// given
@@ -213,14 +226,11 @@ func TestCreateBooking(t *testing.T) {
 			// when
 			resp, err := s.CreateBooking(tc.args.ctx, tc.args.req)
 			// then
+			mock.AssertExpectationsForObjects(t, m.app)
+
 			if tc.wantErr != "" {
-				assert.Containsf(
-					t,
-					err.Error(),
-					tc.wantErr,
-					"CreateBooking() error = %v, wantErr %v",
-					err,
-					tc.wantErr,
+				assert.Containsf(t, err.Error(),
+					tc.wantErr, "CreateBooking() error = %v, wantErr %v", err, tc.wantErr,
 				)
 				return
 			}
@@ -229,12 +239,11 @@ func TestCreateBooking(t *testing.T) {
 	}
 }
 
-func TestUpdateBooking(t *testing.T) {
+func TestServer_UpdateBooking(t *testing.T) {
 	type args struct {
 		ctx context.Context
 		req *api.UpdateBookingRequest
 	}
-
 	booking, err := bootstrap.NewBooking("campsite-id")
 	assert.NoError(t, err)
 
@@ -257,7 +266,7 @@ func TestUpdateBooking(t *testing.T) {
 			want:    &api.UpdateBookingResponse{},
 			wantErr: "",
 		},
-		"BookingDatesNotAvailable": {
+		"Error_FailedPrecondition_BookingDatesNotAvailable": {
 			args: args{
 				ctx: context.Background(),
 				req: &api.UpdateBookingRequest{Booking: BookingFromDomain(booking)},
@@ -276,6 +285,7 @@ func TestUpdateBooking(t *testing.T) {
 			wantErr: codes.FailedPrecondition.String(),
 		},
 	}
+
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// given
@@ -285,30 +295,26 @@ func TestUpdateBooking(t *testing.T) {
 				tc.on(m)
 			}
 			// when
-			resp, err := s.UpdateBooking(tc.args.ctx, tc.args.req)
+			got, err := s.UpdateBooking(tc.args.ctx, tc.args.req)
 			// then
+			mock.AssertExpectationsForObjects(t, m.app)
+
 			if tc.wantErr != "" {
-				assert.Containsf(
-					t,
-					err.Error(),
-					tc.wantErr,
-					"UpdateBooking() error = %v, wantErr %v",
-					err,
-					tc.wantErr,
+				assert.Containsf(t, err.Error(),
+					tc.wantErr, "UpdateBooking() error = %v, wantErr %v", err, tc.wantErr,
 				)
 				return
 			}
-			assert.Equal(t, tc.want, resp)
+			assert.Equal(t, tc.want, got)
 		})
 	}
 }
 
-func TestCancelBooking(t *testing.T) {
+func TestServer_CancelBooking(t *testing.T) {
 	type args struct {
 		ctx context.Context
 		req *api.CancelBookingRequest
 	}
-
 	booking, err := bootstrap.NewBooking("campsite-id")
 	assert.NoError(t, err)
 
@@ -331,7 +337,7 @@ func TestCancelBooking(t *testing.T) {
 			want:    &api.CancelBookingResponse{},
 			wantErr: "",
 		},
-		"BookingAlreadyCancelled": {
+		"Error_FailedPrecondition_BookingAlreadyCancelled": {
 			args: args{
 				ctx: context.Background(),
 				req: &api.CancelBookingRequest{BookingId: booking.BookingID},
@@ -356,35 +362,31 @@ func TestCancelBooking(t *testing.T) {
 				tc.on(m)
 			}
 			// when
-			resp, err := s.CancelBooking(tc.args.ctx, tc.args.req)
+			got, err := s.CancelBooking(tc.args.ctx, tc.args.req)
 			// then
+			mock.AssertExpectationsForObjects(t, m.app)
+
 			if tc.wantErr != "" {
-				assert.Containsf(
-					t,
-					err.Error(),
-					tc.wantErr,
-					"CancelBooking() error = %v, wantErr %v",
-					err,
-					tc.wantErr,
+				assert.Containsf(t, err.Error(),
+					tc.wantErr, "CancelBooking() error = %v, wantErr %v", err, tc.wantErr,
 				)
 				return
 			}
-			assert.Equal(t, tc.want, resp)
+			assert.Equal(t, tc.want, got)
 		})
 	}
 }
 
-func TestGetVacantDates(t *testing.T) {
+func TestServer_GetVacantDates(t *testing.T) {
 	type args struct {
 		ctx context.Context
 		req *api.GetVacantDatesRequest
 	}
-
 	tests := map[string]struct {
 		args    args
 		on      func(f mocks)
 		want    *api.GetVacantDatesResponse
-		wantErr string
+		wantErr error
 	}{
 		"Success": {
 			args: args{
@@ -401,9 +403,27 @@ func TestGetVacantDates(t *testing.T) {
 				).Return([]string{"2006-01-02"}, nil)
 			},
 			want:    &api.GetVacantDatesResponse{VacantDates: []string{"2006-01-02"}},
-			wantErr: "",
+			wantErr: nil,
+		},
+		"Error_CommitTx": {
+			args: args{
+				ctx: context.Background(),
+				req: &api.GetVacantDatesRequest{
+					CampsiteId: "campsite-id",
+					StartDate:  "2006-01-02",
+					EndDate:    "2006-01-03",
+				},
+			},
+			on: func(f mocks) {
+				f.app.On(
+					"GetVacantDates", context.Background(), mock.Anything,
+				).Return(nil, bootstrap.ErrCommitTx)
+			},
+			want:    nil,
+			wantErr: bootstrap.ErrCommitTx,
 		},
 	}
+
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// given
@@ -413,20 +433,16 @@ func TestGetVacantDates(t *testing.T) {
 				tc.on(m)
 			}
 			// when
-			resp, err := s.GetVacantDates(tc.args.ctx, tc.args.req)
+			got, err := s.GetVacantDates(tc.args.ctx, tc.args.req)
 			// then
-			if tc.wantErr != "" {
-				assert.Containsf(
-					t,
-					err.Error(),
-					tc.wantErr,
-					"GetVacantDates() error = %v, wantErr %v",
-					err,
-					tc.wantErr,
-				)
+			mock.AssertExpectationsForObjects(t, m.app)
+
+			if tc.wantErr != nil {
+				assert.ErrorIs(t, err, tc.wantErr, "GetVacantDates() error = %v, wantErr %v",
+					err, tc.wantErr)
 				return
 			}
-			assert.Equal(t, tc.want, resp)
+			assert.Equal(t, tc.want, got)
 		})
 	}
 }
