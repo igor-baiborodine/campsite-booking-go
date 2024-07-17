@@ -52,9 +52,9 @@ func TestFindAll(t *testing.T) {
 		"Success": {
 			mockQuery: func(mock sqlmock.Sqlmock) {
 				rows := sqlmock.NewRows(columnsRow).
-					AddRow(rowValues(campsites[0])...).
-					AddRow(rowValues(campsites[1])...).
-					AddRow(rowValues(campsites[2])...)
+					AddRow(campsiteRowValues(campsites[0])...).
+					AddRow(campsiteRowValues(campsites[1])...).
+					AddRow(campsiteRowValues(campsites[2])...)
 				mock.ExpectBegin()
 				mock.ExpectQuery(queries.FindAllCampsitesQuery).WillReturnRows(rows)
 				mock.ExpectCommit()
@@ -91,9 +91,9 @@ func TestFindAll(t *testing.T) {
 		"Error_Rows": {
 			mockQuery: func(mock sqlmock.Sqlmock) {
 				rows := sqlmock.NewRows(columnsRow).
-					AddRow(rowValues(campsites[0])...).
-					AddRow(rowValues(campsites[1])...).
-					AddRow(rowValues(campsites[2])...)
+					AddRow(campsiteRowValues(campsites[0])...).
+					AddRow(campsiteRowValues(campsites[1])...).
+					AddRow(campsiteRowValues(campsites[2])...)
 				rows.RowError(2, rowErr)
 				mock.ExpectBegin()
 				mock.ExpectQuery(queries.FindAllCampsitesQuery).WillReturnRows(rows)
@@ -105,9 +105,9 @@ func TestFindAll(t *testing.T) {
 		"Error_Commit": {
 			mockQuery: func(mock sqlmock.Sqlmock) {
 				rows := sqlmock.NewRows(columnsRow).
-					AddRow(rowValues(campsites[0])...).
-					AddRow(rowValues(campsites[1])...).
-					AddRow(rowValues(campsites[2])...)
+					AddRow(campsiteRowValues(campsites[0])...).
+					AddRow(campsiteRowValues(campsites[1])...).
+					AddRow(campsiteRowValues(campsites[2])...)
 				mock.ExpectBegin()
 				mock.ExpectQuery(queries.FindAllCampsitesQuery).WillReturnRows(rows)
 				mock.ExpectCommit().WillReturnError(commitErr)
@@ -129,9 +129,10 @@ func TestFindAll(t *testing.T) {
 			tc.mockQuery(mock)
 			repo := NewCampsiteRepository(db, logger.NewDefault(os.Stdout, nil))
 			// when
-			campsites, err := repo.FindAll(context.TODO())
+			got, err := repo.FindAll(context.TODO())
 			// then
-			assert.Equal(t, tc.want, campsites)
+			assert.Equal(t, tc.want, got, "FindAll() got = %v, want %v",
+				got, tc.want)
 			assert.ErrorIs(t, err, tc.wantErr, "FindAll() error = %v, wantErr %v",
 				err, tc.wantErr)
 
@@ -141,7 +142,7 @@ func TestFindAll(t *testing.T) {
 	}
 }
 
-func rowValues(c *domain.Campsite) []driver.Value {
+func campsiteRowValues(c *domain.Campsite) []driver.Value {
 	return []driver.Value{
 		c.ID,
 		c.CampsiteID,
