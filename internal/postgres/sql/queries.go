@@ -1,7 +1,7 @@
 package sql
 
 const (
-	InsertCampsiteQuery = `
+	InsertCampsite = `
 		INSERT INTO campsites (
 			campsite_id, 
 			campsite_code, 
@@ -15,7 +15,7 @@ const (
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 	`
 
-	FindAllCampsitesQuery = `
+	FindAllCampsites = `
 		SELECT 
 		    id,
 		    campsite_id, 
@@ -29,7 +29,7 @@ const (
 		FROM campsites
 	`
 
-	FindBookingByBookingIDQuery = `
+	FindBookingByBookingID = `
 		SELECT 
 		    id,
 		    booking_id, 
@@ -43,7 +43,7 @@ const (
 		WHERE booking_id = $1
 	`
 
-	InsertBookingQuery = `
+	InsertBooking = `
 		INSERT INTO bookings (
 			booking_id, 
 			campsite_id, 
@@ -56,7 +56,7 @@ const (
 		VALUES ($1, $2, $3, $4, $5, $6, $7)
 	`
 
-	FindAllBookingsForDateRangeQuery = `
+	FindAllBookingsForDateRange = `
 		SELECT
 		    id,
 		    booking_id, 
@@ -74,7 +74,7 @@ const (
 		            OR ($2 <= start_date AND start_date <= $3)) 
 	`
 
-	UpdateBookingQuery = `
+	UpdateBooking = `
 		UPDATE bookings
 		SET 
 		    campsite_id = $2, 

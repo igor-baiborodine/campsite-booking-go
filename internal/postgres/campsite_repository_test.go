@@ -51,7 +51,7 @@ func TestCampsiteRepository_FindAll(t *testing.T) {
 					AddRow(campsiteRowValues(campsites[1])...).
 					AddRow(campsiteRowValues(campsites[2])...)
 				mock.ExpectBegin()
-				mock.ExpectQuery(queries.FindAllCampsitesQuery).WillReturnRows(rows)
+				mock.ExpectQuery(queries.FindAllCampsites).WillReturnRows(rows)
 				mock.ExpectCommit()
 			},
 			want:    campsites,
@@ -61,7 +61,7 @@ func TestCampsiteRepository_FindAll(t *testing.T) {
 			mockTxPhases: func(mock sqlmock.Sqlmock) {
 				rows := sqlmock.NewRows(columnsRow)
 				mock.ExpectBegin()
-				mock.ExpectQuery(queries.FindAllCampsitesQuery).WillReturnRows(rows)
+				mock.ExpectQuery(queries.FindAllCampsites).WillReturnRows(rows)
 				mock.ExpectCommit()
 			},
 			want:    nil,
@@ -77,7 +77,7 @@ func TestCampsiteRepository_FindAll(t *testing.T) {
 		"Error_Query": {
 			mockTxPhases: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
-				mock.ExpectQuery(queries.FindAllCampsitesQuery).WillReturnError(bootstrap.ErrQuery)
+				mock.ExpectQuery(queries.FindAllCampsites).WillReturnError(bootstrap.ErrQuery)
 				mock.ExpectRollback()
 			},
 			want:    nil,
@@ -91,7 +91,7 @@ func TestCampsiteRepository_FindAll(t *testing.T) {
 					AddRow(campsiteRowValues(campsites[2])...)
 				rows.RowError(2, bootstrap.ErrRow)
 				mock.ExpectBegin()
-				mock.ExpectQuery(queries.FindAllCampsitesQuery).WillReturnRows(rows)
+				mock.ExpectQuery(queries.FindAllCampsites).WillReturnRows(rows)
 				mock.ExpectRollback()
 			},
 			want:    nil,
@@ -104,7 +104,7 @@ func TestCampsiteRepository_FindAll(t *testing.T) {
 					AddRow(campsiteRowValues(campsites[1])...).
 					AddRow(campsiteRowValues(campsites[2])...)
 				mock.ExpectBegin()
-				mock.ExpectQuery(queries.FindAllCampsitesQuery).WillReturnRows(rows)
+				mock.ExpectQuery(queries.FindAllCampsites).WillReturnRows(rows)
 				mock.ExpectCommit().WillReturnError(bootstrap.ErrCommit)
 			},
 			want:    nil,
@@ -149,7 +149,7 @@ func TestCampsiteRepository_Insert(t *testing.T) {
 		"Success": {
 			mockTxPhases: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
-				mock.ExpectExec(queries.InsertCampsiteQuery).
+				mock.ExpectExec(queries.InsertCampsite).
 					WithArgs(campsiteArgs(campsite)...).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				mock.ExpectCommit()
@@ -165,7 +165,7 @@ func TestCampsiteRepository_Insert(t *testing.T) {
 		"Error_Query": {
 			mockTxPhases: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
-				mock.ExpectExec(queries.InsertCampsiteQuery).
+				mock.ExpectExec(queries.InsertCampsite).
 					WithArgs(campsiteArgs(campsite)...).
 					WillReturnError(bootstrap.ErrExec)
 				mock.ExpectRollback()
@@ -175,7 +175,7 @@ func TestCampsiteRepository_Insert(t *testing.T) {
 		"Error_Commit": {
 			mockTxPhases: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
-				mock.ExpectExec(queries.InsertCampsiteQuery).
+				mock.ExpectExec(queries.InsertCampsite).
 					WithArgs(campsiteArgs(campsite)...).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				mock.ExpectCommit().WillReturnError(bootstrap.ErrCommit)
