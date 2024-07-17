@@ -132,7 +132,6 @@ func TestFind(t *testing.T) {
 				got, tc.want)
 			assert.ErrorIs(t, err, tc.wantErr, "Find() error = %v, wantErr %v",
 				err, tc.wantErr)
-
 			err = mock.ExpectationsWereMet()
 			assert.NoError(t, err)
 		})
