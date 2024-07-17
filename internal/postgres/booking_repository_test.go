@@ -209,6 +209,19 @@ func TestBookingRepository_Insert(t *testing.T) {
 			},
 			wantErr: bootstrap.ErrExec,
 		},
+		"Error_Rows": {
+			mockTxPhases: func(mock sqlmock.Sqlmock) {
+				rows := sqlmock.NewRows(columnsRow).
+					AddRow(bookingRowValues(booking)...)
+				rows.RowError(0, bootstrap.ErrRow)
+				mock.ExpectBegin()
+				mock.ExpectQuery(queries.FindAllBookingsForDateRange+"FOR UPDATE").
+					WithArgs(booking.CampsiteID, booking.StartDate, booking.EndDate).
+					WillReturnRows(rows)
+				mock.ExpectRollback()
+			},
+			wantErr: bootstrap.ErrRow,
+		},
 		"Error_Commit": {
 			mockTxPhases: func(mock sqlmock.Sqlmock) {
 				rows := sqlmock.NewRows(columnsRow)
