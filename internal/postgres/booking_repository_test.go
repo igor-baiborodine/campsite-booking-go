@@ -146,7 +146,10 @@ func TestBookingRepository_Insert(t *testing.T) {
 	}
 	startDate := booking.StartDate
 	endDate := booking.EndDate
-	errBookingDatesNotAvailable := domain.ErrBookingDatesNotAvailable{startDate, endDate}
+	errBookingDatesNotAvailable := domain.ErrBookingDatesNotAvailable{
+		StartDate: startDate,
+		EndDate:   endDate,
+	}
 
 	tests := map[string]struct {
 		mockTxPhases func(mock sqlmock.Sqlmock)
