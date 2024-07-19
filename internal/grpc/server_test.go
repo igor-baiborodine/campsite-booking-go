@@ -23,22 +23,17 @@ type mocks struct {
 }
 
 func TestServer_GetCampsites(t *testing.T) {
-	type args struct {
-		ctx context.Context
-		req *api.GetCampsitesRequest
-	}
-	req := &api.GetCampsitesRequest{}
 	campsite, err := bootstrap.NewCampsite()
 	assert.NoError(t, err)
 
 	tests := map[string]struct {
-		args    args
+		req     *api.GetCampsitesRequest
 		on      func(f mocks)
 		want    *api.GetCampsitesResponse
 		wantErr error
 	}{
 		"Success": {
-			args: args{ctx: context.Background(), req: req},
+			req: &api.GetCampsitesRequest{},
 			on: func(f mocks) {
 				f.app.On("GetCampsites", mock.Anything, mock.Anything).
 					Return([]*domain.Campsite{campsite}, nil)
@@ -49,7 +44,7 @@ func TestServer_GetCampsites(t *testing.T) {
 			wantErr: nil,
 		},
 		"Error_ErrQuery": {
-			args: args{ctx: context.Background(), req: req},
+			req: &api.GetCampsitesRequest{},
 			on: func(f mocks) {
 				f.app.On("GetCampsites", mock.Anything, mock.Anything).
 					Return(nil, bootstrap.ErrQuery)
@@ -68,7 +63,7 @@ func TestServer_GetCampsites(t *testing.T) {
 				tc.on(m)
 			}
 			// when
-			got, err := s.GetCampsites(tc.args.ctx, tc.args.req)
+			got, err := s.GetCampsites(context.TODO(), tc.req)
 			// then
 			mock.AssertExpectationsForObjects(t, m.app)
 
@@ -83,10 +78,6 @@ func TestServer_GetCampsites(t *testing.T) {
 }
 
 func TestServer_CreateCampsite(t *testing.T) {
-	type args struct {
-		ctx context.Context
-		req *api.CreateCampsiteRequest
-	}
 	campsite, err := bootstrap.NewCampsite()
 	assert.NoError(t, err)
 
@@ -100,21 +91,21 @@ func TestServer_CreateCampsite(t *testing.T) {
 	}
 
 	tests := map[string]struct {
-		args    args
+		req     *api.CreateCampsiteRequest
 		on      func(f mocks)
 		wantErr error
 	}{
 		"Success": {
-			args: args{ctx: context.Background(), req: req},
+			req: req,
 			on: func(f mocks) {
-				f.app.On("CreateCampsite", context.Background(), mock.Anything).Return(nil)
+				f.app.On("CreateCampsite", context.TODO(), mock.Anything).Return(nil)
 			},
 			wantErr: nil,
 		},
 		"Error_CommitTx": {
-			args: args{ctx: context.Background(), req: req},
+			req: req,
 			on: func(f mocks) {
-				f.app.On("CreateCampsite", context.Background(), mock.Anything).
+				f.app.On("CreateCampsite", context.TODO(), mock.Anything).
 					Return(bootstrap.ErrCommitTx)
 			},
 			wantErr: bootstrap.ErrCommitTx,
@@ -130,7 +121,7 @@ func TestServer_CreateCampsite(t *testing.T) {
 				tc.on(m)
 			}
 			// when
-			got, err := s.CreateCampsite(tc.args.ctx, tc.args.req)
+			got, err := s.CreateCampsite(context.TODO(), req)
 			// then
 			mock.AssertExpectationsForObjects(t, m.app)
 
@@ -145,40 +136,30 @@ func TestServer_CreateCampsite(t *testing.T) {
 }
 
 func TestServer_GetBooking(t *testing.T) {
-	type args struct {
-		ctx context.Context
-		req *api.GetBookingRequest
-	}
 	booking, err := bootstrap.NewBooking("campsite-id")
 	assert.NoError(t, err)
 	nonExistingID := "non-existing-id"
 	errBookingNotFound := domain.ErrBookingNotFound{BookingID: nonExistingID}
 
 	tests := map[string]struct {
-		args    args
+		req     *api.GetBookingRequest
 		on      func(f mocks)
 		want    *api.GetBookingResponse
 		wantErr error
 	}{
 		"Success": {
-			args: args{
-				ctx: context.Background(),
-				req: &api.GetBookingRequest{BookingId: booking.BookingID},
-			},
+			req: &api.GetBookingRequest{BookingId: booking.BookingID},
 			on: func(f mocks) {
-				f.app.On("GetBooking", context.Background(), query.GetBooking{BookingID: booking.BookingID}).
+				f.app.On("GetBooking", context.TODO(), query.GetBooking{BookingID: booking.BookingID}).
 					Return(booking, nil)
 			},
 			want:    &api.GetBookingResponse{Booking: BookingFromDomain(booking)},
 			wantErr: nil,
 		},
 		"Error_NotFound_ErrBookingNotFound": {
-			args: args{
-				ctx: context.Background(),
-				req: &api.GetBookingRequest{BookingId: nonExistingID},
-			},
+			req: &api.GetBookingRequest{BookingId: nonExistingID},
 			on: func(f mocks) {
-				f.app.On("GetBooking", context.Background(), query.GetBooking{BookingID: nonExistingID}).
+				f.app.On("GetBooking", context.TODO(), query.GetBooking{BookingID: nonExistingID}).
 					Return(nil, errBookingNotFound)
 			},
 			want:    &api.GetBookingResponse{Booking: BookingFromDomain(booking)},
@@ -195,7 +176,7 @@ func TestServer_GetBooking(t *testing.T) {
 				tc.on(m)
 			}
 			// when
-			got, err := s.GetBooking(tc.args.ctx, tc.args.req)
+			got, err := s.GetBooking(context.TODO(), tc.req)
 			// then
 			mock.AssertExpectationsForObjects(t, m.app)
 
@@ -210,51 +191,36 @@ func TestServer_GetBooking(t *testing.T) {
 }
 
 func TestServer_CreateBooking(t *testing.T) {
-	type args struct {
-		ctx context.Context
-		req *api.CreateBookingRequest
-	}
 	booking, err := bootstrap.NewBooking("campsite-id")
 	assert.NoError(t, err)
 	errBookingDatesNotAvailable := domain.ErrBookingDatesNotAvailable{
 		StartDate: booking.StartDate,
 		EndDate:   booking.EndDate,
 	}
+	req := &api.CreateBookingRequest{
+		CampsiteId: booking.CampsiteID,
+		Email:      booking.Email,
+		FullName:   booking.FullName,
+		StartDate:  booking.StartDate.Format(time.DateOnly),
+		EndDate:    booking.EndDate.Format(time.DateOnly),
+	}
 
 	tests := map[string]struct {
-		args    args
+		req     *api.CreateBookingRequest
 		on      func(f mocks)
 		wantErr error
 	}{
 		"Success": {
-			args: args{
-				ctx: context.Background(),
-				req: &api.CreateBookingRequest{
-					CampsiteId: booking.CampsiteID,
-					Email:      booking.Email,
-					FullName:   booking.FullName,
-					StartDate:  booking.StartDate.Format(time.DateOnly),
-					EndDate:    booking.EndDate.Format(time.DateOnly),
-				},
-			},
+			req: req,
 			on: func(f mocks) {
-				f.app.On("CreateBooking", context.Background(), mock.Anything).Return(nil)
+				f.app.On("CreateBooking", context.TODO(), mock.Anything).Return(nil)
 			},
 			wantErr: nil,
 		},
 		"Error_FailedPrecondition_BookingDatesNotAvailable": {
-			args: args{
-				ctx: context.Background(),
-				req: &api.CreateBookingRequest{
-					CampsiteId: booking.CampsiteID,
-					Email:      booking.Email,
-					FullName:   booking.FullName,
-					StartDate:  booking.StartDate.Format(time.DateOnly),
-					EndDate:    booking.EndDate.Format(time.DateOnly),
-				},
-			},
+			req: req,
 			on: func(f mocks) {
-				f.app.On("CreateBooking", context.Background(), mock.Anything).
+				f.app.On("CreateBooking", context.TODO(), mock.Anything).
 					Return(errBookingDatesNotAvailable)
 			},
 			wantErr: status.Error(codes.FailedPrecondition, errBookingDatesNotAvailable.Error()),
@@ -270,7 +236,7 @@ func TestServer_CreateBooking(t *testing.T) {
 				tc.on(m)
 			}
 			// when
-			got, err := s.CreateBooking(tc.args.ctx, tc.args.req)
+			got, err := s.CreateBooking(context.TODO(), tc.req)
 			// then
 			mock.AssertExpectationsForObjects(t, m.app)
 
@@ -285,41 +251,32 @@ func TestServer_CreateBooking(t *testing.T) {
 }
 
 func TestServer_UpdateBooking(t *testing.T) {
-	type args struct {
-		ctx context.Context
-		req *api.UpdateBookingRequest
-	}
 	booking, err := bootstrap.NewBooking("campsite-id")
 	assert.NoError(t, err)
 	errBookingDatesNotAvailable := domain.ErrBookingDatesNotAvailable{
 		StartDate: booking.StartDate,
 		EndDate:   booking.EndDate,
 	}
+	req := &api.UpdateBookingRequest{Booking: BookingFromDomain(booking)}
 
 	tests := map[string]struct {
-		args    args
+		req     *api.UpdateBookingRequest
 		on      func(f mocks)
 		want    *api.UpdateBookingResponse
 		wantErr error
 	}{
 		"Success": {
-			args: args{
-				ctx: context.Background(),
-				req: &api.UpdateBookingRequest{Booking: BookingFromDomain(booking)},
-			},
+			req: req,
 			on: func(f mocks) {
-				f.app.On("UpdateBooking", context.Background(), mock.Anything).Return(nil)
+				f.app.On("UpdateBooking", context.TODO(), mock.Anything).Return(nil)
 			},
 			want:    &api.UpdateBookingResponse{},
 			wantErr: nil,
 		},
 		"Error_FailedPrecondition_BookingDatesNotAvailable": {
-			args: args{
-				ctx: context.Background(),
-				req: &api.UpdateBookingRequest{Booking: BookingFromDomain(booking)},
-			},
+			req: req,
 			on: func(f mocks) {
-				f.app.On("UpdateBooking", context.Background(), mock.Anything).
+				f.app.On("UpdateBooking", context.TODO(), mock.Anything).
 					Return(errBookingDatesNotAvailable)
 			},
 			want:    nil,
@@ -336,7 +293,7 @@ func TestServer_UpdateBooking(t *testing.T) {
 				tc.on(m)
 			}
 			// when
-			got, err := s.UpdateBooking(tc.args.ctx, tc.args.req)
+			got, err := s.UpdateBooking(context.TODO(), tc.req)
 			// then
 			mock.AssertExpectationsForObjects(t, m.app)
 
@@ -351,38 +308,29 @@ func TestServer_UpdateBooking(t *testing.T) {
 }
 
 func TestServer_CancelBooking(t *testing.T) {
-	type args struct {
-		ctx context.Context
-		req *api.CancelBookingRequest
-	}
 	booking, err := bootstrap.NewBooking("campsite-id")
 	assert.NoError(t, err)
 	errBookingAlreadyCancelled := domain.ErrBookingAlreadyCancelled{BookingID: booking.BookingID}
+	req := &api.CancelBookingRequest{BookingId: booking.BookingID}
 
 	tests := map[string]struct {
-		args    args
+		req     *api.CancelBookingRequest
 		on      func(f mocks)
 		want    *api.CancelBookingResponse
 		wantErr error
 	}{
 		"Success": {
-			args: args{
-				ctx: context.Background(),
-				req: &api.CancelBookingRequest{BookingId: booking.BookingID},
-			},
+			req: req,
 			on: func(f mocks) {
-				f.app.On("CancelBooking", context.Background(), mock.Anything).Return(nil)
+				f.app.On("CancelBooking", context.TODO(), mock.Anything).Return(nil)
 			},
 			want:    &api.CancelBookingResponse{},
 			wantErr: nil,
 		},
 		"Error_FailedPrecondition_BookingAlreadyCancelled": {
-			args: args{
-				ctx: context.Background(),
-				req: &api.CancelBookingRequest{BookingId: booking.BookingID},
-			},
+			req: req,
 			on: func(f mocks) {
-				f.app.On("CancelBooking", context.Background(), mock.Anything).
+				f.app.On("CancelBooking", context.TODO(), mock.Anything).
 					Return(errBookingAlreadyCancelled)
 			},
 			want:    nil,
@@ -398,7 +346,7 @@ func TestServer_CancelBooking(t *testing.T) {
 				tc.on(m)
 			}
 			// when
-			got, err := s.CancelBooking(tc.args.ctx, tc.args.req)
+			got, err := s.CancelBooking(context.TODO(), tc.req)
 			// then
 			mock.AssertExpectationsForObjects(t, m.app)
 
@@ -413,46 +361,33 @@ func TestServer_CancelBooking(t *testing.T) {
 }
 
 func TestServer_GetVacantDates(t *testing.T) {
-	type args struct {
-		ctx context.Context
-		req *api.GetVacantDatesRequest
+	req := &api.GetVacantDatesRequest{
+		CampsiteId: "campsite-id",
+		StartDate:  "2006-01-02",
+		EndDate:    "2006-01-03",
 	}
 
 	tests := map[string]struct {
-		args    args
+		req     *api.GetVacantDatesRequest
 		on      func(f mocks)
 		want    *api.GetVacantDatesResponse
 		wantErr error
 	}{
 		"Success": {
-			args: args{
-				ctx: context.Background(),
-				req: &api.GetVacantDatesRequest{
-					CampsiteId: "campsite-id",
-					StartDate:  "2006-01-02",
-					EndDate:    "2006-01-03",
-				},
-			},
+			req: req,
 			on: func(f mocks) {
 				f.app.On(
-					"GetVacantDates", context.Background(), mock.Anything,
+					"GetVacantDates", context.TODO(), mock.Anything,
 				).Return([]string{"2006-01-02"}, nil)
 			},
 			want:    &api.GetVacantDatesResponse{VacantDates: []string{"2006-01-02"}},
 			wantErr: nil,
 		},
 		"Error_CommitTx": {
-			args: args{
-				ctx: context.Background(),
-				req: &api.GetVacantDatesRequest{
-					CampsiteId: "campsite-id",
-					StartDate:  "2006-01-02",
-					EndDate:    "2006-01-03",
-				},
-			},
+			req: req,
 			on: func(f mocks) {
 				f.app.On(
-					"GetVacantDates", context.Background(), mock.Anything,
+					"GetVacantDates", context.TODO(), mock.Anything,
 				).Return(nil, bootstrap.ErrCommitTx)
 			},
 			want:    nil,
@@ -469,7 +404,7 @@ func TestServer_GetVacantDates(t *testing.T) {
 				tc.on(m)
 			}
 			// when
-			got, err := s.GetVacantDates(tc.args.ctx, tc.args.req)
+			got, err := s.GetVacantDates(context.TODO(), tc.req)
 			// then
 			mock.AssertExpectationsForObjects(t, m.app)
 
