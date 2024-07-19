@@ -99,7 +99,7 @@ func TestBookingRepository_Find(t *testing.T) {
 			want:    nil,
 			wantErr: bootstrap.ErrRow,
 		},
-		"Error_Commit": {
+		"Error_CommitTx": {
 			mockTxPhases: func(mock sqlmock.Sqlmock) {
 				rows := sqlmock.NewRows(columnsRow).
 					AddRow(bookingRowValues(booking)...)
@@ -107,10 +107,10 @@ func TestBookingRepository_Find(t *testing.T) {
 				mock.ExpectQuery(queries.FindBookingByBookingID).
 					WithArgs(booking.BookingID).
 					WillReturnRows(rows)
-				mock.ExpectCommit().WillReturnError(bootstrap.ErrCommit)
+				mock.ExpectCommit().WillReturnError(bootstrap.ErrCommitTx)
 			},
 			want:    nil,
-			wantErr: bootstrap.ErrCommit,
+			wantErr: bootstrap.ErrCommitTx,
 		},
 	}
 
@@ -183,7 +183,7 @@ func TestBookingRepository_FindForDateRange(t *testing.T) {
 			want:    nil,
 			wantErr: bootstrap.ErrQuery,
 		},
-		"Error_Commit": {
+		"Error_CommitTx": {
 			mockTxPhases: func(mock sqlmock.Sqlmock) {
 				rows := sqlmock.NewRows(columnsRow).
 					AddRow(bookingRowValues(booking)...)
@@ -191,10 +191,10 @@ func TestBookingRepository_FindForDateRange(t *testing.T) {
 				mock.ExpectQuery(queries.FindAllBookingsForDateRange).
 					WithArgs(campsiteID, startDate, endDate).
 					WillReturnRows(rows)
-				mock.ExpectCommit().WillReturnError(bootstrap.ErrCommit)
+				mock.ExpectCommit().WillReturnError(bootstrap.ErrCommitTx)
 			},
 			want:    nil,
-			wantErr: bootstrap.ErrCommit,
+			wantErr: bootstrap.ErrCommitTx,
 		},
 	}
 
@@ -308,7 +308,7 @@ func TestBookingRepository_Insert(t *testing.T) {
 			},
 			wantErr: bootstrap.ErrRow,
 		},
-		"Error_Commit": {
+		"Error_CommitTx": {
 			mockTxPhases: func(mock sqlmock.Sqlmock) {
 				rows := sqlmock.NewRows(columnsRow)
 				mock.ExpectBegin()
@@ -318,9 +318,9 @@ func TestBookingRepository_Insert(t *testing.T) {
 				mock.ExpectExec(queries.InsertBooking).
 					WithArgs(bookingArgs(booking)...).
 					WillReturnResult(sqlmock.NewResult(1, 1))
-				mock.ExpectCommit().WillReturnError(bootstrap.ErrCommit)
+				mock.ExpectCommit().WillReturnError(bootstrap.ErrCommitTx)
 			},
-			wantErr: bootstrap.ErrCommit,
+			wantErr: bootstrap.ErrCommitTx,
 		},
 	}
 
@@ -437,7 +437,7 @@ func TestBookingRepository_Update(t *testing.T) {
 			},
 			wantErr: bootstrap.ErrRow,
 		},
-		"Error_Commit": {
+		"Error_CommitTx": {
 			mockTxPhases: func(mock sqlmock.Sqlmock) {
 				rows := sqlmock.NewRows(columnsRow)
 				mock.ExpectBegin()
@@ -447,9 +447,9 @@ func TestBookingRepository_Update(t *testing.T) {
 				mock.ExpectExec(queries.UpdateBooking).
 					WithArgs(bookingArgs(booking)...).
 					WillReturnResult(sqlmock.NewResult(1, 1))
-				mock.ExpectCommit().WillReturnError(bootstrap.ErrCommit)
+				mock.ExpectCommit().WillReturnError(bootstrap.ErrCommitTx)
 			},
-			wantErr: bootstrap.ErrCommit,
+			wantErr: bootstrap.ErrCommitTx,
 		},
 	}
 
