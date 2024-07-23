@@ -5,12 +5,10 @@ package postgres
 import (
 	"context"
 	"database/sql/driver"
-	"os"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/domain"
-	"github.com/igor-baiborodine/campsite-booking-go/internal/logger"
 	queries "github.com/igor-baiborodine/campsite-booking-go/internal/postgres/sql"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/testing/bootstrap"
 	"github.com/stretchr/testify/assert"
@@ -122,7 +120,7 @@ func TestCampsiteRepository_FindAll(t *testing.T) {
 			defer db.Close()
 
 			tc.mockTxPhases(mock)
-			repo := NewCampsiteRepository(db, logger.NewDefault(os.Stdout, nil))
+			repo := NewCampsiteRepository(db)
 			// when
 			got, err := repo.FindAll(context.TODO())
 			// then
@@ -194,7 +192,7 @@ func TestCampsiteRepository_Insert(t *testing.T) {
 			defer db.Close()
 
 			tc.mockTxPhases(mock)
-			repo := NewCampsiteRepository(db, logger.NewDefault(os.Stdout, nil))
+			repo := NewCampsiteRepository(db)
 			// when
 			err = repo.Insert(context.TODO(), campsite)
 			// then

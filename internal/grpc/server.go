@@ -2,7 +2,6 @@ package grpc
 
 import (
 	"context"
-	"log/slog"
 	"time"
 
 	"github.com/bufbuild/protovalidate-go"
@@ -26,14 +25,14 @@ type server struct {
 
 var _ api.CampgroundsServiceServer = (*server)(nil)
 
-func NewServer(l *slog.Logger) (*grpc.Server, error) {
+func NewServer() (*grpc.Server, error) {
 	validator, err := protovalidate.New()
 	if err != nil {
 		return nil, err
 	}
 	opts := []grpc.ServerOption{
 		grpc.ChainUnaryInterceptor(
-			logging.UnaryServerInterceptor(logServiceCalls(l)),
+			logging.UnaryServerInterceptor(logServiceCalls()),
 			protovalidate_middleware.UnaryServerInterceptor(validator),
 		),
 	}

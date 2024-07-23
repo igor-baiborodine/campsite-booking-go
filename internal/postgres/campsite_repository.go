@@ -3,7 +3,6 @@ package postgres
 import (
 	"context"
 	"database/sql"
-	"log/slog"
 
 	"github.com/igor-baiborodine/campsite-booking-go/internal/domain"
 	queries "github.com/igor-baiborodine/campsite-booking-go/internal/postgres/sql"
@@ -11,14 +10,13 @@ import (
 )
 
 type CampsiteRepository struct {
-	db     *sql.DB
-	logger *slog.Logger
+	db *sql.DB
 }
 
 var _ domain.CampsiteRepository = (*CampsiteRepository)(nil)
 
-func NewCampsiteRepository(db *sql.DB, logger *slog.Logger) CampsiteRepository {
-	return CampsiteRepository{db, logger}
+func NewCampsiteRepository(db *sql.DB) CampsiteRepository {
+	return CampsiteRepository{db}
 }
 
 func (r CampsiteRepository) FindAll(ctx context.Context) (campsites []*domain.Campsite, err error) {
@@ -26,13 +24,13 @@ func (r CampsiteRepository) FindAll(ctx context.Context) (campsites []*domain.Ca
 	if err != nil {
 		return nil, errors.Wrap(err, "begin transaction")
 	}
-	defer rollbackTx(tx, r.logger)
+	defer rollbackTx(tx)
 
 	rows, err := tx.QueryContext(ctx, queries.FindAllCampsites)
 	if err != nil {
 		return nil, errors.Wrap(err, "query campsites")
 	}
-	defer closeRows(rows, r.logger)
+	defer closeRows(rows)
 
 	for rows.Next() {
 		campsite := &domain.Campsite{}
@@ -59,7 +57,7 @@ func (r CampsiteRepository) Insert(ctx context.Context, campsite *domain.Campsit
 	if err != nil {
 		return errors.Wrap(err, "begin transaction")
 	}
-	defer rollbackTx(tx, r.logger)
+	defer rollbackTx(tx)
 
 	_, err = tx.ExecContext(ctx, queries.InsertCampsite,
 		campsite.CampsiteID, campsite.CampsiteCode, campsite.Capacity, campsite.Restrooms,

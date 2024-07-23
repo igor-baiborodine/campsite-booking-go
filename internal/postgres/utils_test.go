@@ -5,6 +5,7 @@ package postgres
 import (
 	"bytes"
 	"database/sql"
+	"log/slog"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
@@ -49,9 +50,9 @@ func TestRollbackTx(t *testing.T) {
 			mock.ExpectRollback().WillReturnError(tc.err)
 
 			var buf bytes.Buffer
-			dl := logger.NewDefault(&buf, nil)
+			slog.SetDefault(logger.NewDefault(&buf, nil))
 			// when
-			rollbackTx(tx, dl)
+			rollbackTx(tx)
 			// then
 			err = mock.ExpectationsWereMet()
 			assert.NoError(t, err)
@@ -99,9 +100,9 @@ func TestCloseRows(t *testing.T) {
 			}
 
 			var buf bytes.Buffer
-			dl := logger.NewDefault(&buf, nil)
+			slog.SetDefault(logger.NewDefault(&buf, nil))
 			// when
-			closeRows(rows, dl)
+			closeRows(rows)
 			// then
 			err = mock.ExpectationsWereMet()
 			assert.NoError(t, err)

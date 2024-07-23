@@ -15,7 +15,7 @@ const (
 	grpcMethod  = "grpc.method"
 )
 
-func logServiceCalls(l *slog.Logger) logging.Logger {
+func logServiceCalls() logging.Logger {
 	return logging.LoggerFunc(
 		func(ctx context.Context, lvl logging.Level, msg string, fields ...any) {
 			f := make(map[string]any, len(fields)/2)
@@ -27,7 +27,7 @@ func logServiceCalls(l *slog.Logger) logging.Logger {
 			}
 
 			if strings.Contains(msg, "finished call") {
-				l.Log(
+				slog.Log(
 					ctx,
 					slog.Level(lvl),
 					msg,
@@ -41,7 +41,7 @@ func logServiceCalls(l *slog.Logger) logging.Logger {
 					f[grpcCode],
 				)
 			} else {
-				l.Log(ctx, slog.Level(lvl), msg, grpcService, f[grpcService], grpcMethod, f[grpcMethod],
+				slog.Log(ctx, slog.Level(lvl), msg, grpcService, f[grpcService], grpcMethod, f[grpcMethod],
 					grpcTimeMs, f[grpcTimeMs])
 			}
 		},

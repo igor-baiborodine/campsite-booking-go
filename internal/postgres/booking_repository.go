@@ -3,7 +3,6 @@ package postgres
 import (
 	"context"
 	"database/sql"
-	"log/slog"
 	"time"
 
 	"github.com/igor-baiborodine/campsite-booking-go/internal/domain"
@@ -12,14 +11,13 @@ import (
 )
 
 type BookingRepository struct {
-	db     *sql.DB
-	logger *slog.Logger
+	db *sql.DB
 }
 
 var _ domain.BookingRepository = (*BookingRepository)(nil)
 
-func NewBookingRepository(db *sql.DB, logger *slog.Logger) BookingRepository {
-	return BookingRepository{db, logger}
+func NewBookingRepository(db *sql.DB) BookingRepository {
+	return BookingRepository{db}
 }
 
 func (r BookingRepository) Find(ctx context.Context, bookingID string) (*domain.Booking, error) {
@@ -27,7 +25,7 @@ func (r BookingRepository) Find(ctx context.Context, bookingID string) (*domain.
 	if err != nil {
 		return nil, errors.Wrap(err, "begin transaction")
 	}
-	defer rollbackTx(tx, r.logger)
+	defer rollbackTx(tx)
 
 	booking := &domain.Booking{}
 	if err = tx.QueryRowContext(
@@ -55,7 +53,7 @@ func (r BookingRepository) FindForDateRange(
 	if err != nil {
 		return nil, errors.Wrap(err, "begin transaction")
 	}
-	defer rollbackTx(tx, r.logger)
+	defer rollbackTx(tx)
 
 	bookings, err := r.findForDateRangeWithTx(
 		ctx, tx, queries.FindAllBookingsForDateRange, campsiteID, startDate, endDate)
@@ -73,7 +71,7 @@ func (r BookingRepository) Insert(ctx context.Context, booking *domain.Booking) 
 	if err != nil {
 		return errors.Wrap(err, "begin transaction")
 	}
-	defer rollbackTx(tx, r.logger)
+	defer rollbackTx(tx)
 
 	query := queries.FindAllBookingsForDateRange + " FOR UPDATE"
 	bookings, err := r.findForDateRangeWithTx(
@@ -107,7 +105,7 @@ func (r BookingRepository) Update(ctx context.Context, booking *domain.Booking) 
 	if err != nil {
 		return errors.Wrap(err, "begin transaction")
 	}
-	defer rollbackTx(tx, r.logger)
+	defer rollbackTx(tx)
 
 	query := queries.FindAllBookingsForDateRange + "FOR UPDATE"
 	bookings, err := r.findForDateRangeWithTx(
@@ -146,7 +144,7 @@ func (r BookingRepository) findForDateRangeWithTx(
 	if err != nil {
 		return nil, errors.Wrap(err, "query bookings for date range")
 	}
-	defer closeRows(rows, r.logger)
+	defer closeRows(rows)
 
 	for rows.Next() {
 		booking := &domain.Booking{}

@@ -2,7 +2,6 @@ package query
 
 import (
 	"context"
-	"log/slog"
 
 	"github.com/igor-baiborodine/campsite-booking-go/internal/application/decorator"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/application/handler"
@@ -20,13 +19,9 @@ type (
 	}
 )
 
-func NewGetCampsitesHandler(
-	campsites domain.CampsiteRepository,
-	logger *slog.Logger,
-) GetCampsitesHandler {
+func NewGetCampsitesHandler(campsites domain.CampsiteRepository) GetCampsitesHandler {
 	return decorator.ApplyQueryDecorator[GetCampsites, []*domain.Campsite](
 		getCampsitesHandler{campsites: campsites},
-		logger,
 	)
 }
 

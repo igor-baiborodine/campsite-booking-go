@@ -7,15 +7,15 @@ import (
 	"github.com/stackus/errors"
 )
 
-func rollbackTx(tx *sql.Tx, logger *slog.Logger) {
+func rollbackTx(tx *sql.Tx) {
 	// Rollback returns sql.ErrTxDone if the transaction was already closed.
 	if err := tx.Rollback(); err != nil && !errors.Is(err, sql.ErrTxDone) {
-		logger.Error("rollback transaction", slog.Any("error", err))
+		slog.Error("rollback transaction", slog.Any("error", err))
 	}
 }
 
-func closeRows(rows *sql.Rows, logger *slog.Logger) {
+func closeRows(rows *sql.Rows) {
 	if err := rows.Close(); err != nil {
-		logger.Error("close rows", slog.Any("error", err))
+		slog.Error("close rows", slog.Any("error", err))
 	}
 }
