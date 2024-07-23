@@ -2,6 +2,7 @@ package grpc
 
 import (
 	"context"
+	"log/slog"
 	"time"
 
 	"github.com/bufbuild/protovalidate-go"
@@ -26,14 +27,24 @@ type server struct {
 var _ api.CampgroundsServiceServer = (*server)(nil)
 
 func NewServer() (*grpc.Server, error) {
-	validator, err := protovalidate.New()
+	requestValidator, err := protovalidate.New()
 	if err != nil {
 		return nil, err
 	}
+	loggingOpts := []logging.Option{
+		logging.WithLogOnEvents(logging.StartCall, logging.FinishCall),
+	}
+
+	if slog.Default().Enabled(context.Background(), slog.LevelDebug) {
+		loggingOpts = append(
+			loggingOpts,
+			logging.WithLogOnEvents(logging.PayloadReceived, logging.PayloadSent),
+		)
+	}
 	opts := []grpc.ServerOption{
 		grpc.ChainUnaryInterceptor(
-			logging.UnaryServerInterceptor(logServiceCalls()),
-			protovalidate_middleware.UnaryServerInterceptor(validator),
+			logging.UnaryServerInterceptor(interceptorLogger(), loggingOpts...),
+			protovalidate_middleware.UnaryServerInterceptor(requestValidator),
 		),
 	}
 	return grpc.NewServer(opts...), nil
