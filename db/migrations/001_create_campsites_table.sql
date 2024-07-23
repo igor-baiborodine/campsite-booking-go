@@ -15,7 +15,6 @@ CREATE TABLE campsites
     CONSTRAINT pk_campsites PRIMARY KEY (id)
 );
 
-CREATE EXTENSION IF NOT EXISTS moddatetime;
 CREATE TRIGGER campsites_update_moddatetime_trigger
     BEFORE UPDATE ON campsites
     FOR EACH ROW
