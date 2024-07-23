@@ -2,7 +2,6 @@ package query
 
 import (
 	"context"
-	"log/slog"
 	"time"
 
 	"github.com/igor-baiborodine/campsite-booking-go/internal/application/decorator"
@@ -26,13 +25,9 @@ type (
 	}
 )
 
-func NewGetVacantDatesHandler(
-	bookings domain.BookingRepository,
-	logger *slog.Logger,
-) GetVacantDatesHandler {
+func NewGetVacantDatesHandler(bookings domain.BookingRepository) GetVacantDatesHandler {
 	return decorator.ApplyQueryDecorator[GetVacantDates, []string](
 		getVacantDatesHandler{bookings: bookings},
-		logger,
 	)
 }
 

@@ -27,7 +27,6 @@ type Service struct {
 	db     *sql.DB
 	rpc    *grpc.Server
 	waiter waiter.Waiter
-	logger *slog.Logger
 }
 
 func New(cfg config.AppConfig) (*Service, error) {
@@ -61,17 +60,13 @@ func (s *Service) Waiter() waiter.Waiter {
 	return s.waiter
 }
 
-func (s *Service) Logger() *slog.Logger {
-	return s.logger
-}
-
 func (s *Service) initDB() (err error) {
 	s.db, err = sql.Open("pgx", s.cfg.PG.Conn)
 	return err
 }
 
 func (s *Service) initRPC() (err error) {
-	srv, err := rpc.NewServer(s.logger)
+	srv, err := rpc.NewServer()
 	if err != nil {
 		return err
 	}
@@ -86,10 +81,15 @@ func (s *Service) initWaiter() {
 }
 
 func (s *Service) initLogger() {
-	s.logger = logger.New(logger.LogConfig{
+	l := logger.New(logger.LogConfig{
 		Environment: s.cfg.Environment,
 		LogLevel:    logger.Level(s.cfg.LogLevel),
 	})
+	slog.SetDefault(l)
+
+	if slog.Default().Enabled(context.Background(), slog.LevelDebug) {
+		slog.Default().Info("slog debug level enabled")
+	}
 }
 
 func (s *Service) MigrateDB(fs fs.FS) error {
@@ -107,10 +107,10 @@ func (s *Service) MigrateDB(fs fs.FS) error {
 
 func (s *Service) Startup() error {
 	// setup driven adapters
-	campsites := postgres.NewCampsiteRepository(s.db, s.logger)
-	bookings := postgres.NewBookingRepository(s.db, s.logger)
+	campsites := postgres.NewCampsiteRepository(s.db)
+	bookings := postgres.NewBookingRepository(s.db)
 	// setup application
-	app := application.New(campsites, bookings, s.logger)
+	app := application.New(campsites, bookings)
 	// setup driver adapters
 	if err := rpc.RegisterServer(app, s.rpc); err != nil {
 		return err
@@ -125,8 +125,8 @@ func (s *Service) WaitForRPC(ctx context.Context) error {
 	}
 	group, gCtx := errgroup.WithContext(ctx)
 	group.Go(func() error {
-		s.logger.Info("✅ rpc server started")
-		defer s.logger.Info("🚫 rpc server shutdown")
+		slog.Info("✅ rpc server started")
+		defer slog.Info("🚫 rpc server shut down")
 		if err := s.RPC().Serve(listener); err != nil && !errors.Is(err, grpc.ErrServerStopped) {
 			return err
 		}
@@ -135,7 +135,7 @@ func (s *Service) WaitForRPC(ctx context.Context) error {
 
 	group.Go(func() error {
 		<-gCtx.Done()
-		s.logger.Info("rpc server to be shutdown")
+		slog.Info("rpc server to be shut down")
 		stopped := make(chan struct{})
 		go func() {
 			s.RPC().GracefulStop()

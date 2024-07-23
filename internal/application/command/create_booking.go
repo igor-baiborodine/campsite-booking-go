@@ -2,7 +2,6 @@ package command
 
 import (
 	"context"
-	"log/slog"
 	"time"
 
 	"github.com/igor-baiborodine/campsite-booking-go/internal/application/decorator"
@@ -30,21 +29,15 @@ type (
 	}
 )
 
-func NewCreateBookingHandler(
-	bookings domain.BookingRepository,
-	logger *slog.Logger,
-) CreateBookingHandler {
-	return decorator.ApplyCommandDecorator[CreateBooking](
-		createBookingHandler{
-			bookings: bookings,
-			validators: []validator.BookingValidator{
-				&validator.BookingStartDateBeforeEndDateValidator{},
-				&validator.BookingAllowedStartDateValidator{},
-				&validator.BookingMaximumStayValidator{},
-			},
+func NewCreateBookingHandler(bookings domain.BookingRepository) CreateBookingHandler {
+	return decorator.ApplyCommandDecorator[CreateBooking](createBookingHandler{
+		bookings: bookings,
+		validators: []validator.BookingValidator{
+			&validator.BookingStartDateBeforeEndDateValidator{},
+			&validator.BookingAllowedStartDateValidator{},
+			&validator.BookingMaximumStayValidator{},
 		},
-		logger,
-	)
+	})
 }
 
 func (h createBookingHandler) Handle(ctx context.Context, cmd CreateBooking) error {

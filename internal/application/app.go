@@ -2,7 +2,6 @@ package application
 
 import (
 	"context"
-	"log/slog"
 
 	"github.com/igor-baiborodine/campsite-booking-go/internal/application/command"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/application/query"
@@ -78,22 +77,18 @@ func (a CampgroundsApp) GetVacantDates(
 
 var _ App = (*CampgroundsApp)(nil)
 
-func New(
-	campsites domain.CampsiteRepository,
-	bookings domain.BookingRepository,
-	logger *slog.Logger,
-) *CampgroundsApp {
+func New(campsites domain.CampsiteRepository, bookings domain.BookingRepository) *CampgroundsApp {
 	return &CampgroundsApp{
 		commands: commands{
-			CreateCampsiteHandler: command.NewCreateCampsiteHandler(campsites, logger),
-			CreateBookingHandler:  command.NewCreateBookingHandler(bookings, logger),
-			UpdateBookingHandler:  command.NewUpdateBookingHandler(bookings, logger),
-			CancelBookingHandler:  command.NewCancelBookingHandler(bookings, logger),
+			CreateCampsiteHandler: command.NewCreateCampsiteHandler(campsites),
+			CreateBookingHandler:  command.NewCreateBookingHandler(bookings),
+			UpdateBookingHandler:  command.NewUpdateBookingHandler(bookings),
+			CancelBookingHandler:  command.NewCancelBookingHandler(bookings),
 		},
 		queries: queries{
-			GetCampsitesHandler:   query.NewGetCampsitesHandler(campsites, logger),
-			GetBookingHandler:     query.NewGetBookingHandler(bookings, logger),
-			GetVacantDatesHandler: query.NewGetVacantDatesHandler(bookings, logger),
+			GetCampsitesHandler:   query.NewGetCampsitesHandler(campsites),
+			GetBookingHandler:     query.NewGetBookingHandler(bookings),
+			GetVacantDatesHandler: query.NewGetVacantDatesHandler(bookings),
 		},
 	}
 }

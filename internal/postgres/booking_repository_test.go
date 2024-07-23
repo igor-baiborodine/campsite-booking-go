@@ -5,13 +5,11 @@ package postgres
 import (
 	"context"
 	"database/sql/driver"
-	"os"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/google/uuid"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/domain"
-	"github.com/igor-baiborodine/campsite-booking-go/internal/logger"
 	queries "github.com/igor-baiborodine/campsite-booking-go/internal/postgres/sql"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/testing/bootstrap"
 	"github.com/stretchr/testify/assert"
@@ -124,7 +122,7 @@ func TestBookingRepository_Find(t *testing.T) {
 			defer db.Close()
 
 			tc.mockTxPhases(mock)
-			repo := NewBookingRepository(db, logger.NewDefault(os.Stdout, nil))
+			repo := NewBookingRepository(db)
 			// when
 			got, err := repo.Find(context.TODO(), booking.BookingID)
 			// then
@@ -208,7 +206,7 @@ func TestBookingRepository_FindForDateRange(t *testing.T) {
 			defer db.Close()
 
 			tc.mockTxPhases(mock)
-			repo := NewBookingRepository(db, logger.NewDefault(os.Stdout, nil))
+			repo := NewBookingRepository(db)
 			// when
 			got, err := repo.FindForDateRange(context.TODO(), campsiteID, startDate, endDate)
 			// then
@@ -334,7 +332,7 @@ func TestBookingRepository_Insert(t *testing.T) {
 			defer db.Close()
 
 			tc.mockTxPhases(mock)
-			repo := NewBookingRepository(db, logger.NewDefault(os.Stdout, nil))
+			repo := NewBookingRepository(db)
 			// when
 			err = repo.Insert(context.TODO(), booking)
 			// then
@@ -463,7 +461,7 @@ func TestBookingRepository_Update(t *testing.T) {
 			defer db.Close()
 
 			tc.mockTxPhases(mock)
-			repo := NewBookingRepository(db, logger.NewDefault(os.Stdout, nil))
+			repo := NewBookingRepository(db)
 			// when
 			err = repo.Update(context.TODO(), booking)
 			// then

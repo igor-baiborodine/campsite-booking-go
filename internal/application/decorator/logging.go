@@ -10,23 +10,18 @@ import (
 )
 
 type loggingCommandHandler[C any] struct {
-	base   handler.Command[C]
-	logger *slog.Logger
+	base handler.Command[C]
 }
 
-func ApplyCommandDecorator[C any](
-	handler handler.Command[C],
-	logger *slog.Logger,
-) handler.Command[C] {
+func ApplyCommandDecorator[C any](handler handler.Command[C]) handler.Command[C] {
 	return loggingCommandHandler[C]{
-		base:   handler,
-		logger: logger,
+		base: handler,
 	}
 }
 
 func (d loggingCommandHandler[C]) Handle(ctx context.Context, cmd C) (err error) {
 	handlerName := extractHandlerName(cmd)
-	logger := d.logger.With("command", handlerName, "command_body", fmt.Sprintf("%#v", cmd))
+	logger := slog.With("command", handlerName, "command_body", fmt.Sprintf("%#v", cmd))
 
 	logger.Debug("executing")
 	defer func() {
@@ -41,23 +36,18 @@ func (d loggingCommandHandler[C]) Handle(ctx context.Context, cmd C) (err error)
 }
 
 type loggingQueryHandler[C any, R any] struct {
-	base   handler.Query[C, R]
-	logger *slog.Logger
+	base handler.Query[C, R]
 }
 
-func ApplyQueryDecorator[C any, R any](
-	handler handler.Query[C, R],
-	logger *slog.Logger,
-) handler.Query[C, R] {
+func ApplyQueryDecorator[C any, R any](handler handler.Query[C, R]) handler.Query[C, R] {
 	return loggingQueryHandler[C, R]{
-		base:   handler,
-		logger: logger,
+		base: handler,
 	}
 }
 
 func (d loggingQueryHandler[C, R]) Handle(ctx context.Context, cmd C) (result R, err error) {
 	handlerName := extractHandlerName(cmd)
-	logger := d.logger.With("query", handlerName, "query_body", fmt.Sprintf("%#v", cmd))
+	logger := slog.With("query", handlerName, "query_body", fmt.Sprintf("%#v", cmd))
 
 	logger.Debug("executing")
 	defer func() {

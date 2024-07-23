@@ -4,6 +4,7 @@ package grpc_test
 
 import (
 	"context"
+	"log/slog"
 	"net"
 	"testing"
 	"time"
@@ -43,20 +44,20 @@ func (s *serverSuite) SetupSuite() {}
 func (s *serverSuite) TearDownSuite() {}
 
 func (s *serverSuite) SetupTest() {
-	const grpcTestPort = ":10912"
-	var err error
-
-	appLogger := logger.New(logger.LogConfig{
+	l := logger.New(logger.LogConfig{
 		Environment: "integration",
 		LogLevel:    "DEBUG",
 	})
+	slog.SetDefault(l)
 
-	s.server, err = rpc.NewServer(appLogger)
+	var err error
+	s.server, err = rpc.NewServer()
 	if err != nil {
 		s.T().Fatal(err)
 	}
 
 	var listener net.Listener
+	const grpcTestPort = ":10912"
 	listener, err = net.Listen("tcp", grpcTestPort)
 	if err != nil {
 		s.T().Fatal(err)
@@ -66,11 +67,7 @@ func (s *serverSuite) SetupTest() {
 		campsites: domain.NewMockCampsiteRepository(s.T()),
 		bookings:  domain.NewMockBookingRepository(s.T()),
 	}
-	app := application.New(
-		s.mocks.campsites,
-		s.mocks.bookings,
-		appLogger,
-	)
+	app := application.New(s.mocks.campsites, s.mocks.bookings)
 
 	if err = rpc.RegisterServer(app, s.server); err != nil {
 		s.T().Fatal(err)

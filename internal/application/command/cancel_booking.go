@@ -2,7 +2,6 @@ package command
 
 import (
 	"context"
-	"log/slog"
 
 	"github.com/igor-baiborodine/campsite-booking-go/internal/application/decorator"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/application/handler"
@@ -22,14 +21,8 @@ type (
 	}
 )
 
-func NewCancelBookingHandler(
-	bookings domain.BookingRepository,
-	logger *slog.Logger,
-) CancelBookingHandler {
-	return decorator.ApplyCommandDecorator[CancelBooking](
-		cancelBookingHandler{bookings: bookings},
-		logger,
-	)
+func NewCancelBookingHandler(bookings domain.BookingRepository) CancelBookingHandler {
+	return decorator.ApplyCommandDecorator[CancelBooking](cancelBookingHandler{bookings: bookings})
 }
 
 func (h cancelBookingHandler) Handle(ctx context.Context, cmd CancelBooking) error {

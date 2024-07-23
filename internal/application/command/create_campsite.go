@@ -2,7 +2,6 @@ package command
 
 import (
 	"context"
-	"log/slog"
 
 	"github.com/igor-baiborodine/campsite-booking-go/internal/application/decorator"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/application/handler"
@@ -28,13 +27,9 @@ type (
 	}
 )
 
-func NewCreateCampsiteHandler(
-	campsites domain.CampsiteRepository,
-	logger *slog.Logger,
-) CreateCampsiteHandler {
+func NewCreateCampsiteHandler(campsites domain.CampsiteRepository) CreateCampsiteHandler {
 	return decorator.ApplyCommandDecorator[CreateCampsite](
 		createCampsiteHandler{campsites: campsites},
-		logger,
 	)
 }
 

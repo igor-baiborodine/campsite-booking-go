@@ -3,12 +3,10 @@ package query
 import (
 	"context"
 	"errors"
-	"os"
 	"testing"
 	"time"
 
 	"github.com/igor-baiborodine/campsite-booking-go/internal/domain"
-	"github.com/igor-baiborodine/campsite-booking-go/internal/logger"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -131,10 +129,7 @@ func TestGetVacantDates(t *testing.T) {
 			m := mocks{
 				bookings: domain.NewMockBookingRepository(t),
 			}
-			h := NewGetVacantDatesHandler(
-				m.bookings,
-				logger.NewDefault(os.Stdout, nil),
-			)
+			h := NewGetVacantDatesHandler(m.bookings)
 			if tc.on != nil {
 				tc.on(m)
 			}

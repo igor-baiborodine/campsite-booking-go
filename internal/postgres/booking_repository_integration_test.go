@@ -6,12 +6,10 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"os"
 	"testing"
 	"time"
 
 	"github.com/igor-baiborodine/campsite-booking-go/internal/domain"
-	"github.com/igor-baiborodine/campsite-booking-go/internal/logger"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/postgres"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/testing/bootstrap"
 	"github.com/stackus/errors"
@@ -59,7 +57,7 @@ func (s *bookingSuite) TearDownSuite() {
 }
 
 func (s *bookingSuite) SetupTest() {
-	s.repo = postgres.NewBookingRepository(s.db, logger.NewDefault(os.Stdout, nil))
+	s.repo = postgres.NewBookingRepository(s.db)
 }
 
 func (s *bookingSuite) TearDownTest() {
