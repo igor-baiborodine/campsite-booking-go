@@ -15,7 +15,6 @@ CREATE TABLE bookings
     CONSTRAINT fk_bookings_campsite_id_campsites FOREIGN KEY (campsite_id) REFERENCES campsites (campsite_id)
 );
 
-CREATE EXTENSION IF NOT EXISTS moddatetime;
 CREATE TRIGGER bookings_update_moddatetime_trigger
     BEFORE UPDATE ON bookings
     FOR EACH ROW

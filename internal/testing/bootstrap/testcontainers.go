@@ -24,6 +24,7 @@ func NewPostgresContainer() (*postgres.PostgresContainer, error) {
 		postgres.WithDatabase(dbName),
 		postgres.WithUsername(dbUser),
 		postgres.WithPassword(dbPassword),
+		postgres.WithInitScripts("../testing/bootstrap/db/test_create_campgrounds_db.sh"),
 		testcontainers.WithWaitStrategy(
 			wait.ForLog("database system is ready to accept connections").
 				WithOccurrence(2).
