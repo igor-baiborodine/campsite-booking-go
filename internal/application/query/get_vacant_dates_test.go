@@ -2,12 +2,14 @@ package query
 
 import (
 	"context"
-	"errors"
 	"testing"
 	"time"
 
 	"github.com/igor-baiborodine/campsite-booking-go/internal/domain"
+	"github.com/igor-baiborodine/campsite-booking-go/internal/testing/bootstrap"
+	"github.com/stackus/errors"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 func parseDateStr(t *testing.T, d string) time.Time {
@@ -19,53 +21,42 @@ func parseDateStr(t *testing.T, d string) time.Time {
 }
 
 func TestGetVacantDates(t *testing.T) {
-	campsiteID := "campsite-id"
-
-	type args struct {
-		ctx context.Context
-		qry GetVacantDates
-	}
-
 	type mocks struct {
 		bookings *domain.MockBookingRepository
 	}
+	campsiteID := "campsite-id"
+	monthOutOfRangeDate := "2024-99-01"
 
 	tests := map[string]struct {
-		args    args
+		qry     GetVacantDates
 		on      func(f mocks)
 		want    []string
-		wantErr string
+		wantErr error
 	}{
-		"Success": {
-			args: args{
-				ctx: context.Background(),
-				qry: GetVacantDates{
-					CampsiteID: campsiteID,
-					StartDate:  "2006-01-02",
-					EndDate:    "2006-01-03",
-				},
+		"Success_NoBookingsFoundForGivenDateRange": {
+			qry: GetVacantDates{
+				CampsiteID: campsiteID,
+				StartDate:  "2006-01-02",
+				EndDate:    "2006-01-03",
 			},
 			on: func(f mocks) {
 				f.bookings.On(
-					"FindForDateRange", context.Background(), campsiteID,
+					"FindForDateRange", context.TODO(), campsiteID,
 					parseDateStr(t, "2006-01-02"), parseDateStr(t, "2006-01-03"),
 				).Return([]*domain.Booking{}, nil)
 			},
 			want:    []string{"2006-01-02"},
-			wantErr: "",
+			wantErr: nil,
 		},
-		"BookingsFoundForGivenDateRange": {
-			args: args{
-				ctx: context.Background(),
-				qry: GetVacantDates{
-					CampsiteID: campsiteID,
-					StartDate:  "2006-01-02",
-					EndDate:    "2006-01-03",
-				},
+		"Success_BookingsFoundForGivenDateRange": {
+			qry: GetVacantDates{
+				CampsiteID: campsiteID,
+				StartDate:  "2006-01-02",
+				EndDate:    "2006-01-03",
 			},
 			on: func(f mocks) {
 				f.bookings.On(
-					"FindForDateRange", context.Background(), campsiteID,
+					"FindForDateRange", context.TODO(), campsiteID,
 					parseDateStr(t, "2006-01-02"), parseDateStr(t, "2006-01-03"),
 				).Return([]*domain.Booking{
 					{
@@ -75,51 +66,42 @@ func TestGetVacantDates(t *testing.T) {
 				}, nil)
 			},
 			want:    nil,
-			wantErr: "",
+			wantErr: nil,
 		},
-		"ParseStartDateError": {
-			args: args{
-				ctx: context.Background(),
-				qry: GetVacantDates{
-					CampsiteID: campsiteID,
-					StartDate:  "9999-88-88",
-					EndDate:    "2006-01-02",
-				},
+		"Error_ParseStartDate": {
+			qry: GetVacantDates{
+				CampsiteID: campsiteID,
+				StartDate:  monthOutOfRangeDate,
+				EndDate:    "2006-01-02",
 			},
 			on:      nil,
 			want:    nil,
-			wantErr: "failed to parse start date 9999-88-88",
+			wantErr: &time.ParseError{Value: monthOutOfRangeDate},
 		},
-		"ParseEndDateError": {
-			args: args{
-				ctx: context.Background(),
-				qry: GetVacantDates{
-					CampsiteID: campsiteID,
-					StartDate:  "2006-01-02",
-					EndDate:    "9999-99-99",
-				},
+		"Error_ParseEndDate": {
+			qry: GetVacantDates{
+				CampsiteID: campsiteID,
+				StartDate:  "2006-01-02",
+				EndDate:    monthOutOfRangeDate,
 			},
 			on:      nil,
 			want:    nil,
-			wantErr: "failed to parse end date 9999-99-99",
+			wantErr: &time.ParseError{Value: monthOutOfRangeDate},
 		},
-		"FindForDateRangeError": {
-			args: args{
-				ctx: context.Background(),
-				qry: GetVacantDates{
-					CampsiteID: campsiteID,
-					StartDate:  "2006-01-02",
-					EndDate:    "2006-01-03",
-				},
+		"Error_BeginTx": {
+			qry: GetVacantDates{
+				CampsiteID: campsiteID,
+				StartDate:  "2006-01-02",
+				EndDate:    "2006-01-03",
 			},
 			on: func(f mocks) {
 				f.bookings.On(
-					"FindForDateRange", context.Background(), campsiteID,
+					"FindForDateRange", context.TODO(), campsiteID,
 					parseDateStr(t, "2006-01-02"), parseDateStr(t, "2006-01-03"),
-				).Return(nil, errors.New("begin transaction"))
+				).Return(nil, bootstrap.ErrBeginTx)
 			},
 			want:    nil,
-			wantErr: "begin transaction",
+			wantErr: bootstrap.ErrBeginTx,
 		},
 	}
 
@@ -134,20 +116,17 @@ func TestGetVacantDates(t *testing.T) {
 				tc.on(m)
 			}
 			// when
-			vacantDates, err := h.Handle(tc.args.ctx, tc.args.qry)
+			got, err := h.Handle(context.TODO(), tc.qry)
 			// then
-			if tc.wantErr != "" {
-				assert.Containsf(
-					t,
-					err.Error(),
-					tc.wantErr,
-					"GetVacantDates() error = %v, wantErr %v",
-					err,
-					tc.wantErr,
-				)
-				return
+			assert.Equal(t, tc.want, got)
+			if err != nil {
+				var parseErr *time.ParseError
+				if errors.As(err, &parseErr) {
+					assert.Equalf(t, monthOutOfRangeDate, parseErr.Value,
+						"GetVacantDates() error = %v, wantErr %v", err, tc.wantErr)
+				}
 			}
-			assert.Equal(t, tc.want, vacantDates)
+			mock.AssertExpectationsForObjects(t, m.bookings)
 		})
 	}
 }
