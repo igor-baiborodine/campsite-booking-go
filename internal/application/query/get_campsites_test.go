@@ -35,6 +35,16 @@ func TestGetCampsitesHandler(t *testing.T) {
 			want:    []*domain.Campsite{campsite},
 			wantErr: nil,
 		},
+		"Success_NoCampsitesFound": {
+			qry: GetCampsites{},
+			on: func(f mocks) {
+				f.campsites.On(
+					"FindAll", context.TODO(),
+				).Return(nil, nil)
+			},
+			want:    nil,
+			wantErr: nil,
+		},
 		"Error_BeginTx": {
 			qry: GetCampsites{},
 			on: func(f mocks) {
