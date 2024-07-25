@@ -20,7 +20,7 @@ func parseDateStr(t *testing.T, d string) time.Time {
 	return date
 }
 
-func TestGetVacantDates(t *testing.T) {
+func TestGetVacantDatesHandler(t *testing.T) {
 	type mocks struct {
 		bookings *domain.MockBookingRepository
 	}

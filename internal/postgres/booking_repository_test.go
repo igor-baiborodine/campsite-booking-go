@@ -53,7 +53,7 @@ func TestBookingRepository_Find(t *testing.T) {
 			want:    booking,
 			wantErr: nil,
 		},
-		"NoBookingFound": {
+		"Error_NoBookingFound": {
 			mockTxPhases: func(mock sqlmock.Sqlmock) {
 				rows := sqlmock.NewRows(columnsRow)
 				mock.ExpectBegin()
