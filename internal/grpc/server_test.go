@@ -65,13 +65,10 @@ func TestServer_GetCampsites(t *testing.T) {
 			// when
 			got, err := s.GetCampsites(context.TODO(), tc.req)
 			// then
-			mock.AssertExpectationsForObjects(t, m.app)
+			defer mock.AssertExpectationsForObjects(t, m.app)
 
-			if tc.wantErr != nil {
-				assert.ErrorIs(
-					t, err, tc.wantErr, "GetCampsites() error = %v, wantErr %v", err, tc.wantErr)
-				return
-			}
+			assert.ErrorIs(t, err, tc.wantErr,
+				"GetCampsites() error = %v, wantErr %v", err, tc.wantErr)
 			assert.Equal(t, tc.want, got)
 		})
 	}
@@ -123,11 +120,11 @@ func TestServer_CreateCampsite(t *testing.T) {
 			// when
 			got, err := s.CreateCampsite(context.TODO(), req)
 			// then
-			mock.AssertExpectationsForObjects(t, m.app)
+			defer mock.AssertExpectationsForObjects(t, m.app)
 
 			if tc.wantErr != nil {
-				assert.ErrorIs(
-					t, err, tc.wantErr, "CreateCampsite() error = %v, wantErr %v", err, tc.wantErr)
+				assert.ErrorIs(t, err, tc.wantErr,
+					"CreateCampsite() error = %v, wantErr %v", err, tc.wantErr)
 				return
 			}
 			assert.NotEmpty(t, got.CampsiteId)
@@ -178,11 +175,11 @@ func TestServer_GetBooking(t *testing.T) {
 			// when
 			got, err := s.GetBooking(context.TODO(), tc.req)
 			// then
-			mock.AssertExpectationsForObjects(t, m.app)
+			defer mock.AssertExpectationsForObjects(t, m.app)
 
 			if tc.wantErr != nil {
-				assert.ErrorIs(
-					t, err, tc.wantErr, "GetBooking() error = %v, wantErr %v", err, tc.wantErr)
+				assert.ErrorIs(t, err, tc.wantErr,
+					"GetBooking() error = %v, wantErr %v", err, tc.wantErr)
 				return
 			}
 			assert.Equal(t, tc.want, got)
@@ -238,11 +235,11 @@ func TestServer_CreateBooking(t *testing.T) {
 			// when
 			got, err := s.CreateBooking(context.TODO(), tc.req)
 			// then
-			mock.AssertExpectationsForObjects(t, m.app)
+			defer mock.AssertExpectationsForObjects(t, m.app)
 
 			if tc.wantErr != nil {
-				assert.ErrorIs(
-					t, err, tc.wantErr, "CreateBooking() error = %v, wantErr %v", err, tc.wantErr)
+				assert.ErrorIs(t, err, tc.wantErr,
+					"CreateBooking() error = %v, wantErr %v", err, tc.wantErr)
 				return
 			}
 			assert.NotEmpty(t, got.BookingId)
@@ -295,11 +292,11 @@ func TestServer_UpdateBooking(t *testing.T) {
 			// when
 			got, err := s.UpdateBooking(context.TODO(), tc.req)
 			// then
-			mock.AssertExpectationsForObjects(t, m.app)
+			defer mock.AssertExpectationsForObjects(t, m.app)
 
 			if tc.wantErr != nil {
-				assert.ErrorIs(
-					t, err, tc.wantErr, "UpdateBooking() error = %v, wantErr %v", err, tc.wantErr)
+				assert.ErrorIs(t, err, tc.wantErr,
+					"UpdateBooking() error = %v, wantErr %v", err, tc.wantErr)
 				return
 			}
 			assert.Equal(t, tc.want, got)
@@ -348,11 +345,11 @@ func TestServer_CancelBooking(t *testing.T) {
 			// when
 			got, err := s.CancelBooking(context.TODO(), tc.req)
 			// then
-			mock.AssertExpectationsForObjects(t, m.app)
+			defer mock.AssertExpectationsForObjects(t, m.app)
 
 			if tc.wantErr != nil {
-				assert.ErrorIs(
-					t, err, tc.wantErr, "CancelBooking() error = %v, wantErr %v", err, tc.wantErr)
+				assert.ErrorIs(t, err, tc.wantErr,
+					"CancelBooking() error = %v, wantErr %v", err, tc.wantErr)
 				return
 			}
 			assert.Equal(t, tc.want, got)
@@ -406,11 +403,11 @@ func TestServer_GetVacantDates(t *testing.T) {
 			// when
 			got, err := s.GetVacantDates(context.TODO(), tc.req)
 			// then
-			mock.AssertExpectationsForObjects(t, m.app)
+			defer mock.AssertExpectationsForObjects(t, m.app)
 
 			if tc.wantErr != nil {
-				assert.ErrorIs(
-					t, err, tc.wantErr, "GetVacantDates() error = %v, wantErr %v", err, tc.wantErr)
+				assert.ErrorIs(t, err, tc.wantErr,
+					"GetVacantDates() error = %v, wantErr %v", err, tc.wantErr)
 				return
 			}
 			assert.Equal(t, tc.want, got)

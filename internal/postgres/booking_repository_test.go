@@ -53,7 +53,7 @@ func TestBookingRepository_Find(t *testing.T) {
 			want:    booking,
 			wantErr: nil,
 		},
-		"NoBookingFound": {
+		"Error_NoBookingFound": {
 			mockTxPhases: func(mock sqlmock.Sqlmock) {
 				rows := sqlmock.NewRows(columnsRow)
 				mock.ExpectBegin()
@@ -126,10 +126,10 @@ func TestBookingRepository_Find(t *testing.T) {
 			// when
 			got, err := repo.Find(context.TODO(), booking.BookingID)
 			// then
-			assert.Equal(t, tc.want, got, "Find() got = %v, want %v",
-				got, tc.want)
-			assert.ErrorIs(t, err, tc.wantErr, "Find() error = %v, wantErr %v",
-				err, tc.wantErr)
+			assert.Equal(t, tc.want, got,
+				"Find() got = %v, want %v", got, tc.want)
+			assert.ErrorIs(t, err, tc.wantErr,
+				"Find() error = %v, wantErr %v", err, tc.wantErr)
 			err = mock.ExpectationsWereMet()
 			assert.NoError(t, err)
 		})
@@ -210,10 +210,10 @@ func TestBookingRepository_FindForDateRange(t *testing.T) {
 			// when
 			got, err := repo.FindForDateRange(context.TODO(), campsiteID, startDate, endDate)
 			// then
-			assert.Equal(t, tc.want, got, "FindForDateRange() got = %v, want %v",
-				got, tc.want)
-			assert.ErrorIs(t, err, tc.wantErr, "FindForDateRange() error = %v, wantErr %v",
-				err, tc.wantErr)
+			assert.Equal(t, tc.want, got,
+				"FindForDateRange() got = %v, want %v", got, tc.want)
+			assert.ErrorIs(t, err, tc.wantErr,
+				"FindForDateRange() error = %v, wantErr %v", err, tc.wantErr)
 			err = mock.ExpectationsWereMet()
 			assert.NoError(t, err)
 		})
@@ -336,8 +336,8 @@ func TestBookingRepository_Insert(t *testing.T) {
 			// when
 			err = repo.Insert(context.TODO(), booking)
 			// then
-			assert.ErrorIs(t, err, tc.wantErr, "Insert() error = %v, wantErr %v",
-				err, tc.wantErr)
+			assert.ErrorIs(t, err, tc.wantErr,
+				"Insert() error = %v, wantErr %v", err, tc.wantErr)
 			err = mock.ExpectationsWereMet()
 			assert.NoError(t, err)
 		})
@@ -465,8 +465,8 @@ func TestBookingRepository_Update(t *testing.T) {
 			// when
 			err = repo.Update(context.TODO(), booking)
 			// then
-			assert.ErrorIs(t, err, tc.wantErr, "Update() error = %v, wantErr %v",
-				err, tc.wantErr)
+			assert.ErrorIs(t, err, tc.wantErr,
+				"Update() error = %v, wantErr %v", err, tc.wantErr)
 			err = mock.ExpectationsWereMet()
 			assert.NoError(t, err)
 		})

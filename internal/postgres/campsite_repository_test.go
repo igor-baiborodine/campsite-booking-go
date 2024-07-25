@@ -126,8 +126,8 @@ func TestCampsiteRepository_FindAll(t *testing.T) {
 			// then
 			assert.Equal(t, tc.want, got, "FindAll() got = %v, want %v",
 				got, tc.want)
-			assert.ErrorIs(t, err, tc.wantErr, "FindAll() error = %v, wantErr %v",
-				err, tc.wantErr)
+			assert.ErrorIs(t, err, tc.wantErr,
+				"FindAll() error = %v, wantErr %v", err, tc.wantErr)
 			err = mock.ExpectationsWereMet()
 			assert.NoError(t, err)
 		})
@@ -196,8 +196,8 @@ func TestCampsiteRepository_Insert(t *testing.T) {
 			// when
 			err = repo.Insert(context.TODO(), campsite)
 			// then
-			assert.ErrorIs(t, err, tc.wantErr, "Insert() error = %v, wantErr %v",
-				err, tc.wantErr)
+			assert.ErrorIs(t, err, tc.wantErr,
+				"Insert() error = %v, wantErr %v", err, tc.wantErr)
 			err = mock.ExpectationsWereMet()
 			assert.NoError(t, err)
 		})
