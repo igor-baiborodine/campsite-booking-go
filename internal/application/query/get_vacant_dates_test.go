@@ -123,7 +123,7 @@ func TestGetVacantDatesHandler(t *testing.T) {
 				var parseErr *time.ParseError
 				if errors.As(err, &parseErr) {
 					assert.Equalf(t, monthOutOfRangeDate, parseErr.Value,
-						"GetVacantDates() error = %v, wantErr %v", err, tc.wantErr)
+						"GetVacantDatesHandler.Handle() error = %v, wantErr %v", err, tc.wantErr)
 				}
 			}
 			mock.AssertExpectationsForObjects(t, m.bookings)

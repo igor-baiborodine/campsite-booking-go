@@ -1,4 +1,4 @@
-package query
+package command
 
 import (
 	"context"
@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-func TestGetCampsitesHandler(t *testing.T) {
+func TestCreateCampsiteHandler(t *testing.T) {
 	type mocks struct {
 		campsites *domain.MockCampsiteRepository
 	}
@@ -18,32 +18,41 @@ func TestGetCampsitesHandler(t *testing.T) {
 	if err != nil {
 		t.Fatalf("create campsite error: %v", err)
 	}
+	campsite.ID = 0
+	campsite.Active = true
+
+	cmd := CreateCampsite{
+		CampsiteID:    campsite.CampsiteID,
+		CampsiteCode:  campsite.CampsiteCode,
+		Capacity:      campsite.Capacity,
+		DrinkingWater: campsite.DrinkingWater,
+		Restrooms:     campsite.Restrooms,
+		PicnicTable:   campsite.PicnicTable,
+		FirePit:       campsite.FirePit,
+	}
 
 	tests := map[string]struct {
-		qry     GetCampsites
+		cmd     CreateCampsite
 		on      func(f mocks)
-		want    []*domain.Campsite
 		wantErr error
 	}{
 		"Success": {
-			qry: GetCampsites{},
+			cmd: cmd,
 			on: func(f mocks) {
 				f.campsites.On(
-					"FindAll", context.TODO(),
-				).Return([]*domain.Campsite{campsite}, nil)
+					"Insert", context.TODO(), campsite,
+				).Return(nil)
 			},
-			want:    []*domain.Campsite{campsite},
 			wantErr: nil,
 		},
-		"Error_BeginTx": {
-			qry: GetCampsites{},
+		"Error_CommitTx": {
+			cmd: cmd,
 			on: func(f mocks) {
 				f.campsites.On(
-					"FindAll", context.TODO(),
-				).Return(nil, bootstrap.ErrBeginTx)
+					"Insert", context.TODO(), campsite,
+				).Return(bootstrap.ErrCommitTx)
 			},
-			want:    nil,
-			wantErr: bootstrap.ErrBeginTx,
+			wantErr: bootstrap.ErrCommitTx,
 		},
 	}
 
@@ -53,17 +62,15 @@ func TestGetCampsitesHandler(t *testing.T) {
 			m := mocks{
 				campsites: domain.NewMockCampsiteRepository(t),
 			}
-			h := NewGetCampsitesHandler(m.campsites)
+			h := NewCreateCampsiteHandler(m.campsites)
 			if tc.on != nil {
 				tc.on(m)
 			}
 			// when
-			got, err := h.Handle(context.TODO(), tc.qry)
+			err := h.Handle(context.TODO(), tc.cmd)
 			// then
-			assert.Equal(t, tc.want, got,
-				"GetCampsitesHandler.Handle() got = %v, want %v", got, tc.want)
 			assert.ErrorIs(t, err, tc.wantErr,
-				"Find() error = %v, wantErr %v", err, tc.wantErr)
+				"CreateCampsiteHandler.Handle() error = %v, wantErr %v", err, tc.wantErr)
 			mock.AssertExpectationsForObjects(t, m.campsites)
 		})
 	}
