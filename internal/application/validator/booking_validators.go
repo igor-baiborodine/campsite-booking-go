@@ -8,10 +8,6 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-type BookingValidator interface {
-	Validate(b *domain.Booking) error
-}
-
 type BookingAllowedStartDateValidator struct{}
 
 type BookingMaximumStayValidator struct{}
@@ -24,7 +20,7 @@ type ErrBookingMaximumStay struct{}
 
 type ErrBookingStartDateBeforeEndDate struct{}
 
-func (v *BookingAllowedStartDateValidator) Validate(b *domain.Booking) error {
+func (v BookingAllowedStartDateValidator) Validate(b *domain.Booking) error {
 	now := time.Now()
 	if b.StartDate.After(now) && b.StartDate.Before(now.AddDate(0, 1, 0)) {
 		return nil
@@ -32,14 +28,14 @@ func (v *BookingAllowedStartDateValidator) Validate(b *domain.Booking) error {
 	return ErrBookingAllowedStartDate{}
 }
 
-func (v *BookingMaximumStayValidator) Validate(b *domain.Booking) error {
+func (v BookingMaximumStayValidator) Validate(b *domain.Booking) error {
 	if b.EndDate.Sub(b.StartDate).Hours()/24 <= 3 {
 		return nil
 	}
 	return ErrBookingMaximumStay{}
 }
 
-func (v *BookingStartDateBeforeEndDateValidator) Validate(b *domain.Booking) error {
+func (v BookingStartDateBeforeEndDateValidator) Validate(b *domain.Booking) error {
 	if b.StartDate.Before(b.EndDate) {
 		return nil
 	}
@@ -58,7 +54,7 @@ func (e ErrBookingStartDateBeforeEndDate) Error() string {
 	return "start_date: must be before end_date"
 }
 
-func Apply(validators []BookingValidator, booking *domain.Booking) error {
+func Apply(validators []domain.BookingValidator, booking *domain.Booking) error {
 	var errs []error
 
 	for _, v := range validators {

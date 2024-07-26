@@ -25,18 +25,17 @@ type (
 
 	updateBookingHandler struct {
 		bookings   domain.BookingRepository
-		validators []validator.BookingValidator
+		validators []domain.BookingValidator
 	}
 )
 
-func NewUpdateBookingHandler(bookings domain.BookingRepository) UpdateBookingHandler {
+func NewUpdateBookingHandler(
+	bookings domain.BookingRepository,
+	validators []domain.BookingValidator,
+) UpdateBookingHandler {
 	return decorator.ApplyCommandDecorator[UpdateBooking](updateBookingHandler{
-		bookings: bookings,
-		validators: []validator.BookingValidator{
-			&validator.BookingStartDateBeforeEndDateValidator{},
-			&validator.BookingAllowedStartDateValidator{},
-			&validator.BookingMaximumStayValidator{},
-		},
+		bookings:   bookings,
+		validators: validators,
 	})
 }
 

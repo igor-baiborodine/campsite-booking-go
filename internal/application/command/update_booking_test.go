@@ -15,7 +15,8 @@ import (
 
 func TestUpdateBookingHandler(t *testing.T) {
 	type mocks struct {
-		bookings *domain.MockBookingRepository
+		bookings  *domain.MockBookingRepository
+		validator *domain.MockBookingValidator
 	}
 	campsiteID := uuid.New().String()
 	booking, err := bootstrap.NewBooking(campsiteID)
@@ -46,12 +47,13 @@ func TestUpdateBookingHandler(t *testing.T) {
 			on: func(f mocks) {
 				booking.Active = true
 				f.bookings.
-					On(
-						"Find", context.TODO(), booking.BookingID,
-					).Return(booking, nil).
-					On(
-						"Update", context.TODO(), booking,
-					).Return(nil)
+					On("Find", context.TODO(), booking.BookingID).
+					Return(booking, nil).
+					On("Update", context.TODO(), booking).
+					Return(nil)
+				f.validator.
+					On("Validate", booking).
+					Return(nil)
 			},
 			wantErr: nil,
 		},
@@ -60,9 +62,8 @@ func TestUpdateBookingHandler(t *testing.T) {
 			on: func(f mocks) {
 				booking.Active = true
 				f.bookings.
-					On(
-						"Find", context.TODO(), booking.BookingID,
-					).Return(nil, bootstrap.ErrBeginTx)
+					On("Find", context.TODO(), booking.BookingID).
+					Return(nil, bootstrap.ErrBeginTx)
 			},
 			wantErr: bootstrap.ErrBeginTx,
 		},
@@ -71,9 +72,8 @@ func TestUpdateBookingHandler(t *testing.T) {
 			on: func(f mocks) {
 				booking.Active = false
 				f.bookings.
-					On(
-						"Find", context.TODO(), booking.BookingID,
-					).Return(booking, nil)
+					On("Find", context.TODO(), booking.BookingID).
+					Return(booking, nil)
 			},
 			wantErr: errBookingAlreadyCancelled,
 		},
@@ -89,9 +89,8 @@ func TestUpdateBookingHandler(t *testing.T) {
 			on: func(f mocks) {
 				booking.Active = true
 				f.bookings.
-					On(
-						"Find", context.TODO(), booking.BookingID,
-					).Return(booking, nil)
+					On("Find", context.TODO(), booking.BookingID).
+					Return(booking, nil)
 			},
 			wantErr: &time.ParseError{Value: monthOutOfRangeDate},
 		},
@@ -107,23 +106,24 @@ func TestUpdateBookingHandler(t *testing.T) {
 			on: func(f mocks) {
 				booking.Active = true
 				f.bookings.
-					On(
-						"Find", context.TODO(), booking.BookingID,
-					).Return(booking, nil)
+					On("Find", context.TODO(), booking.BookingID).
+					Return(booking, nil)
 			},
 			wantErr: &time.ParseError{Value: monthOutOfRangeDate},
 		},
+		// TODO: add test case for validate error
 		"Error_Update_CommitTx": {
 			cmd: cmd,
 			on: func(f mocks) {
 				booking.Active = true
 				f.bookings.
-					On(
-						"Find", context.TODO(), booking.BookingID,
-					).Return(booking, nil).
-					On(
-						"Update", context.TODO(), booking,
-					).Return(bootstrap.ErrCommitTx)
+					On("Find", context.TODO(), booking.BookingID).
+					Return(booking, nil).
+					On("Update", context.TODO(), booking).
+					Return(bootstrap.ErrCommitTx)
+				f.validator.
+					On("Validate", booking).
+					Return(nil)
 			},
 			wantErr: bootstrap.ErrCommitTx,
 		},
@@ -133,9 +133,13 @@ func TestUpdateBookingHandler(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			// given
 			m := mocks{
-				bookings: domain.NewMockBookingRepository(t),
+				bookings:  domain.NewMockBookingRepository(t),
+				validator: domain.NewMockBookingValidator(t),
 			}
-			h := NewUpdateBookingHandler(m.bookings)
+			var validators []domain.BookingValidator
+			validators = append(validators, m.validator)
+			h := NewUpdateBookingHandler(m.bookings, validators)
+
 			if tc.on != nil {
 				tc.on(m)
 			}

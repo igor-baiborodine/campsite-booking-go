@@ -15,7 +15,8 @@ import (
 
 func TestCreateBookingHandler(t *testing.T) {
 	type mocks struct {
-		bookings *domain.MockBookingRepository
+		bookings  *domain.MockBookingRepository
+		validator *domain.MockBookingValidator
 	}
 	campsiteID := uuid.New().String()
 	booking, err := bootstrap.NewBooking(campsiteID)
@@ -47,9 +48,12 @@ func TestCreateBookingHandler(t *testing.T) {
 		"Success": {
 			cmd: cmd,
 			on: func(f mocks) {
-				f.bookings.On(
-					"Insert", context.TODO(), booking,
-				).Return(nil)
+				f.bookings.
+					On("Insert", context.TODO(), booking).
+					Return(nil)
+				f.validator.
+					On("Validate", booking).
+					Return(nil)
 			},
 			wantErr: nil,
 		},
@@ -77,12 +81,16 @@ func TestCreateBookingHandler(t *testing.T) {
 			on:      nil,
 			wantErr: &time.ParseError{Value: monthOutOfRangeDate},
 		},
+		// TODO: add test case for validate error
 		"Error_ErrBookingDatesNotAvailable": {
 			cmd: cmd,
 			on: func(f mocks) {
-				f.bookings.On(
-					"Insert", context.TODO(), booking,
-				).Return(errBookingDatesNotAvailable)
+				f.bookings.
+					On("Insert", context.TODO(), booking).
+					Return(errBookingDatesNotAvailable)
+				f.validator.
+					On("Validate", booking).
+					Return(nil)
 			},
 			wantErr: errBookingDatesNotAvailable,
 		},
@@ -92,9 +100,13 @@ func TestCreateBookingHandler(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			// given
 			m := mocks{
-				bookings: domain.NewMockBookingRepository(t),
+				bookings:  domain.NewMockBookingRepository(t),
+				validator: domain.NewMockBookingValidator(t),
 			}
-			h := NewCreateBookingHandler(m.bookings)
+			var validators []domain.BookingValidator
+			validators = append(validators, m.validator)
+			h := NewCreateBookingHandler(m.bookings, validators)
+
 			if tc.on != nil {
 				tc.on(m)
 			}

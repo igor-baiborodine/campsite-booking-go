@@ -192,7 +192,7 @@ func TestApply(t *testing.T) {
 		},
 	}
 
-	validators := []BookingValidator{
+	validators := []domain.BookingValidator{
 		&BookingStartDateBeforeEndDateValidator{},
 		&BookingAllowedStartDateValidator{},
 		&BookingMaximumStayValidator{},
