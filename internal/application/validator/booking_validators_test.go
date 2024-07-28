@@ -4,6 +4,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/hashicorp/go-multierror"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/domain"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/testing/bootstrap"
 	"github.com/stretchr/testify/assert"
@@ -42,13 +43,9 @@ func TestBookingAllowedStartDateValidator_Validate(t *testing.T) {
 			// when
 			err := v.Validate(tc.booking)
 			// then
-			if tc.wantErr != nil {
-				assert.ErrorIs(t, err, tc.wantErr,
-					"BookingAllowedStartDateValidator.Validate() error = %v, wantErr %v",
-					err, tc.wantErr)
-				return
-			}
-			assert.Nil(t, err)
+			assert.Equalf(t, tc.wantErr, err,
+				"BookingAllowedStartDateValidator.Validate() error = %v, wantErr %v",
+				err, tc.wantErr)
 		})
 	}
 }
@@ -91,13 +88,9 @@ func TestBookingMaximumStayValidator_Validate(t *testing.T) {
 			// when
 			err := v.Validate(tc.booking)
 			// then
-			if tc.wantErr != nil {
-				assert.ErrorIs(t, err, tc.wantErr,
-					"BookingMaximumStayValidator.Validate() error = %v, wantErr %v",
-					err, tc.wantErr)
-				return
-			}
-			assert.Nil(t, err)
+			assert.Equalf(t, tc.wantErr, err,
+				"BookingMaximumStayValidator.Validate() error = %v, wantErr %v",
+				err, tc.wantErr)
 		})
 	}
 }
@@ -140,13 +133,9 @@ func TestBookingStartDateBeforeEndDateValidator_Validate(t *testing.T) {
 			// when
 			err := v.Validate(tc.booking)
 			// then
-			if tc.wantErr != nil {
-				assert.ErrorIs(t, err, tc.wantErr,
-					"BookingStartDateBeforeEndDateValidator.Validate() error = %v, wantErr %v",
-					err, tc.wantErr)
-				return
-			}
-			assert.Nil(t, err)
+			assert.Equalf(t, tc.wantErr, err,
+				"BookingStartDateBeforeEndDateValidator.Validate() error = %v, wantErr %v",
+				err, tc.wantErr)
 		})
 	}
 }
@@ -155,23 +144,23 @@ func TestApply(t *testing.T) {
 	now := bootstrap.AsStartOfDayUTC(time.Now())
 
 	tests := map[string]struct {
-		booking  *domain.Booking
-		wantErrs []string
+		booking *domain.Booking
+		wantErr error
 	}{
 		"Success": {
 			booking: &domain.Booking{
 				StartDate: now.AddDate(0, 0, 1),
 				EndDate:   now.AddDate(0, 0, 2),
 			},
-			wantErrs: nil,
+			wantErr: nil,
 		},
 		"Error_BookingStartDateBeforeEndDateValidator": {
 			booking: &domain.Booking{
 				StartDate: now.AddDate(0, 0, 2),
 				EndDate:   now.AddDate(0, 0, 1),
 			},
-			wantErrs: []string{
-				ErrBookingStartDateBeforeEndDate{}.Error(),
+			wantErr: domain.ErrBookingValidation{
+				MultiErr: multierror.Append(ErrBookingStartDateBeforeEndDate{}),
 			},
 		},
 		"Error_BookingAllowedStartDate_ErrBookingMaximumStay": {
@@ -179,9 +168,11 @@ func TestApply(t *testing.T) {
 				StartDate: now.AddDate(0, 2, 2),
 				EndDate:   now.AddDate(0, 4, 2),
 			},
-			wantErrs: []string{
-				ErrBookingAllowedStartDate{}.Error(),
-				ErrBookingMaximumStay{}.Error(),
+			wantErr: domain.ErrBookingValidation{
+				MultiErr: multierror.Append(
+					multierror.Append(ErrBookingAllowedStartDate{}),
+					ErrBookingMaximumStay{},
+				),
 			},
 		},
 	}
@@ -190,22 +181,15 @@ func TestApply(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			// given
 			validators := []domain.BookingValidator{
-				&BookingStartDateBeforeEndDateValidator{},
-				&BookingAllowedStartDateValidator{},
-				&BookingMaximumStayValidator{},
+				BookingStartDateBeforeEndDateValidator{},
+				BookingAllowedStartDateValidator{},
+				BookingMaximumStayValidator{},
 			}
 			// when
 			err := Apply(validators, tc.booking)
 			// then
-			if tc.wantErrs != nil {
-				for _, wantErr := range tc.wantErrs {
-					assert.Containsf(t, err.Error(), wantErr,
-						"Apply() error = %v, wantErr %v", err, wantErr,
-					)
-				}
-				return
-			}
-			assert.Nil(t, err)
+			assert.Equalf(t, tc.wantErr, err,
+				"Apply() error = %v, wantErr %v", err, tc.wantErr)
 		})
 	}
 }
