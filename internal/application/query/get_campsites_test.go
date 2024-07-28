@@ -28,9 +28,9 @@ func TestGetCampsitesHandler(t *testing.T) {
 		"Success": {
 			qry: GetCampsites{},
 			on: func(f mocks) {
-				f.campsites.On(
-					"FindAll", context.TODO(),
-				).Return([]*domain.Campsite{campsite}, nil)
+				f.campsites.
+					On("FindAll", context.TODO()).
+					Return([]*domain.Campsite{campsite}, nil)
 			},
 			want:    []*domain.Campsite{campsite},
 			wantErr: nil,
@@ -38,9 +38,9 @@ func TestGetCampsitesHandler(t *testing.T) {
 		"Success_NoCampsitesFound": {
 			qry: GetCampsites{},
 			on: func(f mocks) {
-				f.campsites.On(
-					"FindAll", context.TODO(),
-				).Return(nil, nil)
+				f.campsites.
+					On("FindAll", context.TODO()).
+					Return(nil, nil)
 			},
 			want:    nil,
 			wantErr: nil,
@@ -48,9 +48,9 @@ func TestGetCampsitesHandler(t *testing.T) {
 		"Error_BeginTx": {
 			qry: GetCampsites{},
 			on: func(f mocks) {
-				f.campsites.On(
-					"FindAll", context.TODO(),
-				).Return(nil, bootstrap.ErrBeginTx)
+				f.campsites.
+					On("FindAll", context.TODO()).
+					Return(nil, bootstrap.ErrBeginTx)
 			},
 			want:    nil,
 			wantErr: bootstrap.ErrBeginTx,
@@ -70,9 +70,9 @@ func TestGetCampsitesHandler(t *testing.T) {
 			// when
 			got, err := h.Handle(context.TODO(), tc.qry)
 			// then
-			assert.Equal(t, tc.want, got,
+			assert.Equalf(t, tc.want, got,
 				"GetCampsitesHandler.Handle() got = %v, want %v", got, tc.want)
-			assert.ErrorIs(t, err, tc.wantErr,
+			assert.Equalf(t, tc.wantErr, err,
 				"Find() error = %v, wantErr %v", err, tc.wantErr)
 			mock.AssertExpectationsForObjects(t, m.campsites)
 		})

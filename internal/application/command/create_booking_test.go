@@ -6,6 +6,8 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/hashicorp/go-multierror"
+	"github.com/igor-baiborodine/campsite-booking-go/internal/application/validator"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/domain"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/testing/bootstrap"
 	"github.com/stackus/errors"
@@ -29,6 +31,7 @@ func TestCreateBookingHandler(t *testing.T) {
 		StartDate: booking.StartDate,
 		EndDate:   booking.EndDate,
 	}
+	errBookingAllowedStartDate := validator.ErrBookingAllowedStartDate{}
 	monthOutOfRangeDate := "2024-99-01"
 
 	cmd := CreateBooking{
@@ -48,11 +51,11 @@ func TestCreateBookingHandler(t *testing.T) {
 		"Success": {
 			cmd: cmd,
 			on: func(f mocks) {
-				f.bookings.
-					On("Insert", context.TODO(), booking).
-					Return(nil)
 				f.validator.
 					On("Validate", booking).
+					Return(nil)
+				f.bookings.
+					On("Insert", context.TODO(), booking).
 					Return(nil)
 			},
 			wantErr: nil,
@@ -81,16 +84,26 @@ func TestCreateBookingHandler(t *testing.T) {
 			on:      nil,
 			wantErr: &time.ParseError{Value: monthOutOfRangeDate},
 		},
-		// TODO: add test case for validate error
+		"Error_Validate_BookingAllowedStartDate": {
+			cmd: cmd,
+			on: func(f mocks) {
+				f.validator.
+					On("Validate", booking).
+					Return(errBookingAllowedStartDate)
+			},
+			wantErr: domain.ErrBookingValidation{
+				MultiErr: multierror.Append(errBookingAllowedStartDate),
+			},
+		},
 		"Error_ErrBookingDatesNotAvailable": {
 			cmd: cmd,
 			on: func(f mocks) {
-				f.bookings.
-					On("Insert", context.TODO(), booking).
-					Return(errBookingDatesNotAvailable)
 				f.validator.
 					On("Validate", booking).
 					Return(nil)
+				f.bookings.
+					On("Insert", context.TODO(), booking).
+					Return(errBookingDatesNotAvailable)
 			},
 			wantErr: errBookingDatesNotAvailable,
 		},
@@ -121,7 +134,7 @@ func TestCreateBookingHandler(t *testing.T) {
 					"CreateBookingHandler.Handle() error = %v, wantErr %v", err, tc.wantErr)
 				return
 			}
-			assert.ErrorIs(t, err, tc.wantErr,
+			assert.Equalf(t, tc.wantErr, err,
 				"CreateBookingHandler.Handle() error = %v, wantErr %v", err, tc.wantErr)
 		})
 	}

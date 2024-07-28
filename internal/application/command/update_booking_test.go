@@ -6,6 +6,8 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/hashicorp/go-multierror"
+	"github.com/igor-baiborodine/campsite-booking-go/internal/application/validator"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/domain"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/testing/bootstrap"
 	"github.com/stackus/errors"
@@ -25,7 +27,9 @@ func TestUpdateBookingHandler(t *testing.T) {
 	}
 	booking.ID = 0
 	booking.Active = true
+
 	errBookingAlreadyCancelled := domain.ErrBookingAlreadyCancelled{BookingID: booking.BookingID}
+	errBookingMaximumStay := validator.ErrBookingMaximumStay{}
 	monthOutOfRangeDate := "2024-99-01"
 
 	cmd := UpdateBooking{
@@ -111,7 +115,21 @@ func TestUpdateBookingHandler(t *testing.T) {
 			},
 			wantErr: &time.ParseError{Value: monthOutOfRangeDate},
 		},
-		// TODO: add test case for validate error
+		"Error_Validate_BookingMaximumStay": {
+			cmd: cmd,
+			on: func(f mocks) {
+				booking.Active = true
+				f.bookings.
+					On("Find", context.TODO(), booking.BookingID).
+					Return(booking, nil)
+				f.validator.
+					On("Validate", booking).
+					Return(errBookingMaximumStay)
+			},
+			wantErr: domain.ErrBookingValidation{
+				MultiErr: multierror.Append(errBookingMaximumStay),
+			},
+		},
 		"Error_Update_CommitTx": {
 			cmd: cmd,
 			on: func(f mocks) {
@@ -154,7 +172,7 @@ func TestUpdateBookingHandler(t *testing.T) {
 					"UpdateBookingHandler.Handle() error = %v, wantErr %v", err, tc.wantErr)
 				return
 			}
-			assert.ErrorIs(t, err, tc.wantErr,
+			assert.Equalf(t, tc.wantErr, err,
 				"UpdateBookingHandler.Handle() error = %v, wantErr %v", err, tc.wantErr)
 		})
 	}

@@ -39,18 +39,18 @@ func TestCreateCampsiteHandler(t *testing.T) {
 		"Success": {
 			cmd: cmd,
 			on: func(f mocks) {
-				f.campsites.On(
-					"Insert", context.TODO(), campsite,
-				).Return(nil)
+				f.campsites.
+					On("Insert", context.TODO(), campsite).
+					Return(nil)
 			},
 			wantErr: nil,
 		},
 		"Error_CommitTx": {
 			cmd: cmd,
 			on: func(f mocks) {
-				f.campsites.On(
-					"Insert", context.TODO(), campsite,
-				).Return(bootstrap.ErrCommitTx)
+				f.campsites.
+					On("Insert", context.TODO(), campsite).
+					Return(bootstrap.ErrCommitTx)
 			},
 			wantErr: bootstrap.ErrCommitTx,
 		},
@@ -69,7 +69,7 @@ func TestCreateCampsiteHandler(t *testing.T) {
 			// when
 			err := h.Handle(context.TODO(), tc.cmd)
 			// then
-			assert.ErrorIs(t, err, tc.wantErr,
+			assert.Equalf(t, tc.wantErr, err,
 				"CreateCampsiteHandler.Handle() error = %v, wantErr %v", err, tc.wantErr)
 			mock.AssertExpectationsForObjects(t, m.campsites)
 		})

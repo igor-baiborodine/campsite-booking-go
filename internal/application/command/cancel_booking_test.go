@@ -34,12 +34,10 @@ func TestCancelBookingHandler(t *testing.T) {
 			on: func(f mocks) {
 				booking.Active = true
 				f.bookings.
-					On(
-						"Find", context.TODO(), booking.BookingID,
-					).Return(booking, nil).
-					On(
-						"Update", context.TODO(), booking,
-					).Return(nil)
+					On("Find", context.TODO(), booking.BookingID).
+					Return(booking, nil).
+					On("Update", context.TODO(), booking).
+					Return(nil)
 			},
 			wantErr: nil,
 		},
@@ -48,9 +46,8 @@ func TestCancelBookingHandler(t *testing.T) {
 			on: func(f mocks) {
 				booking.Active = true
 				f.bookings.
-					On(
-						"Find", context.TODO(), booking.BookingID,
-					).Return(nil, bootstrap.ErrBeginTx)
+					On("Find", context.TODO(), booking.BookingID).
+					Return(nil, bootstrap.ErrBeginTx)
 			},
 			wantErr: bootstrap.ErrBeginTx,
 		},
@@ -59,9 +56,8 @@ func TestCancelBookingHandler(t *testing.T) {
 			on: func(f mocks) {
 				booking.Active = false
 				f.bookings.
-					On(
-						"Find", context.TODO(), booking.BookingID,
-					).Return(booking, nil)
+					On("Find", context.TODO(), booking.BookingID).
+					Return(booking, nil)
 			},
 			wantErr: errBookingAlreadyCancelled,
 		},
@@ -70,12 +66,10 @@ func TestCancelBookingHandler(t *testing.T) {
 			on: func(f mocks) {
 				booking.Active = true
 				f.bookings.
-					On(
-						"Find", context.TODO(), booking.BookingID,
-					).Return(booking, nil).
-					On(
-						"Update", context.TODO(), booking,
-					).Return(bootstrap.ErrCommitTx)
+					On("Find", context.TODO(), booking.BookingID).
+					Return(booking, nil).
+					On("Update", context.TODO(), booking).
+					Return(bootstrap.ErrCommitTx)
 			},
 			wantErr: bootstrap.ErrCommitTx,
 		},
@@ -94,7 +88,7 @@ func TestCancelBookingHandler(t *testing.T) {
 			// when
 			err := h.Handle(context.TODO(), tc.cmd)
 			// then
-			assert.ErrorIs(t, err, tc.wantErr,
+			assert.Equalf(t, tc.wantErr, err,
 				"CancelBookingHandler.Handle() error = %v, wantErr %v", err, tc.wantErr)
 			mock.AssertExpectationsForObjects(t, m.bookings)
 		})

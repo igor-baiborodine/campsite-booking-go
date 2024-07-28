@@ -215,6 +215,8 @@ func handleDomainError(e error) error {
 		return status.Error(codes.NotFound, e.Error())
 	case domain.ErrBookingAlreadyCancelled, domain.ErrBookingDatesNotAvailable:
 		return status.Error(codes.FailedPrecondition, e.Error())
+	case domain.ErrBookingValidation:
+		return status.Error(codes.InvalidArgument, e.Error())
 	default:
 		return e
 	}

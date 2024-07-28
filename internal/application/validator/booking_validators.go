@@ -4,8 +4,6 @@ import (
 	"time"
 
 	"github.com/igor-baiborodine/campsite-booking-go/internal/domain"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 type BookingAllowedStartDateValidator struct{}
@@ -55,21 +53,15 @@ func (e ErrBookingStartDateBeforeEndDate) Error() string {
 }
 
 func Apply(validators []domain.BookingValidator, booking *domain.Booking) error {
-	var errs []error
+	merr := domain.ErrBookingValidation{}
 
 	for _, v := range validators {
-		err := v.Validate(booking)
-		if err != nil {
-			errs = append(errs, err)
+		if err := v.Validate(booking); err != nil {
+			merr.Append(err)
 		}
 	}
-
-	if len(errs) > 0 {
-		var msg string
-		for _, e := range errs {
-			msg += "\n - " + e.Error()
-		}
-		return status.Errorf(codes.InvalidArgument, "validation error: %s", msg)
+	if merr.MultiErr.ErrorOrNil() != nil {
+		return merr
 	}
 	return nil
 }

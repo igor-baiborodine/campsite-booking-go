@@ -7,7 +7,6 @@ import (
 	"github.com/igor-baiborodine/campsite-booking-go/internal/domain"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/testing/bootstrap"
 	"github.com/stretchr/testify/assert"
-	"google.golang.org/grpc/codes"
 )
 
 func TestBookingAllowedStartDateValidator_Validate(t *testing.T) {
@@ -44,8 +43,7 @@ func TestBookingAllowedStartDateValidator_Validate(t *testing.T) {
 			err := v.Validate(tc.booking)
 			// then
 			if tc.wantErr != nil {
-				assert.ErrorIs(
-					t, err, tc.wantErr,
+				assert.ErrorIs(t, err, tc.wantErr,
 					"BookingAllowedStartDateValidator.Validate() error = %v, wantErr %v",
 					err, tc.wantErr)
 				return
@@ -94,8 +92,7 @@ func TestBookingMaximumStayValidator_Validate(t *testing.T) {
 			err := v.Validate(tc.booking)
 			// then
 			if tc.wantErr != nil {
-				assert.ErrorIs(
-					t, err, tc.wantErr,
+				assert.ErrorIs(t, err, tc.wantErr,
 					"BookingMaximumStayValidator.Validate() error = %v, wantErr %v",
 					err, tc.wantErr)
 				return
@@ -144,8 +141,7 @@ func TestBookingStartDateBeforeEndDateValidator_Validate(t *testing.T) {
 			err := v.Validate(tc.booking)
 			// then
 			if tc.wantErr != nil {
-				assert.ErrorIs(
-					t, err, tc.wantErr,
+				assert.ErrorIs(t, err, tc.wantErr,
 					"BookingStartDateBeforeEndDateValidator.Validate() error = %v, wantErr %v",
 					err, tc.wantErr)
 				return
@@ -175,7 +171,6 @@ func TestApply(t *testing.T) {
 				EndDate:   now.AddDate(0, 0, 1),
 			},
 			wantErrs: []string{
-				codes.InvalidArgument.String(),
 				ErrBookingStartDateBeforeEndDate{}.Error(),
 			},
 		},
@@ -185,35 +180,27 @@ func TestApply(t *testing.T) {
 				EndDate:   now.AddDate(0, 4, 2),
 			},
 			wantErrs: []string{
-				codes.InvalidArgument.String(),
 				ErrBookingAllowedStartDate{}.Error(),
 				ErrBookingMaximumStay{}.Error(),
 			},
 		},
 	}
 
-	validators := []domain.BookingValidator{
-		&BookingStartDateBeforeEndDateValidator{},
-		&BookingAllowedStartDateValidator{},
-		&BookingMaximumStayValidator{},
-	}
-
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// given
-
+			validators := []domain.BookingValidator{
+				&BookingStartDateBeforeEndDateValidator{},
+				&BookingAllowedStartDateValidator{},
+				&BookingMaximumStayValidator{},
+			}
 			// when
 			err := Apply(validators, tc.booking)
 			// then
 			if tc.wantErrs != nil {
 				for _, wantErr := range tc.wantErrs {
-					assert.Containsf(
-						t,
-						err.Error(),
-						wantErr,
-						"Apply() error = %v, wantErr %v",
-						err,
-						wantErr,
+					assert.Containsf(t, err.Error(), wantErr,
+						"Apply() error = %v, wantErr %v", err, wantErr,
 					)
 				}
 				return
