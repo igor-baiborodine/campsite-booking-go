@@ -126,12 +126,11 @@ func TestBookingRepository_Find(t *testing.T) {
 			// when
 			got, err := repo.Find(context.TODO(), booking.BookingID)
 			// then
-			assert.Equal(t, tc.want, got,
+			assert.Equalf(t, tc.want, got,
 				"Find() got = %v, want %v", got, tc.want)
 			assert.ErrorIs(t, err, tc.wantErr,
 				"Find() error = %v, wantErr %v", err, tc.wantErr)
-			err = mock.ExpectationsWereMet()
-			assert.NoError(t, err)
+			assert.NoError(t, mock.ExpectationsWereMet())
 		})
 	}
 }
@@ -210,12 +209,11 @@ func TestBookingRepository_FindForDateRange(t *testing.T) {
 			// when
 			got, err := repo.FindForDateRange(context.TODO(), campsiteID, startDate, endDate)
 			// then
-			assert.Equal(t, tc.want, got,
+			assert.Equalf(t, tc.want, got,
 				"FindForDateRange() got = %v, want %v", got, tc.want)
 			assert.ErrorIs(t, err, tc.wantErr,
 				"FindForDateRange() error = %v, wantErr %v", err, tc.wantErr)
-			err = mock.ExpectationsWereMet()
-			assert.NoError(t, err)
+			assert.NoError(t, mock.ExpectationsWereMet())
 		})
 	}
 }
@@ -338,8 +336,7 @@ func TestBookingRepository_Insert(t *testing.T) {
 			// then
 			assert.ErrorIs(t, err, tc.wantErr,
 				"Insert() error = %v, wantErr %v", err, tc.wantErr)
-			err = mock.ExpectationsWereMet()
-			assert.NoError(t, err)
+			assert.NoError(t, mock.ExpectationsWereMet())
 		})
 	}
 }
@@ -467,8 +464,7 @@ func TestBookingRepository_Update(t *testing.T) {
 			// then
 			assert.ErrorIs(t, err, tc.wantErr,
 				"Update() error = %v, wantErr %v", err, tc.wantErr)
-			err = mock.ExpectationsWereMet()
-			assert.NoError(t, err)
+			assert.NoError(t, mock.ExpectationsWereMet())
 		})
 	}
 }
