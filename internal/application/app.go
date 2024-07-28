@@ -5,6 +5,7 @@ import (
 
 	"github.com/igor-baiborodine/campsite-booking-go/internal/application/command"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/application/query"
+	"github.com/igor-baiborodine/campsite-booking-go/internal/application/validator"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/domain"
 )
 
@@ -37,6 +38,12 @@ type (
 		queries
 	}
 )
+
+var bookingValidators = []domain.BookingValidator{
+	validator.BookingStartDateBeforeEndDate{},
+	validator.BookingAllowedStartDate{},
+	validator.BookingMaximumStay{},
+}
 
 func (a CampgroundsApp) CreateCampsite(ctx context.Context, cmd command.CreateCampsite) error {
 	return a.commands.CreateCampsiteHandler.Handle(ctx, cmd)
@@ -81,8 +88,8 @@ func New(campsites domain.CampsiteRepository, bookings domain.BookingRepository)
 	return &CampgroundsApp{
 		commands: commands{
 			CreateCampsiteHandler: command.NewCreateCampsiteHandler(campsites),
-			CreateBookingHandler:  command.NewCreateBookingHandler(bookings),
-			UpdateBookingHandler:  command.NewUpdateBookingHandler(bookings),
+			CreateBookingHandler:  command.NewCreateBookingHandler(bookings, bookingValidators),
+			UpdateBookingHandler:  command.NewUpdateBookingHandler(bookings, bookingValidators),
 			CancelBookingHandler:  command.NewCancelBookingHandler(bookings),
 		},
 		queries: queries{

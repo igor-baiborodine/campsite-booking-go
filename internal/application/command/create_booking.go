@@ -25,18 +25,17 @@ type (
 
 	createBookingHandler struct {
 		bookings   domain.BookingRepository
-		validators []validator.BookingValidator
+		validators []domain.BookingValidator
 	}
 )
 
-func NewCreateBookingHandler(bookings domain.BookingRepository) CreateBookingHandler {
+func NewCreateBookingHandler(
+	bookings domain.BookingRepository,
+	validators []domain.BookingValidator,
+) CreateBookingHandler {
 	return decorator.ApplyCommandDecorator[CreateBooking](createBookingHandler{
-		bookings: bookings,
-		validators: []validator.BookingValidator{
-			&validator.BookingStartDateBeforeEndDateValidator{},
-			&validator.BookingAllowedStartDateValidator{},
-			&validator.BookingMaximumStayValidator{},
-		},
+		bookings:   bookings,
+		validators: validators,
 	})
 }
 

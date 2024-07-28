@@ -118,7 +118,8 @@ func TestGetVacantDatesHandler(t *testing.T) {
 			// when
 			got, err := h.Handle(context.TODO(), tc.qry)
 			// then
-			assert.Equal(t, tc.want, got)
+			assert.Equalf(t, tc.want, got,
+				"GetVacantDatesHandler.Handle() got = %v, want %v", got, tc.want)
 			if err != nil {
 				var parseErr *time.ParseError
 				if errors.As(err, &parseErr) {
