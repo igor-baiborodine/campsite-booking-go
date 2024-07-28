@@ -6,11 +6,11 @@ import (
 	"github.com/igor-baiborodine/campsite-booking-go/internal/domain"
 )
 
-type BookingAllowedStartDateValidator struct{}
+type BookingAllowedStartDate struct{}
 
-type BookingMaximumStayValidator struct{}
+type BookingMaximumStay struct{}
 
-type BookingStartDateBeforeEndDateValidator struct{}
+type BookingStartDateBeforeEndDate struct{}
 
 type ErrBookingAllowedStartDate struct{}
 
@@ -18,7 +18,7 @@ type ErrBookingMaximumStay struct{}
 
 type ErrBookingStartDateBeforeEndDate struct{}
 
-func (v BookingAllowedStartDateValidator) Validate(b *domain.Booking) error {
+func (v BookingAllowedStartDate) Validate(b *domain.Booking) error {
 	now := time.Now()
 	if b.StartDate.After(now) && b.StartDate.Before(now.AddDate(0, 1, 0)) {
 		return nil
@@ -26,14 +26,14 @@ func (v BookingAllowedStartDateValidator) Validate(b *domain.Booking) error {
 	return ErrBookingAllowedStartDate{}
 }
 
-func (v BookingMaximumStayValidator) Validate(b *domain.Booking) error {
+func (v BookingMaximumStay) Validate(b *domain.Booking) error {
 	if b.EndDate.Sub(b.StartDate).Hours()/24 <= 3 {
 		return nil
 	}
 	return ErrBookingMaximumStay{}
 }
 
-func (v BookingStartDateBeforeEndDateValidator) Validate(b *domain.Booking) error {
+func (v BookingStartDateBeforeEndDate) Validate(b *domain.Booking) error {
 	if b.StartDate.Before(b.EndDate) {
 		return nil
 	}

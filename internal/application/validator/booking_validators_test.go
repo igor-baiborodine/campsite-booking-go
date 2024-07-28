@@ -34,7 +34,7 @@ func TestBookingAllowedStartDateValidator_Validate(t *testing.T) {
 			wantErr: ErrBookingAllowedStartDate{},
 		},
 	}
-	v := BookingAllowedStartDateValidator{}
+	v := BookingAllowedStartDate{}
 
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
@@ -44,7 +44,7 @@ func TestBookingAllowedStartDateValidator_Validate(t *testing.T) {
 			err := v.Validate(tc.booking)
 			// then
 			assert.Equalf(t, tc.wantErr, err,
-				"BookingAllowedStartDateValidator.Validate() error = %v, wantErr %v",
+				"BookingAllowedStartDate.Validate() error = %v, wantErr %v",
 				err, tc.wantErr)
 		})
 	}
@@ -79,7 +79,7 @@ func TestBookingMaximumStayValidator_Validate(t *testing.T) {
 			wantErr: ErrBookingMaximumStay{},
 		},
 	}
-	v := BookingMaximumStayValidator{}
+	v := BookingMaximumStay{}
 
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
@@ -89,7 +89,7 @@ func TestBookingMaximumStayValidator_Validate(t *testing.T) {
 			err := v.Validate(tc.booking)
 			// then
 			assert.Equalf(t, tc.wantErr, err,
-				"BookingMaximumStayValidator.Validate() error = %v, wantErr %v",
+				"BookingMaximumStay.Validate() error = %v, wantErr %v",
 				err, tc.wantErr)
 		})
 	}
@@ -124,7 +124,7 @@ func TestBookingStartDateBeforeEndDateValidator_Validate(t *testing.T) {
 			wantErr: ErrBookingStartDateBeforeEndDate{},
 		},
 	}
-	v := BookingStartDateBeforeEndDateValidator{}
+	v := BookingStartDateBeforeEndDate{}
 
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
@@ -134,7 +134,7 @@ func TestBookingStartDateBeforeEndDateValidator_Validate(t *testing.T) {
 			err := v.Validate(tc.booking)
 			// then
 			assert.Equalf(t, tc.wantErr, err,
-				"BookingStartDateBeforeEndDateValidator.Validate() error = %v, wantErr %v",
+				"BookingStartDateBeforeEndDate.Validate() error = %v, wantErr %v",
 				err, tc.wantErr)
 		})
 	}
@@ -181,9 +181,9 @@ func TestApply(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			// given
 			validators := []domain.BookingValidator{
-				BookingStartDateBeforeEndDateValidator{},
-				BookingAllowedStartDateValidator{},
-				BookingMaximumStayValidator{},
+				BookingStartDateBeforeEndDate{},
+				BookingAllowedStartDate{},
+				BookingMaximumStay{},
 			}
 			// when
 			err := Apply(validators, tc.booking)

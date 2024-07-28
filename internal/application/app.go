@@ -40,9 +40,9 @@ type (
 )
 
 var bookingValidators = []domain.BookingValidator{
-	validator.BookingStartDateBeforeEndDateValidator{},
-	validator.BookingAllowedStartDateValidator{},
-	validator.BookingMaximumStayValidator{},
+	validator.BookingStartDateBeforeEndDate{},
+	validator.BookingAllowedStartDate{},
+	validator.BookingMaximumStay{},
 }
 
 func (a CampgroundsApp) CreateCampsite(ctx context.Context, cmd command.CreateCampsite) error {
