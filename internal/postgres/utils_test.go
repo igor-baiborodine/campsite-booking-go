@@ -16,20 +16,20 @@ import (
 
 func TestRollbackTx(t *testing.T) {
 	tests := map[string]struct {
-		err  error
-		want string
+		mockErr error
+		want    string
 	}{
 		"Success": {
-			err:  nil,
-			want: "",
+			mockErr: nil,
+			want:    "",
 		},
 		"Error_ErTxDone": {
-			err:  sql.ErrTxDone,
-			want: "",
+			mockErr: sql.ErrTxDone,
+			want:    "",
 		},
 		"Error_Unexpected": {
-			err:  errors.Wrap(errors.ErrUnknown, "unexpected error during rollback"),
-			want: "ERROR rollback transaction error=unexpected error during rollback",
+			mockErr: errors.Wrap(errors.ErrUnknown, "unexpected error during rollback"),
+			want:    "ERROR rollback transaction error=unexpected error during rollback",
 		},
 	}
 
@@ -47,38 +47,36 @@ func TestRollbackTx(t *testing.T) {
 			if err != nil {
 				t.Fatalf("begin transaction error: %v", err)
 			}
-			mock.ExpectRollback().WillReturnError(tc.err)
+			mock.ExpectRollback().WillReturnError(tc.mockErr)
 
 			var buf bytes.Buffer
 			slog.SetDefault(logger.NewDefault(&buf, nil))
 			// when
 			rollbackTx(tx)
 			// then
-			err = mock.ExpectationsWereMet()
-			assert.NoError(t, err)
-
-			got := buf.String()
 			if tc.want != "" {
+				got := buf.String()
 				assert.Containsf(t, got, tc.want,
 					"rollbackTx() got = %s, want %s", got, tc.want,
 				)
 			}
+			assert.NoError(t, mock.ExpectationsWereMet())
 		})
 	}
 }
 
 func TestCloseRows(t *testing.T) {
 	tests := map[string]struct {
-		err  error
-		want string
+		mockErr error
+		want    string
 	}{
 		"Success": {
-			err:  nil,
-			want: "",
+			mockErr: nil,
+			want:    "",
 		},
 		"Error_Unexpected": {
-			err:  errors.Wrap(errors.ErrUnknown, "unexpected error during close rows"),
-			want: "ERROR close rows error=unexpected error during close rows",
+			mockErr: errors.Wrap(errors.ErrUnknown, "unexpected error during close rows"),
+			want:    "ERROR close rows error=unexpected error during close rows",
 		},
 	}
 
@@ -91,7 +89,7 @@ func TestCloseRows(t *testing.T) {
 			}
 			defer db.Close()
 
-			mockRows := sqlmock.NewRows([]string{"column"}).CloseError(tc.err)
+			mockRows := sqlmock.NewRows([]string{"column"}).CloseError(tc.mockErr)
 			mock.ExpectQuery("^SELECT (.+)$").WillReturnRows(mockRows)
 
 			rows, err := db.Query("SELECT 1")
@@ -104,15 +102,13 @@ func TestCloseRows(t *testing.T) {
 			// when
 			closeRows(rows)
 			// then
-			err = mock.ExpectationsWereMet()
-			assert.NoError(t, err)
-
-			got := buf.String()
 			if tc.want != "" {
+				got := buf.String()
 				assert.Containsf(t, got, tc.want,
 					"closeRows() got = %s, want %s", got, tc.want,
 				)
 			}
+			assert.NoError(t, mock.ExpectationsWereMet())
 		})
 	}
 }
