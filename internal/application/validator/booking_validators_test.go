@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestBookingAllowedStartDateValidator_Validate(t *testing.T) {
+func TestBookingAllowedStartDate_Validate(t *testing.T) {
 	now := bootstrap.AsStartOfDayUTC(time.Now())
 
 	tests := map[string]struct {
@@ -50,7 +50,7 @@ func TestBookingAllowedStartDateValidator_Validate(t *testing.T) {
 	}
 }
 
-func TestBookingMaximumStayValidator_Validate(t *testing.T) {
+func TestBookingMaximumStay_Validate(t *testing.T) {
 	now := bootstrap.AsStartOfDayUTC(time.Now())
 
 	tests := map[string]struct {
@@ -95,7 +95,7 @@ func TestBookingMaximumStayValidator_Validate(t *testing.T) {
 	}
 }
 
-func TestBookingStartDateBeforeEndDateValidator_Validate(t *testing.T) {
+func TestBookingStartDateBeforeEndDate_Validate(t *testing.T) {
 	now := bootstrap.AsStartOfDayUTC(time.Now())
 
 	tests := map[string]struct {

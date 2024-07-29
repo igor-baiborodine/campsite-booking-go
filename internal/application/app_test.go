@@ -12,14 +12,14 @@ func TestApp_New(t *testing.T) {
 	campsiteRepository := domain.NewMockCampsiteRepository(t)
 	bookingRepository := domain.NewMockBookingRepository(t)
 	// when
-	app := New(campsiteRepository, bookingRepository)
+	got := New(campsiteRepository, bookingRepository)
 	// then
-	assert.NotNil(t, app)
-	assert.NotNil(t, app.commands.CreateCampsiteHandler)
-	assert.NotNil(t, app.commands.CreateBookingHandler)
-	assert.NotNil(t, app.commands.UpdateBookingHandler)
-	assert.NotNil(t, app.commands.CancelBookingHandler)
-	assert.NotNil(t, app.queries.GetCampsitesHandler)
-	assert.NotNil(t, app.queries.GetBookingHandler)
-	assert.NotNil(t, app.queries.GetVacantDatesHandler)
+	assert.NotNil(t, got)
+	assert.NotNil(t, got.commands.CreateCampsiteHandler)
+	assert.NotNil(t, got.commands.CreateBookingHandler)
+	assert.NotNil(t, got.commands.UpdateBookingHandler)
+	assert.NotNil(t, got.commands.CancelBookingHandler)
+	assert.NotNil(t, got.queries.GetCampsitesHandler)
+	assert.NotNil(t, got.queries.GetBookingHandler)
+	assert.NotNil(t, got.queries.GetVacantDatesHandler)
 }
