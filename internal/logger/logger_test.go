@@ -46,7 +46,8 @@ func TestLogger_New(t *testing.T) {
 			// then
 			assert.NotNil(t, got)
 			enabled := got.Enabled(context.TODO(), tc.want)
-			assert.Truef(t, enabled, "New() enabled log level = %t, want true for %s", enabled, tc.want)
+			assert.Truef(t, enabled,
+				"New() enabled log level = %t, want true for %s", enabled, tc.want)
 		})
 	}
 }
