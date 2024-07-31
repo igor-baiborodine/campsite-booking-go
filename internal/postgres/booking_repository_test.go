@@ -126,7 +126,7 @@ func TestBookingRepository_Find(t *testing.T) {
 			// when
 			got, err := repo.Find(context.TODO(), booking.BookingID)
 			// then
-			assert.Equalf(t, tc.want, got,
+			assert.Equal(t, tc.want, got,
 				"Find() got = %v, want %v", got, tc.want)
 			assert.ErrorIs(t, err, tc.wantErr,
 				"Find() error = %v, wantErr %v", err, tc.wantErr)
@@ -209,7 +209,7 @@ func TestBookingRepository_FindForDateRange(t *testing.T) {
 			// when
 			got, err := repo.FindForDateRange(context.TODO(), campsiteID, startDate, endDate)
 			// then
-			assert.Equalf(t, tc.want, got,
+			assert.Equal(t, tc.want, got,
 				"FindForDateRange() got = %v, want %v", got, tc.want)
 			assert.ErrorIs(t, err, tc.wantErr,
 				"FindForDateRange() error = %v, wantErr %v", err, tc.wantErr)

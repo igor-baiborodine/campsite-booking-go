@@ -69,7 +69,7 @@ func TestCreateCampsiteHandler(t *testing.T) {
 			// when
 			err := h.Handle(context.TODO(), tc.cmd)
 			// then
-			assert.Equalf(t, tc.wantErr, err,
+			assert.Equal(t, tc.wantErr, err,
 				"CreateCampsiteHandler.Handle() error = %v, wantErr %v", err, tc.wantErr)
 			mock.AssertExpectationsForObjects(t, m.campsites)
 		})

@@ -69,9 +69,9 @@ func TestServer_GetCampsites(t *testing.T) {
 			// when
 			got, err := s.GetCampsites(context.TODO(), tc.req)
 			// then
-			assert.Equalf(t, tc.want, got,
+			assert.Equal(t, tc.want, got,
 				"GetCampsites() got = %v, want %v", got, tc.want)
-			assert.Equalf(t, tc.wantErr, err,
+			assert.Equal(t, tc.wantErr, err,
 				"GetCampsites() error = %v, wantErr %v", err, tc.wantErr)
 			mock.AssertExpectationsForObjects(t, m.app)
 		})
@@ -130,7 +130,7 @@ func TestServer_CreateCampsite(t *testing.T) {
 			defer mock.AssertExpectationsForObjects(t, m.app)
 
 			if tc.wantErr != nil {
-				assert.Equalf(t, tc.wantErr, err,
+				assert.Equal(t, tc.wantErr, err,
 					"CreateCampsite() error = %v, wantErr %v", err, tc.wantErr)
 				return
 			}
@@ -188,9 +188,9 @@ func TestServer_GetBooking(t *testing.T) {
 			// when
 			got, err := s.GetBooking(context.TODO(), tc.req)
 			// then
-			assert.Equalf(t, tc.want, got,
+			assert.Equal(t, tc.want, got,
 				"GetBooking() got = %v, want %v", got, tc.want)
-			assert.Equalf(t, tc.wantErr, err,
+			assert.Equal(t, tc.wantErr, err,
 				"GetBooking() error = %v, wantErr %v", err, tc.wantErr)
 			mock.AssertExpectationsForObjects(t, m.app)
 		})
@@ -251,7 +251,7 @@ func TestServer_CreateBooking(t *testing.T) {
 			defer mock.AssertExpectationsForObjects(t, m.app)
 
 			if tc.wantErr != nil {
-				assert.Equalf(t, tc.wantErr, err,
+				assert.Equal(t, tc.wantErr, err,
 					"CreateBooking() error = %v, wantErr %v", err, tc.wantErr)
 				return
 			}
@@ -323,7 +323,7 @@ func TestServer_UpdateBooking(t *testing.T) {
 			// then
 			assert.Equal(t, tc.want, got,
 				"UpdateBooking() got = %v, want %v", got, tc.want)
-			assert.Equalf(t, tc.wantErr, err,
+			assert.Equal(t, tc.wantErr, err,
 				"UpdateBooking() error = %v, wantErr %v", err, tc.wantErr)
 			mock.AssertExpectationsForObjects(t, m.app)
 		})
@@ -376,7 +376,7 @@ func TestServer_CancelBooking(t *testing.T) {
 			// then
 			assert.Equal(t, tc.want, got,
 				"CancelBooking() got = %v, want %v", got, tc.want)
-			assert.Equalf(t, tc.wantErr, err,
+			assert.Equal(t, tc.wantErr, err,
 				"CancelBooking() error = %v, wantErr %v", err, tc.wantErr)
 			mock.AssertExpectationsForObjects(t, m.app)
 		})
@@ -431,7 +431,7 @@ func TestServer_GetVacantDates(t *testing.T) {
 			// then
 			assert.Equal(t, tc.want, got,
 				"GetVacantDates() got = %v, want %v", got, tc.want)
-			assert.Equalf(t, tc.wantErr, err,
+			assert.Equal(t, tc.wantErr, err,
 				"GetVacantDates() error = %v, wantErr %v", err, tc.wantErr)
 			mock.AssertExpectationsForObjects(t, m.app)
 		})

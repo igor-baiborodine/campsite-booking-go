@@ -10,7 +10,7 @@ import (
 func interceptorLogger() logging.Logger {
 	return logging.LoggerFunc(
 		func(ctx context.Context, lvl logging.Level, msg string, fields ...any) {
-			slog.Default().Log(ctx, slog.Level(lvl), msg, fields...)
+			slog.Log(ctx, slog.Level(lvl), msg, fields...)
 		},
 	)
 }

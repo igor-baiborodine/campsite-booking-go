@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestBookingAllowedStartDateValidator_Validate(t *testing.T) {
+func TestBookingAllowedStartDate_Validate(t *testing.T) {
 	now := bootstrap.AsStartOfDayUTC(time.Now())
 
 	tests := map[string]struct {
@@ -43,14 +43,14 @@ func TestBookingAllowedStartDateValidator_Validate(t *testing.T) {
 			// when
 			err := v.Validate(tc.booking)
 			// then
-			assert.Equalf(t, tc.wantErr, err,
+			assert.Equal(t, tc.wantErr, err,
 				"BookingAllowedStartDate.Validate() error = %v, wantErr %v",
 				err, tc.wantErr)
 		})
 	}
 }
 
-func TestBookingMaximumStayValidator_Validate(t *testing.T) {
+func TestBookingMaximumStay_Validate(t *testing.T) {
 	now := bootstrap.AsStartOfDayUTC(time.Now())
 
 	tests := map[string]struct {
@@ -88,14 +88,14 @@ func TestBookingMaximumStayValidator_Validate(t *testing.T) {
 			// when
 			err := v.Validate(tc.booking)
 			// then
-			assert.Equalf(t, tc.wantErr, err,
+			assert.Equal(t, tc.wantErr, err,
 				"BookingMaximumStay.Validate() error = %v, wantErr %v",
 				err, tc.wantErr)
 		})
 	}
 }
 
-func TestBookingStartDateBeforeEndDateValidator_Validate(t *testing.T) {
+func TestBookingStartDateBeforeEndDate_Validate(t *testing.T) {
 	now := bootstrap.AsStartOfDayUTC(time.Now())
 
 	tests := map[string]struct {
@@ -133,7 +133,7 @@ func TestBookingStartDateBeforeEndDateValidator_Validate(t *testing.T) {
 			// when
 			err := v.Validate(tc.booking)
 			// then
-			assert.Equalf(t, tc.wantErr, err,
+			assert.Equal(t, tc.wantErr, err,
 				"BookingStartDateBeforeEndDate.Validate() error = %v, wantErr %v",
 				err, tc.wantErr)
 		})
@@ -188,7 +188,7 @@ func TestApply(t *testing.T) {
 			// when
 			err := Apply(validators, tc.booking)
 			// then
-			assert.Equalf(t, tc.wantErr, err,
+			assert.Equal(t, tc.wantErr, err,
 				"Apply() error = %v, wantErr %v", err, tc.wantErr)
 		})
 	}

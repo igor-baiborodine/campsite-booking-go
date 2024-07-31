@@ -131,7 +131,7 @@ func TestCampsiteRepository_FindAll(t *testing.T) {
 			// when
 			got, err := repo.FindAll(context.TODO())
 			// then
-			assert.Equalf(t, tc.want, got, "FindAll() got = %v, want %v",
+			assert.Equal(t, tc.want, got, "FindAll() got = %v, want %v",
 				got, tc.want)
 			assert.ErrorIs(t, err, tc.wantErr,
 				"FindAll() error = %v, wantErr %v", err, tc.wantErr)
