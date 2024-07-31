@@ -60,9 +60,9 @@ func TestGetBookingHandler(t *testing.T) {
 			// when
 			got, err := h.Handle(context.TODO(), tc.qry)
 			// then
-			assert.Equalf(t, tc.want, got,
+			assert.Equal(t, tc.want, got,
 				"GetBookingHandler.Handle() got = %v, want %v", got, tc.want)
-			assert.Equalf(t, tc.wantErr, err,
+			assert.Equal(t, tc.wantErr, err,
 				"GetBookingHandler.Handle() error = %v, wantErr %v", err, tc.wantErr)
 			mock.AssertExpectationsForObjects(t, m.bookings)
 		})

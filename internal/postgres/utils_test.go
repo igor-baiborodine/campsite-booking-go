@@ -56,7 +56,7 @@ func TestRollbackTx(t *testing.T) {
 			// then
 			if tc.want != "" {
 				got := buf.String()
-				assert.Containsf(t, got, tc.want,
+				assert.Contains(t, got, tc.want,
 					"rollbackTx() got = %s, want %s", got, tc.want)
 			}
 			assert.NoError(t, mock.ExpectationsWereMet())
@@ -103,7 +103,7 @@ func TestCloseRows(t *testing.T) {
 			// then
 			if tc.want != "" {
 				got := buf.String()
-				assert.Containsf(t, got, tc.want,
+				assert.Contains(t, got, tc.want,
 					"closeRows() got = %s, want %s", got, tc.want)
 			}
 			assert.NoError(t, mock.ExpectationsWereMet())

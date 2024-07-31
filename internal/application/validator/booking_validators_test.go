@@ -43,7 +43,7 @@ func TestBookingAllowedStartDate_Validate(t *testing.T) {
 			// when
 			err := v.Validate(tc.booking)
 			// then
-			assert.Equalf(t, tc.wantErr, err,
+			assert.Equal(t, tc.wantErr, err,
 				"BookingAllowedStartDate.Validate() error = %v, wantErr %v",
 				err, tc.wantErr)
 		})
@@ -88,7 +88,7 @@ func TestBookingMaximumStay_Validate(t *testing.T) {
 			// when
 			err := v.Validate(tc.booking)
 			// then
-			assert.Equalf(t, tc.wantErr, err,
+			assert.Equal(t, tc.wantErr, err,
 				"BookingMaximumStay.Validate() error = %v, wantErr %v",
 				err, tc.wantErr)
 		})
@@ -133,7 +133,7 @@ func TestBookingStartDateBeforeEndDate_Validate(t *testing.T) {
 			// when
 			err := v.Validate(tc.booking)
 			// then
-			assert.Equalf(t, tc.wantErr, err,
+			assert.Equal(t, tc.wantErr, err,
 				"BookingStartDateBeforeEndDate.Validate() error = %v, wantErr %v",
 				err, tc.wantErr)
 		})
@@ -188,7 +188,7 @@ func TestApply(t *testing.T) {
 			// when
 			err := Apply(validators, tc.booking)
 			// then
-			assert.Equalf(t, tc.wantErr, err,
+			assert.Equal(t, tc.wantErr, err,
 				"Apply() error = %v, wantErr %v", err, tc.wantErr)
 		})
 	}

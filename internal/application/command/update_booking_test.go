@@ -168,11 +168,11 @@ func TestUpdateBookingHandler(t *testing.T) {
 
 			var parseErr *time.ParseError
 			if errors.As(err, &parseErr) {
-				assert.Equalf(t, monthOutOfRangeDate, parseErr.Value,
+				assert.Equal(t, monthOutOfRangeDate, parseErr.Value,
 					"UpdateBookingHandler.Handle() error = %v, wantErr %v", err, tc.wantErr)
 				return
 			}
-			assert.Equalf(t, tc.wantErr, err,
+			assert.Equal(t, tc.wantErr, err,
 				"UpdateBookingHandler.Handle() error = %v, wantErr %v", err, tc.wantErr)
 		})
 	}
