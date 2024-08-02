@@ -34,7 +34,14 @@ func (c RPCConfig) Address() string {
 
 func InitConfig() (AppConfig, error) {
 	cfg := AppConfig{}
-	if err := dotenv.Load(dotenv.EnvironmentFiles(os.Getenv("ENVIRONMENT"))); err != nil {
+	filesOpt := dotenv.EnvironmentFiles(os.Getenv("ENVIRONMENT"))
+	pathsOpt := dotenv.Paths(".")
+
+	path := os.Getenv("ENVIRONMENT_CONFIG_PATH")
+	if path != "" {
+		pathsOpt = dotenv.Paths(path)
+	}
+	if err := dotenv.Load(filesOpt, pathsOpt); err != nil {
 		return cfg, err
 	}
 	err := envconfig.Process("", &cfg)
