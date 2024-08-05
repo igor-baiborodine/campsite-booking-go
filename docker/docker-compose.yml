@@ -3,9 +3,19 @@ version: '3.9'
 services:
   postgres:
     image: postgres:15.2-alpine
+    restart: always
     environment:
       POSTGRES_PASSWORD: postgres
     ports:
       - "5432:5432"
     volumes:
       - ../docker/db:/docker-entrypoint-initdb.d/
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD", "pg_isready -U root -d campgrounds" ]
+      interval: 5s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  pgdata:
