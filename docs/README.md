@@ -81,13 +81,13 @@ $ make install-tools
 ```
 
 If you use either [IntelliJ IDEA](https://www.jetbrains.com/idea/) or [GoLand](https://www.jetbrains.com/go/) IDEs, 
-follow this [guide](/readme/IDE-SETUP.md) to configure it. 
+follow this [guide](/docs/IDE-SETUP.md) to configure it. 
 
 ### Run with IDE
 
 * Go to **Run | Edit Configurations...** and create a new `Run/Debug` configuration as follows:
 
-![Run with IDE Config](/readme/run-with-ide-config.png)
+![Run with IDE Config](/docs/run-with-ide-config.png)
 
 * Start a PostgreSQL instance using **Docker Compose** by executing the following command from the
   project's root:
