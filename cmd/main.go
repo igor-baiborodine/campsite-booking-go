@@ -28,6 +28,7 @@ func run() (err error) {
 	if err != nil {
 		return err
 	}
+	slog.Info("initialized service")
 
 	defer func(db *sql.DB) {
 		if err = db.Close(); err != nil {
@@ -35,13 +36,14 @@ func run() (err error) {
 		}
 	}(s.DB())
 	if err = s.MigrateDB(migrations.FS); err != nil {
+		slog.Error("failed to migrate DB", "error", err)
 		return err
 	}
+	slog.Info("migrated DB")
 
 	if err = s.Startup(); err != nil {
 		return err
 	}
-
 	slog.Info("✅ campgrounds app stared")
 	defer slog.Info("🚫 campgrounds app stopped")
 
