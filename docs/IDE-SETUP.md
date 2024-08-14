@@ -15,21 +15,21 @@
 
 Go to **File | Settings | Plugins** and install **Go**(Intelli IDEA) and **File Watchers** plugins:
 
-![IDE Setup Plugins](/readme/ide-setup-plugins.png)
+![IDE Setup Plugins](/docs/ide-setup-plugins.png)
 
 ### Line Length (Hard Wrap)
 
 Go to **File | Settings | Editor | Code Style | General** and set the value of `Hard wrap at`
 to `100`:
 
-![IDE Setup Line Length](/readme/ide-setup-hard-wrap.png)
+![IDE Setup Line Length](/docs/ide-setup-hard-wrap.png)
 
 ### Imports
 
 Go to **File | Settings | Editor | Code Style | Go | Imports** and set the value of `Sorting type`
 to `goimports`:
 
-![IDE Setup Imports](/readme/ide-setup-goimports.png)
+![IDE Setup Imports](/docs/ide-setup-goimports.png)
 
 ### File Watchers
 
@@ -40,6 +40,6 @@ this [guide](https://github.com/mvdan/gofumpt?tab=readme-ov-file#goland) for mor
 file[campsite-booking-go]:*/&&!file[campsite-booking-go]:campgroundspb/v1//*&&!file[campsite-booking-go]:*/mock_*.go
 ```
 
-![IDE Setup File Watchers Scope](/readme/ide-setup-file-watchers-scope.png)
+![IDE Setup File Watchers Scope](/docs/ide-setup-file-watchers-scope.png)
 
-![IDE Setup File Watchers](/readme/ide-setup-file-watchers.png)
+![IDE Setup File Watchers](/docs/ide-setup-file-watchers.png)
