@@ -1,6 +1,16 @@
-version: '3.9'
-
 services:
+  campgrounds:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    ports:
+      - "8085:8085"
+    env_file:
+      - .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+
   postgres:
     image: postgres:15.2-alpine
     restart: always
@@ -12,7 +22,7 @@ services:
       - ../docker/db:/docker-entrypoint-initdb.d/
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: [ "CMD", "pg_isready -U root -d campgrounds" ]
+      test: [ "CMD-SHELL", "pg_isready -U campgrounds_user -d campgrounds" ]
       interval: 5s
       timeout: 10s
       retries: 3
