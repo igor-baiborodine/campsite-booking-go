@@ -68,7 +68,7 @@ TODO: elaborate on implementation details
 **Prerequisites**:
 1. [Git](https://git-scm.com/), see this [guide](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) on how to install Git.
 2. [Make](https://man7.org/linux/man-pages/man1/make.1.html)
-3. [Go](https://go.dev/) (version >= 1.21), see this [guide](https://go.dev/doc/install) on how to install Go.
+3. [Go](https://go.dev/) (version >= 1.22), see this [guide](https://go.dev/doc/install) on how to install Go.
 
 Clone the project and install the necessary tools(protoc, mockery, golines, goimports, gofumpt,
 golangci-lint):
