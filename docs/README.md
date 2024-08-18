@@ -53,26 +53,25 @@
 
 **Technologies used**:
 
-* [Go](https://github.com/golang/go), [gRPC](https://github.com/grpc/grpc-go), 
+* [Go](https://github.com/golang/go), [gRPC](https://github.com/grpc/grpc-go) 
 * [protovalidate-go](https://github.com/bufbuild/protovalidate-go) (requests validation)
 * [goimports](https://pkg.go.dev/golang.org/x/tools/cmd/goimports), [golines](https://github.com/segmentio/golines), [gofumpt](https://github.com/mvdan/gofumpt) (code style & formatting)
+* [Goose](https://pressly.github.io/goose/) (DB migrations)
 * [PostgreSQL](https://www.postgresql.org/)  
 * [Docker](https://www.docker.com/), [Docker Compose](https://docs.docker.com/compose/)
-* [Goose](https://pressly.github.io/goose/) (DB migrations)
 * TODO
 
 TODO: elaborate on implementation details
 
-## Up & Running
-
-### Project Setup
+## Project Setup
 
 **Prerequisites**:
 1. [Git](https://git-scm.com/), see this [guide](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) on how to install Git.
-2. [Make](https://man7.org/linux/man-pages/man1/make.1.html) 
-3. [Go](https://go.dev/) (version >= 1.21), see this [guide](https://go.dev/doc/install) on how to install Go.
+2. [Make](https://man7.org/linux/man-pages/man1/make.1.html)
+3. [Go](https://go.dev/) (version >= 1.22), see this [guide](https://go.dev/doc/install) on how to install Go.
 
-Clone the project and install the necessary tools: 
+Clone the project and install the necessary tools(protoc, mockery, golines, goimports, gofumpt,
+golangci-lint):
 
 ```shell
 $ git clone https://github.com/igor-baiborodine/campsite-booking-go.git
@@ -80,8 +79,10 @@ $ cd campsite-booking-go
 $ make install-tools
 ```
 
-If you use either [IntelliJ IDEA](https://www.jetbrains.com/idea/) or [GoLand](https://www.jetbrains.com/go/) IDEs, 
-follow this [guide](/docs/IDE-SETUP.md) to configure it. 
+If you use either [IntelliJ IDEA](https://www.jetbrains.com/idea/) or [GoLand](https://www.jetbrains.com/go/) IDEs,
+follow this [guide](/docs/ide-setup/README.md) to configure it.
+
+## Up & Running
 
 ### Run with IDE
 
@@ -96,12 +97,22 @@ follow this [guide](/docs/IDE-SETUP.md) to configure it.
 $ docker compose -f docker/docker-compose.yml up -d postgres 
 ```
 
-* Once it's been verified that the database is up and running, launch the `Run/Debug` configuration
+* Verify the health status of the running `postgres` container:
+```shell
+$ docker inspect --format="{{.State.Health.Status}}" postgres
+```
+
+* If the output is `healthy`, launch the `Run/Debug` configuration
   created in the previous steps.
 
 ### Run with Docker Compose
 
-* TODO
+* Start PostgreSQL and campgrounds app instances using **Docker Compose** by executing the following
+  command from the project's root:
+
+```shell
+$ docker compose -f docker/docker-compose.yml -p campsite-booking-go up -d 
+```
 
 ### Run with Kubernetes
 
