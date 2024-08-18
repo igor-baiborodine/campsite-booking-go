@@ -3,7 +3,8 @@ name: readme-toc
 on:
   push:
     branches: [ "main" ]
-    paths: [ "readme/*.md" ]
+    paths: [ "docs/**/*.md" ]
+  workflow_dispatch:
 
 jobs:
   generate-toc:
@@ -12,4 +13,4 @@ jobs:
     steps:
       - uses: technote-space/toc-generator@v4
         with:
-          TARGET_PATHS: "readme/*.md"
+          TARGET_PATHS: "docs/**/*.md"
