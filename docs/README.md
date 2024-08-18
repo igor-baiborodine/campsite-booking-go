@@ -81,7 +81,7 @@ $ make install-tools
 ```
 
 If you use either [IntelliJ IDEA](https://www.jetbrains.com/idea/) or [GoLand](https://www.jetbrains.com/go/) IDEs, 
-follow this [guide](/docs/IDE-SETUP.md) to configure it. 
+follow this [guide](/docs/ide-setup/README.md) to configure it. 
 
 ### Run with IDE
 
@@ -96,12 +96,22 @@ follow this [guide](/docs/IDE-SETUP.md) to configure it.
 $ docker compose -f docker/docker-compose.yml up -d postgres 
 ```
 
-* Once it's been verified that the database is up and running, launch the `Run/Debug` configuration
+* Verify the health status of the `postgres` container:
+```shell
+$ docker inspect --format="{{.State.Health.Status}}" postgres
+```
+
+* If the output is `healthy`, launch the `Run/Debug` configuration
   created in the previous steps.
 
 ### Run with Docker Compose
 
-* TODO
+* Start PostgreSQL and campgrounds app instances using **Docker Compose** by executing the following
+  command from the project's root:
+
+```shell
+$ docker compose -f docker/docker-compose.yml -p campsite-booking-go up -d 
+```
 
 ### Run with Kubernetes
 

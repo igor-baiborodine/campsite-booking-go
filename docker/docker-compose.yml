@@ -1,5 +1,6 @@
 services:
   campgrounds:
+    container_name: campgrounds
     build:
       context: ..
       dockerfile: docker/Dockerfile
@@ -12,6 +13,7 @@ services:
         condition: service_healthy
 
   postgres:
+    container_name: postgres
     image: postgres:15.2-alpine
     restart: always
     environment:
