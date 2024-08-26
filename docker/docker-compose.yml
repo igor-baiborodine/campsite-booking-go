@@ -21,7 +21,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ../docker/db:/docker-entrypoint-initdb.d/
+      - ../db/init:/docker-entrypoint-initdb.d/
       - pgdata:/var/lib/postgresql/data
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U campgrounds_user -d campgrounds" ]

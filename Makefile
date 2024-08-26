@@ -1,7 +1,7 @@
 -include k8s/local-k8s.mk
 
 ################################################################################
-# Variables                                                                    #
+# Variables
 ################################################################################
 PROTOC_GEN_GO_VERSION = v1.34.2
 PROTOC_GEN_GO_GRPC_VERSION = v1.4.0
@@ -35,7 +35,7 @@ init-format:
 	go install github.com/segmentio/golines@$(GOLINES_VERSION)
 	go install mvdan.cc/gofumpt@$(GOFUMPT_VERSION)
 
-################################################################################
+#################################################################################
 # Target: init-golangci-lint
 ################################################################################
 .PHONY: init-golangci-lint
