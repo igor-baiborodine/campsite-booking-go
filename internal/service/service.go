@@ -61,7 +61,7 @@ func (s *Service) Waiter() waiter.Waiter {
 }
 
 func (s *Service) initDB() (err error) {
-	s.db, err = sql.Open("pgx", s.cfg.PG.Conn)
+	s.db, err = sql.Open("pgx", config.ReplaceEnvPlaceholders(s.cfg.PG.Conn))
 	return err
 }
 
