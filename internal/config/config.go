@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"os"
+	"regexp"
 	"time"
 
 	"github.com/kelseyhightower/envconfig"
@@ -11,7 +12,7 @@ import (
 
 type (
 	PGConfig struct {
-		Conn string `required:"true"`
+		Conn string `envconfig:"PG_CONN" default:"host=postgres dbname=${CAMPGROUNDS_DB} user=${CAMPGROUNDS_USER} password=${CAMPGROUNDS_PASSWORD}"`
 	}
 
 	RPCConfig struct {
@@ -40,4 +41,19 @@ func InitConfig() (AppConfig, error) {
 	err := envconfig.Process("", &cfg)
 
 	return cfg, err
+}
+
+// ReplaceEnvPlaceholders replaces placeholders of the format ${VAR_NAME}
+// with their environment variable values only if the variable is set.
+func ReplaceEnvPlaceholders(configValue string) string {
+	re := regexp.MustCompile(`\$\{([^}]+)\}`)
+	result := re.ReplaceAllStringFunc(configValue, func(placeholder string) string {
+		envVar := placeholder[2 : len(placeholder)-1]
+		val, ok := os.LookupEnv(envVar)
+		if ok {
+			return val
+		}
+		return placeholder
+	})
+	return result
 }

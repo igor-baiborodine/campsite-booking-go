@@ -94,7 +94,7 @@ follow this [guide](/docs/ide-setup/README.md) to configure it.
   project's root:
 
 ```shell
-$ docker compose -f docker/docker-compose.yml up -d postgres 
+$ docker compose -f docker/docker-compose.yml -p campsite-booking-go up -d postgres 
 ```
 
 * Verify the health status of the running `postgres` container:
