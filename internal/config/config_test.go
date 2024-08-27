@@ -17,7 +17,7 @@ func TestInitConfig(t *testing.T) {
 	// then
 	assert.NoError(t, err)
 	assert.Equal(t, "INFO", cfg.LogLevel)
-	assert.Equal(t, time.Duration(15*time.Second), cfg.ShutdownTimeout)
+	assert.Equal(t, 15*time.Second, cfg.ShutdownTimeout)
 }
 
 func TestReplaceEnvPlaceholders(t *testing.T) {
