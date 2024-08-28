@@ -5,34 +5,57 @@ KIND_CLUSTER_NAME = local-k8s # context will be "kind-local-k8s"
 HELM_RELEASE_NAME = campgrounds
 
 ###############################################################################
-# Target: cluster-create
+# Target: cluster-deploy
 ###############################################################################
-.PHONY: cluster-create
-cluster-create:
+.PHONY: cluster-deploy
+cluster-deploy:
 	@kind create cluster --name $(KIND_CLUSTER_NAME) --config ./k8s/kind-config.yaml
+	@kubectl cluster-info --context kind-$(KIND_CLUSTER_NAME)
 
 ################################################################################
-# Target: cluster-delete
+# Target: cluster-remove
 ################################################################################
-.PHONY: cluster-delete
-cluster-delete:
+.PHONY: cluster-remove
+cluster-remove:
 	@kind delete cluster --name $(KIND_CLUSTER_NAME)
 
 ################################################################################
-# Target: postgres-install
+# Target: postgres-deploy
 ################################################################################
-.PHONY: postgres-install
-postgres-install:
-	@kubectl create configmap init-db-config --from-file=./db/init/
-	@kubectl get configmap init-db-config -o yaml
-	@helm install $(HELM_RELEASE_NAME) bitnami/postgresql --version 15.2.10 -f ./k8s/postgres/values.yaml
+.PHONY: postgres-deploy
+postgres-deploy:
+	@kubectl create secret generic postgres-secret --from-literal=POSTGRES_PASSWORD=postgres
+	@kubectl create secret generic campgrounds-secret --from-literal=CAMPGROUNDS_PASSWORD=campgrounds_pass
+	@kubectl create configmap initdb-config --from-file=./db/init/
+	@kubectl get configmap initdb-config -o yaml
+	@kubectl apply -f ./k8s/postgres.yaml
 
 ################################################################################
-# Target: postgres-uninstall
+# Target: postgres-remove
 ################################################################################
-.PHONY: postgres-uninstall
-postgres-uninstall:
-	@kubectl get configmap init-db-config > /dev/null 2>&1 \
-		&& kubectl delete configmap init-db-config \
-		|| echo "ConfigMap 'init-db-config' does not exist."
-	@helm uninstall $(HELM_RELEASE_NAME)
+.PHONY: postgres-remove
+postgres-remove:
+	@kubectl get secret postgres-secret > /dev/null 2>&1 \
+    		&& kubectl delete secret postgres-secret \
+    		|| echo "secret 'postgres-secret' does not exist."
+	@kubectl get secret campgrounds-secret > /dev/null 2>&1 \
+			&& kubectl delete secret campgrounds-secret \
+			|| echo "secret 'campgrounds-secret' does not exist."
+	@kubectl get configmap initdb-config > /dev/null 2>&1 \
+		&& kubectl delete configmap initdb-config \
+		|| echo "configmap 'initdb-config' does not exist."
+	@kubectl delete deployment postgres
+
+################################################################################
+# Target: api-deploy
+################################################################################
+.PHONY: api-deploy
+api-deploy:
+	@kubectl apply -f ./k8s/campgrounds/api.yaml
+
+################################################################################
+# Target: api-remove
+################################################################################
+.PHONY: api-remove
+api-remove:
+	@kubectl delete deployment campgrounds-api

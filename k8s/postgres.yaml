@@ -30,14 +30,29 @@ spec:
     spec:
       containers:
         - name: postgres
-          image: postgres:10.0-alpine
+          image: postgres:15.2-alpine
+          env:
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: POSTGRES_PASSWORD
+            - name: CAMPGROUNDS_DB
+              value: "campgrounds"
+            - name: CAMPGROUNDS_USER
+              value: "campgrounds_user"
+            - name: CAMPGROUNDS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: campgrounds-secret
+                  key: CAMPGROUNDS_PASSWORD
           ports:
             - containerPort: 5432
               name: postgres
           volumeMounts:
-            - name: postgres-schema
+            - name: initdb
               mountPath: /docker-entrypoint-initdb.d
       volumes:
-        - name: db-schema
+        - name: initdb
           configMap:
-            name: db-schema
+            name: initdb-config
