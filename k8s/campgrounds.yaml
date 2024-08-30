@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: campgrounds
+spec:
+  # Make this a headless service so that each endpoint will be exposed
+  # as a separate DNS A record.
+  clusterIP: None
+  ports:
+  - name: grpc
+    port: 8085
+  selector:
+    app: campgrounds
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: campgrounds
+  labels:
+    app: campgrounds
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: campgrounds
+  template:
+    metadata:
+      labels:
+        app: campgrounds
+    spec:
+      containers:
+      - name: campgrounds
+        image: ibaiborodine/campsite-booking-go:latest
+        imagePullPolicy: IfNotPresent
+        env:
+          - name: CAMPGROUNDS_DB
+            value: "campgrounds"
+          - name: CAMPGROUNDS_USER
+            value: "campgrounds_user"
+          - name: CAMPGROUNDS_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: campgrounds-secret
+                key: CAMPGROUNDS_PASSWORD
+        ports:
+        - name: grpc
+          containerPort: 8085

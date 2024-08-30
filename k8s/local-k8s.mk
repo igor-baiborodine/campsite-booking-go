@@ -3,6 +3,15 @@
 ###############################################################################
 KIND_CLUSTER_NAME = local-k8s # context will be "kind-local-k8s"
 HELM_RELEASE_NAME = campgrounds
+APP_DOCKER_IMAGE = ibaiborodine/campsite-booking-go
+
+###############################################################################
+# Target: image-build
+###############################################################################
+.PHONY: image-build
+image-build:
+	@docker build --no-cache -t $(APP_DOCKER_IMAGE) -f ./docker/Dockerfile .
+	@docker image ls | grep $(APP_DOCKER_IMAGE)
 
 ###############################################################################
 # Target: cluster-deploy
@@ -18,12 +27,13 @@ cluster-deploy:
 .PHONY: cluster-remove
 cluster-remove:
 	@kind delete cluster --name $(KIND_CLUSTER_NAME)
+	@docker volume prune -f
 
 ################################################################################
-# Target: postgres-deploy
+# Target: db-deploy
 ################################################################################
-.PHONY: postgres-deploy
-postgres-deploy:
+.PHONY: db-deploy
+db-deploy:
 	@kubectl create secret generic postgres-secret --from-literal=POSTGRES_PASSWORD=postgres
 	@kubectl create secret generic campgrounds-secret --from-literal=CAMPGROUNDS_PASSWORD=campgrounds_pass
 	@kubectl create configmap initdb-config --from-file=./db/init/
@@ -31,10 +41,10 @@ postgres-deploy:
 	@kubectl apply -f ./k8s/postgres.yaml
 
 ################################################################################
-# Target: postgres-remove
+# Target: db-remove
 ################################################################################
-.PHONY: postgres-remove
-postgres-remove:
+.PHONY: db-remove
+db-remove:
 	@kubectl get secret postgres-secret > /dev/null 2>&1 \
     		&& kubectl delete secret postgres-secret \
     		|| echo "secret 'postgres-secret' does not exist."
@@ -47,15 +57,23 @@ postgres-remove:
 	@kubectl delete deployment postgres
 
 ################################################################################
+# Target: secret-campgrounds-show
+################################################################################
+.PHONY: secret-campgrounds-show
+secret-campgrounds-show:
+	@kubectl get secret campgrounds-secret -o jsonpath="{.data.CAMPGROUNDS_PASSWORD}"; echo
+
+################################################################################
 # Target: api-deploy
 ################################################################################
 .PHONY: api-deploy
 api-deploy:
-	@kubectl apply -f ./k8s/campgrounds/api.yaml
+	@kind load docker-image $(APP_DOCKER_IMAGE) --name local-k8s
+	@kubectl apply -f ./k8s/campgrounds.yaml
 
 ################################################################################
 # Target: api-remove
 ################################################################################
 .PHONY: api-remove
 api-remove:
-	@kubectl delete deployment campgrounds-api
+	@kubectl delete deployment campgrounds

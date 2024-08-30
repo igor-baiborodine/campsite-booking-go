@@ -44,7 +44,7 @@ init-golangci-lint:
 	golangci-lint --version
 
 ################################################################################
-# Target: install-tolls
+# Target: install-tools
 ################################################################################
 .PHONY: install-tools
 install-tools: init-proto init-mock init-format init-golangci-lint
