@@ -2,7 +2,6 @@
 # Variables
 ###############################################################################
 KIND_CLUSTER_NAME = local-k8s # context will be "kind-local-k8s"
-HELM_RELEASE_NAME = campgrounds
 APP_DOCKER_IMAGE = ibaiborodine/campsite-booking-go
 
 ###############################################################################
