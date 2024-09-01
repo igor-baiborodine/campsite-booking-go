@@ -14,12 +14,14 @@ spec:
   clusterIP: None
 ---
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: postgres
   labels:
     app: postgres
 spec:
+  serviceName: "postgres"
+  replicas: 1
   selector:
     matchLabels:
       app: postgres
@@ -28,6 +30,10 @@ spec:
       labels:
         app: postgres
     spec:
+      volumes:
+        - name: initdb
+          configMap:
+            name: initdb-config
       containers:
         - name: postgres
           image: postgres:15.2-alpine
@@ -52,7 +58,13 @@ spec:
           volumeMounts:
             - name: initdb
               mountPath: /docker-entrypoint-initdb.d
-      volumes:
-        - name: initdb
-          configMap:
-            name: initdb-config
+            - name: pgdata
+              mountPath: /var/lib/postgresql/data
+  volumeClaimTemplates:
+    - metadata:
+        name: pgdata
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 1Gi
