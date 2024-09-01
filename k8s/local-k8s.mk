@@ -53,7 +53,8 @@ db-remove:
 	@kubectl get configmap initdb-config > /dev/null 2>&1 \
 		&& kubectl delete configmap initdb-config \
 		|| echo "configmap 'initdb-config' does not exist."
-	@kubectl delete deployment postgres
+	@kubectl delete statefulset postgres
+	@kubectl delete pvc -l app=postgres
 
 ################################################################################
 # Target: secret-campgrounds-show
