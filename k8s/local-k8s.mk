@@ -77,3 +77,33 @@ api-deploy:
 .PHONY: api-remove
 api-remove:
 	@kubectl delete deployment campgrounds
+
+################################################################################
+# Target: proxy-deploy
+################################################################################
+.PHONY: proxy-deploy
+proxy-deploy:
+	@kubectl apply -f ./k8s/envoy/configmap.yaml
+	@kubectl get configmap envoy-config -o yaml
+	@kubectl apply -f ./k8s/envoy/deployment.yaml
+	@kubectl apply -f ./k8s/envoy/service.yaml
+
+################################################################################
+# Target: proxy-remove
+################################################################################
+.PHONY: proxy-remove
+proxy-remove:
+	@kubectl get configmap envoy-config > /dev/null 2>&1 \
+		&& kubectl delete configmap envoy-config \
+		|| echo "configmap 'envoy-config' does not exist."
+	@kubectl delete deployment envoy
+	@kubectl delete service envoy
+
+################################################################################
+# Target: services-list
+################################################################################
+.PHONY: services-list
+services-list:
+	@kubectl get services \
+		--all-namespaces \
+		--output=jsonpath='{range .items[*]}{.metadata.name}.{.metadata.namespace}.svc.cluster.local{"\n"}{end}'

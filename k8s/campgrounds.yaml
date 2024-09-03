@@ -11,9 +11,7 @@ spec:
     port: 8085
   selector:
     app: campgrounds
-
 ---
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:

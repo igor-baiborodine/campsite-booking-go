@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: envoy
+  labels:
+    app: envoy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: envoy
+  template:
+    metadata:
+      labels:
+        app: envoy
+    spec:
+      containers:
+        - name: envoy
+          image: envoyproxy/envoy:v1.31-latest
+          ports:
+            - name: grpc
+              containerPort: 8080
+            - name: admin
+              containerPort: 9901
+          volumeMounts:
+            - name: envoy-config
+              mountPath: /etc/envoy/envoy.yaml
+              subPath: envoy.yaml
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 9901
+            initialDelaySeconds: 3
+            periodSeconds: 3
+      volumes:
+        - name: envoy-config
+          configMap:
+            name: envoy-config
+            items:
+              - key: envoy.yaml
+                path: envoy.yaml
