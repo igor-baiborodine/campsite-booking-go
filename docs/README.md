@@ -82,17 +82,17 @@ $ make install-tools
 If you use either [IntelliJ IDEA](https://www.jetbrains.com/idea/) or [GoLand](https://www.jetbrains.com/go/) IDEs,
 follow this [guide](/docs/ide-setup/README.md) to configure it.
 
-## Up & Running
+## Up & Running Locally
 
-### Run with IDE
+⚠️ Please note that all commands listed below should be executed from the project's root.
+
+### Run with IntelliJ/GoLand IDE
 
 * Go to **Run | Edit Configurations...** and create a new `Run/Debug` configuration as follows:
 
 ![Run with IDE Config](/docs/run-with-ide-config.png)
 
-* Start a PostgreSQL instance using **Docker Compose** by executing the following command from the
-  project's root:
-
+* Start a PostgreSQL instance using **Docker Compose**:
 ```shell
 $ docker compose -f docker/docker-compose.yml -p campsite-booking-go up -d postgres 
 ```
@@ -103,17 +103,30 @@ $ docker inspect --format="{{.State.Health.Status}}" postgres
 ```
 
 * If the output is `healthy`, launch the `Run/Debug` configuration
-  created in the previous steps.
+  created in the previous step.
 
 ### Run with Docker Compose
 
-* Start PostgreSQL and campgrounds app instances using **Docker Compose** by executing the following
-  command from the project's root:
-
+* Start PostgreSQL and campgrounds app instances using **Docker Compose**:
 ```shell
 $ docker compose -f docker/docker-compose.yml -p campsite-booking-go up -d 
 ```
 
 ### Run with Kubernetes
 
-* TODO
+#### Prerequisites
+
+- Install [kind](https://kind.sigs.k8s.io/):
+```shell
+$ go install sigs.k8s.io/kind@$latest
+$ kind version
+```
+
+- Install [kubectl](https://kubernetes.io/docs/reference/kubectl/):
+```shell
+$ curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+$ curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256"
+$ echo "$(cat kubectl.sha256)  kubectl" | sha256sum --check
+$ sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+$ kubectl version --client
+```
