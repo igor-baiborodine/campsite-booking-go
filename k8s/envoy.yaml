@@ -1,3 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: envoy
+spec:
+  clusterIP: None
+  ports:
+    - name: grpc
+      port: 8080
+  selector:
+    app: envoy
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -37,5 +49,5 @@ spec:
           configMap:
             name: envoy-config
             items:
-              - key: envoy.yaml
+              - key: envoy-config.yaml
                 path: envoy.yaml

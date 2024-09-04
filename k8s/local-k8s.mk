@@ -29,6 +29,27 @@ cluster-remove:
 	@docker volume prune -f
 
 ################################################################################
+# Target: all-deploy
+################################################################################
+.PHONY: all-deploy
+all-deploy: db-deploy api-deploy proxy-deploy
+
+################################################################################
+# Target: all-remove
+################################################################################
+.PHONY: all-remove
+all-remove: proxy-remove api-remove db-remove
+
+################################################################################
+# Target: services-list
+################################################################################
+.PHONY: services-list
+services-list:
+	@kubectl get services \
+		--all-namespaces \
+		--output=jsonpath='{range .items[*]}{.metadata.name}.{.metadata.namespace}.svc.cluster.local{"\n"}{end}'
+
+################################################################################
 # Target: db-deploy
 ################################################################################
 .PHONY: db-deploy
@@ -83,10 +104,9 @@ api-remove:
 ################################################################################
 .PHONY: proxy-deploy
 proxy-deploy:
-	@kubectl apply -f ./k8s/envoy/configmap.yaml
+	@kubectl create configmap envoy-config --from-file=./k8s/envoy-config.yaml
 	@kubectl get configmap envoy-config -o yaml
-	@kubectl apply -f ./k8s/envoy/deployment.yaml
-	@kubectl apply -f ./k8s/envoy/service.yaml
+	@kubectl apply -f ./k8s/envoy.yaml
 
 ################################################################################
 # Target: proxy-remove
@@ -97,13 +117,3 @@ proxy-remove:
 		&& kubectl delete configmap envoy-config \
 		|| echo "configmap 'envoy-config' does not exist."
 	@kubectl delete deployment envoy
-	@kubectl delete service envoy
-
-################################################################################
-# Target: services-list
-################################################################################
-.PHONY: services-list
-services-list:
-	@kubectl get services \
-		--all-namespaces \
-		--output=jsonpath='{range .items[*]}{.metadata.name}.{.metadata.namespace}.svc.cluster.local{"\n"}{end}'

@@ -30,10 +30,6 @@ spec:
       labels:
         app: postgres
     spec:
-      volumes:
-        - name: initdb
-          configMap:
-            name: initdb-config
       containers:
         - name: postgres
           image: postgres:15.2-alpine
@@ -60,6 +56,10 @@ spec:
               mountPath: /docker-entrypoint-initdb.d
             - name: pgdata
               mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: initdb
+          configMap:
+            name: initdb-config
   volumeClaimTemplates:
     - metadata:
         name: pgdata
