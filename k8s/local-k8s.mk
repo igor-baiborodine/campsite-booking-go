@@ -57,7 +57,7 @@ db-deploy:
 	@kubectl create secret generic postgres-secret --from-literal=POSTGRES_PASSWORD=postgres
 	@kubectl create secret generic campgrounds-secret --from-literal=CAMPGROUNDS_PASSWORD=campgrounds_pass
 	@kubectl create configmap initdb-config --from-file=./db/init/
-	@kubectl get configmap initdb-config -o yaml
+#	@kubectl get configmap initdb-config -o yaml
 	@kubectl apply -f ./k8s/postgres.yaml
 
 ################################################################################
@@ -105,7 +105,7 @@ api-remove:
 .PHONY: proxy-deploy
 proxy-deploy:
 	@kubectl create configmap envoy-config --from-file=./k8s/envoy-config.yaml
-	@kubectl get configmap envoy-config -o yaml
+#	@kubectl get configmap envoy-config -o yaml
 	@kubectl apply -f ./k8s/envoy.yaml
 
 ################################################################################
