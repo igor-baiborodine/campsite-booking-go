@@ -14,10 +14,13 @@
   - [System Requirements](#system-requirements)
 - [Implementation Details](#implementation-details)
 - [Project Setup](#project-setup)
-- [Up & Running](#up--running)
-  - [Run with IDE](#run-with-ide)
+- [Up & Running Locally](#up--running-locally)
+  - [Run with IntelliJ/GoLand IDE](#run-with-intellijgoland-ide)
   - [Run with Docker Compose](#run-with-docker-compose)
   - [Run with Kubernetes](#run-with-kubernetes)
+- [Tests](#tests)
+  - [Unit & Integration](#unit--integration)
+  - [gRPCurl](#grpcurl)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
