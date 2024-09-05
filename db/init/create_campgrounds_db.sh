@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-echo "Creating campgrounds database..."
+echo "creating campgrounds database..."
 psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOSQL
   CREATE DATABASE "$CAMPGROUNDS_DB";
   CREATE USER "$CAMPGROUNDS_USER" WITH ENCRYPTED PASSWORD '$CAMPGROUNDS_PASSWORD';

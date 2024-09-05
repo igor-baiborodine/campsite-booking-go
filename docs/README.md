@@ -82,17 +82,17 @@ $ make install-tools
 If you use either [IntelliJ IDEA](https://www.jetbrains.com/idea/) or [GoLand](https://www.jetbrains.com/go/) IDEs,
 follow this [guide](/docs/ide-setup/README.md) to configure it.
 
-## Up & Running
+## Up & Running Locally
 
-### Run with IDE
+⚠️ Please note that all commands listed below should be executed from the project's root.
+
+### Run with IntelliJ/GoLand IDE
 
 * Go to **Run | Edit Configurations...** and create a new `Run/Debug` configuration as follows:
 
 ![Run with IDE Config](/docs/run-with-ide-config.png)
 
-* Start a PostgreSQL instance using **Docker Compose** by executing the following command from the
-  project's root:
-
+* Start a PostgreSQL instance using **Docker Compose**:
 ```shell
 $ docker compose -f docker/docker-compose.yml -p campsite-booking-go up -d postgres 
 ```
@@ -103,17 +103,81 @@ $ docker inspect --format="{{.State.Health.Status}}" postgres
 ```
 
 * If the output is `healthy`, launch the `Run/Debug` configuration
-  created in the previous steps.
+  created in the previous step.
 
 ### Run with Docker Compose
 
-* Start PostgreSQL and campgrounds app instances using **Docker Compose** by executing the following
-  command from the project's root:
-
+* Start PostgreSQL and campgrounds app instances using **Docker Compose**:
 ```shell
 $ docker compose -f docker/docker-compose.yml -p campsite-booking-go up -d 
 ```
 
 ### Run with Kubernetes
 
-* TODO
+**Prerequisites**:
+
+- Install [kind](https://kind.sigs.k8s.io/):
+```shell
+$ go install sigs.k8s.io/kind@$latest
+$ kind version
+```
+
+- Install [kubectl](https://kubernetes.io/docs/reference/kubectl/):
+```shell
+$ curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+$ curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256"
+$ echo "$(cat kubectl.sha256)  kubectl" | sha256sum --check
+$ sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+$ kubectl version --client
+```
+
+1. Spin up a 3-node cluster: 
+```bash 
+$ make cluster-deploy
+# which is equivalent of
+$ kind create cluster --name local-k8s --config ./k8s/kind-config.yaml
+$ kubectl cluster-info --context kind-local-k8s
+```
+2. Deploy PostgreSQL, Campgrounds application, and Envoy proxy:
+```bash
+$ make all-deploy
+# which is equivalent of
+# db-deploy
+$ kubectl create secret generic postgres-secret --from-literal=POSTGRES_PASSWORD=postgres
+$ kubectl create secret generic campgrounds-secret --from-literal=CAMPGROUNDS_PASSWORD=campgrounds_pass
+$ kubectl create configmap initdb-config --from-file=./db/init/
+$ kubectl apply -f ./k8s/postgres.yaml
+# api-deploy
+$ kubectl apply -f ./k8s/campgrounds.yaml
+# proxy-deploy:
+$ kubectl create configmap envoy-config --from-file=./k8s/envoy-config.yaml
+$ kubectl apply -f ./k8s/envoy.yaml
+```
+3. Verify the status of created pods:
+```bash
+$ kubectl get pods 
+# which may look like this
+NAME                           READY   STATUS    RESTARTS      AGE
+campgrounds-796fff564f-dgfsm   1/1     Running   2 (81s ago)   89s
+campgrounds-796fff564f-qj44x   1/1     Running   2 (81s ago)   89s
+campgrounds-796fff564f-vqfjz   1/1     Running   3 (61s ago)   89s
+envoy-9dbcd5c66-h4p9v          1/1     Running   0             89s
+postgres-0                     1/1     Running   0             2m13s
+```
+
+4. Use the `port-forward` command to forward Envoy’s port `8080` to `localhost:8080` to test the
+   Campgrounds services:
+```bash
+$ PROXY_POD_NAME=$(kubectl get pods --selector=app=envoy -o jsonpath='{.items[0].metadata.name}')
+$ kubectl port-forward "$PROXY_POD_NAME" 8080:8080
+```
+
+## Tests
+
+### Unit & Integration
+
+TODO
+
+### gRPCurl
+
+TODO
