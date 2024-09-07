@@ -21,6 +21,8 @@
 - [Tests](#tests)
   - [Unit & Integration](#unit--integration)
   - [gRPCurl](#grpcurl)
+- [the Run with IntelliJ/GoLand IDE
+or Run with Docker Compose.](#the-run-with-intellijgoland-ide%0Aor-run-with-docker-compose)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
