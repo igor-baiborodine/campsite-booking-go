@@ -267,3 +267,31 @@ $ grpcurl -plaintext -d '{}' localhost:8085 campgroundspb.v1.CampgroundsService/
   ]
 }
 ```
+6. Create a booking:
+```bash
+$ grpcurl -plaintext -d \
+    '{"campsite_id": "07df7f35-9c7a-4b10-a702-66844a7ec08c", "email": "john.smith@example.com", "full_name": "John Smith", "start_date": "2024-09-09", "end_date": "2024-09-12"}' \
+    localhost:8085 campgroundspb.v1.CampgroundsService/CreateBooking
+# output
+{
+  "bookingId": "692abbc0-5457-4f2b-8a6e-061ba2e5dd90"
+}
+```
+7. Get a booking:
+```bash
+$ grpcurl -plaintext -d \
+    '{"booking_id": "692abbc0-5457-4f2b-8a6e-061ba2e5dd90"}' \
+    localhost:8085 campgroundspb.v1.CampgroundsService/GetBooking
+# output
+{
+  "booking": {
+    "bookingId": "692abbc0-5457-4f2b-8a6e-061ba2e5dd90",
+    "campsiteId": "07df7f35-9c7a-4b10-a702-66844a7ec08c",
+    "email": "john.smith@example.com",
+    "fullName": "John Smith",
+    "startDate": "2024-09-09",
+    "endDate": "2024-09-12",
+    "active": true
+  }
+}
+```
