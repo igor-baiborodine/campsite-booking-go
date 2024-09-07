@@ -85,17 +85,20 @@ $ make install-tools
 If you use either [IntelliJ IDEA](https://www.jetbrains.com/idea/) or [GoLand](https://www.jetbrains.com/go/) IDEs,
 follow this [guide](/docs/ide-setup/README.md) to configure it.
 
-## Up & Running Locally
+>
+> ⚠️ **Please note that all commands listed below should be executed from the project's root.**
+>
 
-⚠️ Please note that all commands listed below should be executed from the project's root.
+## Up & Running Locally
 
 ### Run with IntelliJ/GoLand IDE
 
-* Go to **Run | Edit Configurations...** and create a new `Run/Debug` configuration as follows:
+* Go to **Run | Edit Configurations...** and create a new `Run/Debug` configuration for the
+  Campgrounds API as follows:
 
 ![Run with IDE Config](/docs/run-with-ide-config.png)
 
-* Start a PostgreSQL instance using **Docker Compose**:
+* Start a PostgreSQL DB instance using **Docker Compose**:
 ```shell
 $ docker compose -f docker/docker-compose.yml -p campsite-booking-go up -d postgres 
 ```
@@ -110,7 +113,7 @@ $ docker inspect --format="{{.State.Health.Status}}" postgres
 
 ### Run with Docker Compose
 
-* Start PostgreSQL and campgrounds app instances using **Docker Compose**:
+* Start PostgreSQL DB and Campgrounds API instances using **Docker Compose**:
 ```shell
 $ docker compose -f docker/docker-compose.yml -p campsite-booking-go up -d 
 ```
@@ -133,7 +136,7 @@ $ echo "$(cat kubectl.sha256)  kubectl" | sha256sum --check
 $ sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
 $ kubectl version --client
 ```
-
+---
 1. Spin up a 3-node cluster: 
 ```bash 
 $ make cluster-deploy
@@ -141,7 +144,7 @@ $ make cluster-deploy
 $ kind create cluster --name local-k8s --config ./k8s/kind-config.yaml
 $ kubectl cluster-info --context kind-local-k8s
 ```
-2. Deploy PostgreSQL, Campgrounds application, and Envoy proxy:
+2. Deploy PostgreSQL DB, Campgrounds API, and Envoy proxy:
 ```bash
 $ make all-deploy
 # which is equivalent of
@@ -167,7 +170,6 @@ campgrounds-796fff564f-vqfjz   1/1     Running   3 (61s ago)   89s
 envoy-9dbcd5c66-h4p9v          1/1     Running   0             89s
 postgres-0                     1/1     Running   0             2m13s
 ```
-
 4. Use the `port-forward` command to forward Envoy’s port `8080` to `localhost:8080` to test the
    Campgrounds services:
 ```bash
@@ -179,8 +181,129 @@ $ kubectl port-forward "$PROXY_POD_NAME" 8080:8080
 
 ### Unit & Integration
 
-TODO
+1. Execute only unit tests:
+```bash
+$ make test
+# which is equivalent of
+$ go test -race ./internal/...
+```
+2. Execute only integration tests:
+```bash
+$ make test-integration
+# which is equivalent of
+$ go test -tags=integration ./internal/...
+```
 
 ### gRPCurl
 
-TODO
+**Prerequisites**:
+
+- Install [gRPCurl](https://github.com/fullstorydev/grpcurl):
+```shell
+$ go install github.com/fullstorydev/grpcurl/cmd/grpcurl@latest
+$ grpcurl -version
+```
+- The Campgrounds API should be up & running using either
+the [Run with IntelliJ/GoLand IDE](#run-with-intellijgoland-ide)
+or [Run with Docker Compose](#run-with-docker-compose).
+---
+1. List the services present on the gRPC server:
+```bash
+$ grpcurl -plaintext localhost:8085 list
+# output
+campgroundspb.v1.CampgroundsService
+grpc.reflection.v1.ServerReflection
+grpc.reflection.v1alpha.ServerReflection
+```
+2. List all the RPC endpoints the `campgroundspb.v1.CampgroundsService` contains:
+```bash
+$ grpcurl -plaintext localhost:8085 describe campgroundspb.v1.CampgroundsService
+# output
+campgroundspb.v1.CampgroundsService is a service:
+service CampgroundsService {
+  rpc CancelBooking ( .campgroundspb.v1.CancelBookingRequest ) returns ( .campgroundspb.v1.CancelBookingResponse );
+  rpc CreateBooking ( .campgroundspb.v1.CreateBookingRequest ) returns ( .campgroundspb.v1.CreateBookingResponse );
+  rpc CreateCampsite ( .campgroundspb.v1.CreateCampsiteRequest ) returns ( .campgroundspb.v1.CreateCampsiteResponse );
+  rpc GetBooking ( .campgroundspb.v1.GetBookingRequest ) returns ( .campgroundspb.v1.GetBookingResponse );
+  rpc GetCampsites ( .campgroundspb.v1.GetCampsitesRequest ) returns ( .campgroundspb.v1.GetCampsitesResponse );
+  rpc GetVacantDates ( .campgroundspb.v1.GetVacantDatesRequest ) returns ( .campgroundspb.v1.GetVacantDatesResponse );
+  rpc UpdateBooking ( .campgroundspb.v1.UpdateBookingRequest ) returns ( .campgroundspb.v1.UpdateBookingResponse );
+}
+```
+3. Get a gRPC message definition, for example for `campgroundspb.v1.GetBookingRequest`:
+```bash
+grpcurl -plaintext localhost:8085 describe campgroundspb.v1.GetBookingRequest
+# output
+campgroundspb.v1.GetBookingRequest is a message:
+message GetBookingRequest {
+  string booking_id = 1 [(.buf.validate.field) = { string: { uuid: true } }];
+}
+```
+4. Create a campsite:
+```bash
+$ grpcurl -plaintext -d \
+    '{"campsite_code": "CAMP01", "capacity": 4, "drinking_water": true, "fire_pit": true, "picnic_table": true, "restrooms": false}' \
+    localhost:8085 campgroundspb.v1.CampgroundsService/CreateCampsite
+# output
+{
+  "campsiteId": "07df7f35-9c7a-4b10-a702-66844a7ec08c"
+}
+```
+5. Get campsites:
+```bash
+$ grpcurl -plaintext -d '{}' localhost:8085 campgroundspb.v1.CampgroundsService/GetCampsites
+# output
+{
+  "campsites": [
+    {
+      "campsiteId": "07df7f35-9c7a-4b10-a702-66844a7ec08c",
+      "campsiteCode": "CAMP01",
+      "capacity": 4,
+      "drinkingWater": true,
+      "picnicTable": true,
+      "firePit": true,
+      "active": true
+    }
+  ]
+}
+```
+6. Create a booking:
+```bash
+$ grpcurl -plaintext -d \
+    '{"campsite_id": "07df7f35-9c7a-4b10-a702-66844a7ec08c", "email": "john.smith@example.com", "full_name": "John Smith", "start_date": "2024-09-09", "end_date": "2024-09-12"}' \
+    localhost:8085 campgroundspb.v1.CampgroundsService/CreateBooking
+# output
+{
+  "bookingId": "692abbc0-5457-4f2b-8a6e-061ba2e5dd90"
+}
+```
+7. Get a booking:
+```bash
+$ grpcurl -plaintext -d \
+    '{"booking_id": "692abbc0-5457-4f2b-8a6e-061ba2e5dd90"}' \
+    localhost:8085 campgroundspb.v1.CampgroundsService/GetBooking
+# output
+{
+  "booking": {
+    "bookingId": "692abbc0-5457-4f2b-8a6e-061ba2e5dd90",
+    "campsiteId": "07df7f35-9c7a-4b10-a702-66844a7ec08c",
+    "email": "john.smith@example.com",
+    "fullName": "John Smith",
+    "startDate": "2024-09-09",
+    "endDate": "2024-09-12",
+    "active": true
+  }
+}
+```
+8. Create a booking that does not meet the [booking constraints](#booking-constraints), for example a
+   maximum stay of three days:
+```bash
+$ grpcurl -plaintext -d \
+    '{"campsite_id": "07df7f35-9c7a-4b10-a702-66844a7ec08c", "email": "john.smith@example.com", "full_name": "John Smith", "start_date": "2024-09-15", "end_date": "2024-09-20"}' \
+    localhost:8085 campgroundspb.v1.CampgroundsService/CreateBooking
+# output
+ERROR:
+  Code: InvalidArgument
+  Message: booking validation: 1 error occurred:
+        * maximum stay: must be less or equal to three days
+```
