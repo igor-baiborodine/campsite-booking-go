@@ -295,3 +295,15 @@ $ grpcurl -plaintext -d \
   }
 }
 ```
+8. Create a booking that does not meet the [booking constraints](#booking-constraints), for example a
+   maximum stay of three days:
+```bash
+$ grpcurl -plaintext -d \
+    '{"campsite_id": "07df7f35-9c7a-4b10-a702-66844a7ec08c", "email": "john.smith@example.com", "full_name": "John Smith", "start_date": "2024-09-15", "end_date": "2024-09-20"}' \
+    localhost:8085 campgroundspb.v1.CampgroundsService/CreateBooking
+# output
+ERROR:
+  Code: InvalidArgument
+  Message: booking validation: 1 error occurred:
+        * maximum stay: must be less or equal to three days
+```
