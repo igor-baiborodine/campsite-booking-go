@@ -109,9 +109,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
-      - name: Check out repo
-        uses: actions/checkout@v4
-      - name: Bump version and tag
+      - name: Bump version, tag latest commit
         uses: bitshifted/git-auto-semver@v1.1.0
         with:
           create_tag: true
