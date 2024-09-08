@@ -173,7 +173,7 @@ envoy-9dbcd5c66-h4p9v          1/1     Running   0             89s
 postgres-0                     1/1     Running   0             2m13s
 ```
 4. Use the `port-forward` command to forward Envoy’s port `8080` to `localhost:8080` to test the
-   Campgrounds services:
+   Campgrounds services using a gRPC client:
 ```bash
 $ PROXY_POD_NAME=$(kubectl get pods --selector=app=envoy -o jsonpath='{.items[0].metadata.name}')
 $ kubectl port-forward "$PROXY_POD_NAME" 8080:8080
@@ -205,9 +205,7 @@ $ go test -tags=integration ./internal/...
 $ go install github.com/fullstorydev/grpcurl/cmd/grpcurl@latest
 $ grpcurl -version
 ```
-- The Campgrounds API should be up & running using either
-the [Run with IntelliJ/GoLand IDE](#run-with-intellijgoland-ide)
-or [Run with Docker Compose](#run-with-docker-compose).
+- The Campgrounds API should be up & running using either the [Run with IntelliJ/GoLand IDE](#run-with-intellijgoland-ide) or [Run with Docker Compose](#run-with-docker-compose).
 ---
 1. List the services present on the gRPC server:
 ```bash
