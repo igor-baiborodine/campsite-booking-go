@@ -113,3 +113,5 @@ jobs:
         uses: actions/checkout@v4
       - name: Bump version and tag
         uses: bitshifted/git-auto-semver@v1.1.0
+        with:
+          create_tag: true
