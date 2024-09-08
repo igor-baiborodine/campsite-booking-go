@@ -105,10 +105,12 @@ jobs:
         run: make test-integration
   semver-tag:
     name: Semver tag
-    needs: [ lint, unit-tests, integration-tests ]
+    needs: [ unit-tests, integration-tests ]
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
       - name: Bump version, tag latest commit
         uses: bitshifted/git-auto-semver@v1.1.0
         with:
