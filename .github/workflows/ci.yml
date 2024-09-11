@@ -123,7 +123,7 @@ jobs:
           tag_exists_error: true
   docker:
     name: Publish Docker image
-    needs: [ unit-tests, integration-tests ]
+    needs: [ semver-tag ]
     runs-on: ubuntu-latest
     steps:
       - name: Check out repo
