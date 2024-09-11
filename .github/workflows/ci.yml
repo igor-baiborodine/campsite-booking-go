@@ -115,3 +115,29 @@ jobs:
         uses: bitshifted/git-auto-semver@v1.1.0
         with:
           create_tag: true
+  docker:
+    name: Publish Docker image
+    needs: [ semver-tag ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+      - name: Extract Docker meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ibaiborodine/campsite-booking-go
+          tags: |
+            type=semver,pattern={{version}}
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/Dockerfile
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
