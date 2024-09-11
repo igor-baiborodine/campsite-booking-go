@@ -117,10 +117,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           minorList: feat
           patchList: build,chore,ci,docs,style,refactor,perf,test
-      - name: List next version
-        run: |
-          echo "next version to tag: ${{ steps.next-version.outputs.next }}"
-#      - uses: rickstaa/action-create-tag@v1
-#        with:
-#          tag: ${{ steps.next-version.outputs.next }}
-#          tag_exists_error: true
+      - uses: rickstaa/action-create-tag@v1
+        with:
+          tag: ${{ steps.next-version.outputs.next }}
+          tag_exists_error: true
