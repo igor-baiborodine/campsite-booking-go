@@ -115,6 +115,3 @@ jobs:
         uses: bitshifted/git-auto-semver@v1.1.0
         with:
           create_tag: true
-      - name: Echo tag version
-        run:
-          echo "New tag version: ${{ steps.bump-and-tag.outputs.version-string }}"
