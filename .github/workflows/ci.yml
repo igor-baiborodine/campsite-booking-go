@@ -110,8 +110,17 @@ jobs:
     steps:
       - name: Check out repo
         uses: actions/checkout@v4
-      - name: Bump version, tag latest commit
-        id: bump-and-tag
-        uses: bitshifted/git-auto-semver@v1.1.0
+      - name: Nex version
+        id: next-version
+        uses: ietf-tools/semver-action@v1
         with:
-          create_tag: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+          minorList: feat
+          patchList: build,chore,ci,docs,style,refactor,perf,test
+      - name: List next version
+        run: |
+          echo "next version to tag: ${{ steps.next-version.outputs.next }}"
+#      - uses: rickstaa/action-create-tag@v1
+#        with:
+#          tag: ${{ steps.next-version.outputs.next }}
+#          tag_exists_error: true
