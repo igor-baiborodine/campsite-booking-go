@@ -8,6 +8,8 @@ import (
 	"io/fs"
 	"log/slog"
 	"net"
+	"net/http"
+	"net/http/pprof"
 	"time"
 
 	"github.com/igor-baiborodine/campsite-booking-go/internal/application"
@@ -127,6 +129,14 @@ func (s *Service) WaitForRPC(ctx context.Context) error {
 	group.Go(func() error {
 		slog.Info("✅ rpc server started")
 		defer slog.Info("🚫 rpc server shut down")
+
+		if s.cfg.Environment == "profile" {
+			mux := http.NewServeMux()
+			mux.HandleFunc("/debug/pprof/", pprof.Index)
+			if err := http.ListenAndServe(":6060", mux); err != nil {
+				return err
+			}
+		}
 		if err := s.RPC().Serve(listener); err != nil && !errors.Is(err, grpc.ErrServerStopped) {
 			return err
 		}
