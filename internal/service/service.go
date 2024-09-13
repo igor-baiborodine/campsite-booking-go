@@ -136,6 +136,7 @@ func (s *Service) WaitForRPC(ctx context.Context) error {
 			if err := http.ListenAndServe(":6060", mux); err != nil {
 				return err
 			}
+			slog.Info("✅ pprof server started")
 		}
 		if err := s.RPC().Serve(listener); err != nil && !errors.Is(err, grpc.ErrServerStopped) {
 			return err
