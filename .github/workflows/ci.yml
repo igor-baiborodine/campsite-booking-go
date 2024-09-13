@@ -110,12 +110,17 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
       - name: Build image
         uses: docker/build-push-action@v6
         with:
           push: false
           context: .
           file: docker/Dockerfile
+          platforms: linux/amd64
   semver-tag:
     name: Semver tag
     needs: [ unit-tests, integration-tests ]
