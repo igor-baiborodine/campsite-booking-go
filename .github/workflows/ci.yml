@@ -3,7 +3,6 @@ name: ci
 on:
   push:
     branches: [ "main" ]
-    tags: [ "v*"]
   pull_request:
     branches: [ "main" ]
   workflow_dispatch:
@@ -15,15 +14,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        target_os: ["linux"]
-        target_arch: ["amd64"]
+        target_os: [ "linux" ]
+        target_arch: [ "amd64" ]
     env:
       GOLANGCILINT_VER: "v1.60.3"
       GOOS: "${{ matrix.target_os }}"
       GOARCH: "${{ matrix.target_arch }}"
       GOPROXY: "https://proxy.golang.org"
     steps:
-      - name: Check out repo
+      - name: Checkout
         uses: actions/checkout@v4
       - name: Set up Go
         uses: actions/setup-go@v5
@@ -65,7 +64,7 @@ jobs:
       GOPROXY: "https://proxy.golang.org"
       TEST_REPORT_FILE_PREFIX: "test_report"
     steps:
-      - name: Check out repo
+      - name: Checkout
         uses: actions/checkout@v4
       - name: Set up Go
         uses: actions/setup-go@v5
@@ -95,7 +94,7 @@ jobs:
       GOARCH: "${{ matrix.target_arch }}"
       GOPROXY: "https://proxy.golang.org"
     steps:
-      - name: Check out repo
+      - name: Checkout
         uses: actions/checkout@v4
       - name: Set up Go
         uses: actions/setup-go@v5
@@ -103,3 +102,44 @@ jobs:
           go-version-file: "go.mod"
       - name: Run integration tests
         run: make test-integration
+  docker-build:
+    name: Docker image
+    if: ${{ github.event_name == 'pull_request' }}
+    needs: [ unit-tests, integration-tests ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Build image
+        uses: docker/build-push-action@v6
+        with:
+          push: false
+          context: .
+          file: docker/Dockerfile
+          platforms: linux/amd64
+  semver-tag:
+    name: Semver tag
+    needs: [ unit-tests, integration-tests ]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.PAT }}
+      - name: Next version
+        id: next-version
+        uses: ietf-tools/semver-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          minorList: feat
+          patchList: build,chore,ci,docs,style,refactor,perf,test
+      - name: Create tag
+        uses: rickstaa/action-create-tag@v1
+        with:
+          tag: ${{ steps.next-version.outputs.next }}
+          tag_exists_error: true
