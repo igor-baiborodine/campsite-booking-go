@@ -103,7 +103,7 @@ jobs:
       - name: Run integration tests
         run: make test-integration
   docker-build:
-    name: Build Docker image
+    name: Docker image
     if: ${{ github.event_name == 'pull_request' }}
     needs: [ unit-tests, integration-tests ]
     runs-on: ubuntu-latest
