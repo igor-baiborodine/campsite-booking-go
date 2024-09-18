@@ -40,7 +40,6 @@ func main() {
 
 func createCampsites(c api.CampgroundsServiceClient, count int) (campsiteIDs []string) {
 	for i := 0; i < count; i++ {
-		newCreateCampsiteRequest()
 		response, err := c.CreateCampsite(context.Background(), newCreateCampsiteRequest())
 		if err != nil {
 			log.Fatalf("failed to create campsite: %v", err)
