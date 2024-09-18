@@ -10,6 +10,7 @@ import (
 	"net"
 	"net/http"
 	"net/http/pprof"
+	os "os"
 	"time"
 
 	"github.com/igor-baiborodine/campsite-booking-go/internal/application"
@@ -130,19 +131,35 @@ func (s *Service) WaitForRPC(ctx context.Context) error {
 		slog.Info("✅ rpc server started")
 		defer slog.Info("🚫 rpc server shut down")
 
-		if s.cfg.Environment == "profile" {
-			mux := http.NewServeMux()
-			mux.HandleFunc("/debug/pprof/", pprof.Index)
-			if err := http.ListenAndServe(":6060", mux); err != nil {
-				return err
-			}
-			slog.Info("✅ pprof server started")
-		}
 		if err := s.RPC().Serve(listener); err != nil && !errors.Is(err, grpc.ErrServerStopped) {
 			return err
 		}
 		return nil
 	})
+
+	var pprofServer *http.Server
+	if os.Getenv("ENABLE_PPROF") == "true" {
+		group.Go(func() error {
+			slog.Info("✅ pprof server started")
+			defer slog.Info("🚫 pprof server shut down")
+
+			mux := http.NewServeMux()
+			mux.HandleFunc("/debug/pprof/", pprof.Index)
+			mux.HandleFunc("/debug/pprof/cmdline", pprof.Cmdline)
+			mux.HandleFunc("/debug/pprof/profile", pprof.Profile)
+			mux.HandleFunc("/debug/pprof/symbol", pprof.Symbol)
+			mux.HandleFunc("/debug/pprof/trace", pprof.Trace)
+
+			pprofServer = &http.Server{
+				Addr:    ":6060",
+				Handler: mux,
+			}
+			if err := pprofServer.ListenAndServe(); err != nil {
+				return err
+			}
+			return nil
+		})
+	}
 
 	group.Go(func() error {
 		<-gCtx.Done()
@@ -150,6 +167,9 @@ func (s *Service) WaitForRPC(ctx context.Context) error {
 		stopped := make(chan struct{})
 		go func() {
 			s.RPC().GracefulStop()
+			if pprofServer != nil {
+				_ = pprofServer.Shutdown(gCtx)
+			}
 			close(stopped)
 		}()
 		timeout := time.NewTimer(s.cfg.ShutdownTimeout)
@@ -157,6 +177,9 @@ func (s *Service) WaitForRPC(ctx context.Context) error {
 		case <-timeout.C:
 			// force it to stop
 			s.RPC().Stop()
+			if pprofServer != nil {
+				_ = pprofServer.Shutdown(gCtx)
+			}
 			return fmt.Errorf("rpc server failed to stop gracefully")
 		case <-stopped:
 			return nil
