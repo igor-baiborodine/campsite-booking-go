@@ -89,7 +89,7 @@ follow this [guide](/docs/ide-setup/README.md) to configure it.
 > ⚠️ **Please note that all commands listed below should be executed from the project's root.**
 >
 
-## Up & Running Locally
+## Up and Running Locally
 
 ### Run with IntelliJ/GoLand IDE
 
@@ -100,6 +100,8 @@ follow this [guide](/docs/ide-setup/README.md) to configure it.
 
 * Start a PostgreSQL DB instance using **Docker Compose**:
 ```shell
+$ make compose-up-postgres
+# which is equivalent of
 $ docker compose -f docker/docker-compose.yml -p campsite-booking-go up -d postgres 
 ```
 
@@ -115,7 +117,9 @@ $ docker inspect --format="{{.State.Health.Status}}" postgres
 
 * Start PostgreSQL DB and Campgrounds API instances using **Docker Compose**:
 ```shell
-$ docker compose -f docker/docker-compose.yml -p campsite-booking-go up -d 
+$ make compose-up
+# which is equivalent of
+$ docker compose -f docker/docker-compose.yml -p campsite-booking-go up -d --build 
 ```
 
 ### Run with Kubernetes
@@ -137,6 +141,7 @@ $ sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
 $ kubectl version --client
 ```
 ---
+
 1. Spin up a 3-node cluster: 
 ```bash 
 $ make cluster-deploy
@@ -179,7 +184,7 @@ $ kubectl port-forward "$PROXY_POD_NAME" 8080:8080
 
 ## Tests
 
-### Unit & Integration
+### Unit and Integration
 
 1. Execute only unit tests:
 ```bash
@@ -194,7 +199,7 @@ $ make test-integration
 $ go test -tags=integration ./internal/...
 ```
 
-### gRPCurl
+### Service and Method Discovery
 
 **Prerequisites**:
 
@@ -205,6 +210,7 @@ $ grpcurl -version
 ```
 - The Campgrounds API should be up & running using either the [Run with IntelliJ/GoLand IDE](#run-with-intellijgoland-ide) or [Run with Docker Compose](#run-with-docker-compose).
 ---
+
 1. List the services present on the gRPC server:
 ```bash
 $ grpcurl -plaintext localhost:8085 list
@@ -237,7 +243,14 @@ message GetBookingRequest {
   string booking_id = 1 [(.buf.validate.field) = { string: { uuid: true } }];
 }
 ```
-4. Create a campsite:
+
+### Functional and Error Handling
+
+**Prerequisites**:
+- The same as for the Service and Method Discovery tests.
+---
+
+1. Create a campsite:
 ```bash
 $ grpcurl -plaintext -d \
     '{"campsite_code": "CAMP01", "capacity": 4, "drinking_water": true, "fire_pit": true, "picnic_table": true, "restrooms": false}' \
@@ -247,7 +260,7 @@ $ grpcurl -plaintext -d \
   "campsiteId": "07df7f35-9c7a-4b10-a702-66844a7ec08c"
 }
 ```
-5. Get campsites:
+2. Get campsites:
 ```bash
 $ grpcurl -plaintext -d '{}' localhost:8085 campgroundspb.v1.CampgroundsService/GetCampsites
 # output
@@ -265,7 +278,7 @@ $ grpcurl -plaintext -d '{}' localhost:8085 campgroundspb.v1.CampgroundsService/
   ]
 }
 ```
-6. Create a booking:
+3. Create a booking:
 ```bash
 $ grpcurl -plaintext -d \
     '{"campsite_id": "07df7f35-9c7a-4b10-a702-66844a7ec08c", "email": "john.smith@example.com", "full_name": "John Smith", "start_date": "2024-09-09", "end_date": "2024-09-12"}' \
@@ -275,7 +288,7 @@ $ grpcurl -plaintext -d \
   "bookingId": "692abbc0-5457-4f2b-8a6e-061ba2e5dd90"
 }
 ```
-7. Get a booking:
+4. Get a booking:
 ```bash
 $ grpcurl -plaintext -d \
     '{"booking_id": "692abbc0-5457-4f2b-8a6e-061ba2e5dd90"}' \
@@ -293,7 +306,7 @@ $ grpcurl -plaintext -d \
   }
 }
 ```
-8. Create a booking that does not meet the [booking constraints](#booking-constraints), for example a
+5. Create a booking that does not meet the [booking constraints](#booking-constraints), for example a
    maximum stay of three days:
 ```bash
 $ grpcurl -plaintext -d \
@@ -305,3 +318,14 @@ ERROR:
   Message: booking validation: 1 error occurred:
         * maximum stay: must be less or equal to three days
 ```
+
+### Performance
+
+**Prerequisites**:
+- The Campgrounds API should be up & running using the [Run with Docker Compose](#run-with-docker-compose).
+---
+
+1. 
+
+
+http://localhost:6060/debug/pprof/

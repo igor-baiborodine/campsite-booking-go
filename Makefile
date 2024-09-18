@@ -1,4 +1,5 @@
--include k8s/local-k8s.mk
+-include docker/Makefile
+-include k8s/Makefile
 
 ################################################################################
 # Variables                                                                    #
