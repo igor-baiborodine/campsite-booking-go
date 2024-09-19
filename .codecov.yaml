@@ -15,3 +15,4 @@ ignore:
   - "campgroundspb/**/api*.go" # generated files
   - "internal/testing/**/*"
   - "internal/**/mock*.go" # generated files
+  - "datagenerator/main.go"
