@@ -138,7 +138,7 @@ func (s *Service) WaitForRPC(ctx context.Context) error {
 	})
 
 	var pprofServer *http.Server
-	if os.Getenv("ENABLE_PPROF") == "true" {
+	if os.Getenv("DEBUG_PPROF") == "true" {
 		group.Go(func() error {
 			slog.Info("✅ pprof server started")
 			defer slog.Info("🚫 pprof server shut down")
