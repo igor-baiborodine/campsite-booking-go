@@ -114,7 +114,11 @@ func createBookings(c api.CampgroundsServiceClient, campsiteIDs []string) (count
 	return count
 }
 
-func newCreateBookingRequest(campsiteId string, startDate time.Time, endDate time.Time) *api.CreateBookingRequest {
+func newCreateBookingRequest(
+	campsiteId string,
+	startDate time.Time,
+	endDate time.Time,
+) *api.CreateBookingRequest {
 	booking := BookingFaker{}
 	err := faker.FakeData(&booking)
 	if err != nil {
