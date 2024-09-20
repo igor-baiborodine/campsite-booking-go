@@ -93,7 +93,11 @@ func createBookings(c api.CampgroundsServiceClient, campsiteIDs []string) (count
 
 	for _, campsiteID := range campsiteIDs {
 		countPerCampsite := 0
+		i := 0
+		// create non-consecutive bookings, i.e., assure to have vacant dates for a given campsite
+		createBooking := true
 		startDate := now.AddDate(0, 0, 1)
+
 		for {
 			endDate := startDate.AddDate(0, 0, newBookingStayPeriod())
 			if !endDate.Before(maxAllowedEndDate) {
@@ -101,12 +105,16 @@ func createBookings(c api.CampgroundsServiceClient, campsiteIDs []string) (count
 			}
 			req := newCreateBookingRequest(campsiteID, startDate, endDate)
 
-			_, err := c.CreateBooking(context.Background(), req)
-			if err != nil {
-				log.Fatalf("failed to create booking for campsite ID %s: %v", campsiteID, err)
+			if createBooking {
+				_, err := c.CreateBooking(context.Background(), req)
+				if err != nil {
+					log.Fatalf("failed to create booking for campsite ID %s: %v", campsiteID, err)
+				}
+				countPerCampsite++
 			}
 			startDate = endDate
-			countPerCampsite++
+			i++
+			createBooking = i%2 == 0
 		}
 		log.Printf("...created %d bookings for campsite ID %s", countPerCampsite, campsiteID)
 		count += countPerCampsite

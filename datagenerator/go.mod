@@ -4,7 +4,7 @@ go 1.22.4
 
 require (
 	github.com/go-faker/faker/v4 v4.4.1
-	github.com/igor-baiborodine/campsite-booking-go v1.0.11
+	github.com/igor-baiborodine/campsite-booking-go v1.1.0
 	google.golang.org/grpc v1.66.2
 )
 
