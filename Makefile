@@ -103,7 +103,7 @@ lint-proto:
 ################################################################################
 .PHONY: test
 test:
-	go test -race $(COVERAGE_OPTS) ./internal/...
+	go test -race $(COVERAGE_OPTS) ./internal/... ./client/...
 
 ################################################################################
 # Target: test-integration
