@@ -323,9 +323,45 @@ ERROR:
 
 **Prerequisites**:
 - The Campgrounds API should be up & running using the [Run with Docker Compose](#run-with-docker-compose).
+- The `pprof` tool should reachable at http://localhost:6060/debug/pprof/ in a browser of your choice.
+- TODO: run data generator using the Docker image
 ---
 
-1. 
+#### pprof
 
+##### GetCampsites
 
-http://localhost:6060/debug/pprof/
+1. Start downloading the profiling data for the `GetCampsites` endpoint from the past 10 seconds and
+   save it to a local file named `get-campsites-profile.pprof`. Then immediately execute the
+   corresponding benchmark test:
+```bash
+$ make pprof-get-campsites
+# which is equivalent of
+$ curl --output ./tests/perf/get-campsites-profile.pprof "http://localhost:6060/debug/pprof/profile?seconds=10"
+$ SERVER_ADDR=localhost:8085 go test -bench BenchmarkGetCampsites ./tests/perf
+```
+
+2. Validate the profiling data for the `GetCampsites` endpoint by launching the `pprof` tool. When
+   prompted, enter the `web` option to generate a report in `SVG` format on a temp file, and start a
+   web browser to view it. Alternatively, you can use the `png` option, to generate a report in `PNG`
+   format:
+```bash
+$ make pprof-get-campsites-data
+# which is equivalent of
+go tool pprof ./tests/perf/get-campsites-profile.pprof
+# output
+File: app
+Type: cpu
+Time: Sep 21, 2024 at 5:52pm (EDT)
+Duration: 10.01s, Total samples = 1.20s (11.99%)
+Entering interactive mode (type "help" for commands, "o" for options)
+(pprof) web
+(pprof) png
+Generating report in profile001.png
+(pprof) 
+```
+3. See https://git.io/JfYMW on how to read the graph.
+   ![pprof GetCampsites data](/docs/pprof-get-campsites-data.png)
+
+### ghz
+TODO: implement me
