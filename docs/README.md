@@ -360,7 +360,7 @@ Entering interactive mode (type "help" for commands, "o" for options)
 Generating report in profile001.png
 (pprof) 
 ```
-3. See https://git.io/JfYMW on how to read the graph.
+3. See https://git.io/JfYMW on how to read the graph:
    ![pprof GetCampsites data](/docs/pprof-get-campsites-data.png)
 
 ### ghz
