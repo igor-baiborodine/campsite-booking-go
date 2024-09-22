@@ -363,5 +363,24 @@ Generating report in profile001.png
 3. See https://git.io/JfYMW on how to read the graph:
    ![pprof GetCampsites data](/docs/pprof-get-campsites-data.png)
 
-### ghz
+##### GetVacantDates
+
+1. Start downloading the profiling data for the `GetVacantDates` endpoint from the past 10 seconds and
+   save it to a local file named `get-vacant-dates-profile.pprof`. Then immediately execute the
+   corresponding benchmark test:
+```bash
+$ make pprof-get-vacant-dates
+# which is equivalent of
+$ curl --output ./tests/perf/get-vacant-dates-profile.pprof "http://localhost:6060/debug/pprof/profile?seconds=10"
+$ SERVER_ADDR=localhost:8085 go test -bench BenchmarkGetVacantDates ./tests/perf
+```
+2. Validate the profiling data for the `GetVacantDates` endpoint by launching the `pprof` tool. When
+   prompted, use either the `web` or `png` option to generate a corresponding report.
+```bash
+$ make pprof-get-vacant-dates-data
+# which is equivalent of
+go tool pprof ./tests/perf/get-vacant-dates-profile.pprof
+```
+
+#### ghz
 TODO: implement me
