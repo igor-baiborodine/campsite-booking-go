@@ -338,7 +338,7 @@ igor@lptacr:~/GitRepos/igor-baiborodine/campsite-booking-go$ go run ./datagenera
 2024/09/22 19:03:09 ...created 9 bookings for campsite ID f954f06b-e5c8-4b04-8f68-1b1e722ce0fb
 2024/09/22 19:03:10 ...created 9 bookings for campsite ID aada6ebf-9c5c-46fe-ad0e-f4a27741085f
 2024/09/22 19:03:10 created total 946 bookings
-- ```
+```
 ---
 
 #### pprof
@@ -354,7 +354,6 @@ $ make pprof-get-campsites
 $ curl --output ./tests/perf/get-campsites-profile.pprof "http://localhost:6060/debug/pprof/profile?seconds=10"
 $ SERVER_ADDR=localhost:8085 go test -bench BenchmarkGetCampsites ./tests/perf
 ```
-
 2. Validate the profiling data for the `GetCampsites` endpoint by launching the `pprof` tool. When
    prompted, enter the `web` option to generate a report in `SVG` format on a temp file, and start a
    web browser to view it. Alternatively, you can use the `png` option, to generate a report in `PNG`
