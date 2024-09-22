@@ -2,15 +2,6 @@
 # Variables
 ###############################################################################
 KIND_CLUSTER_NAME = local-k8s # context will be "kind-local-k8s"
-APP_DOCKER_IMAGE = ibaiborodine/campsite-booking-go
-
-###############################################################################
-# Target: image-build
-###############################################################################
-.PHONY: image-build
-image-build:
-	@docker build --no-cache -t $(APP_DOCKER_IMAGE) -f ./docker/Dockerfile .
-	@docker image ls | grep $(APP_DOCKER_IMAGE)
 
 ###############################################################################
 # Target: cluster-deploy
@@ -89,7 +80,7 @@ secret-campgrounds-show:
 ################################################################################
 .PHONY: api-deploy
 api-deploy:
-	@kind load docker-image $(APP_DOCKER_IMAGE) --name local-k8s
+#	@kind load docker-image $(APP_DOCKER_IMAGE) --name local-k8s
 	@kubectl apply -f ./k8s/campgrounds.yaml
 
 ################################################################################

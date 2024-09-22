@@ -54,5 +54,5 @@ RUN chmod a+x ${APP_HOME}/bin/*
 
 WORKDIR ${APP_HOME}
 ENTRYPOINT ["docker-entrypoint.sh"]
-EXPOSE 8085
+EXPOSE 8085 6060
 CMD ["app"]

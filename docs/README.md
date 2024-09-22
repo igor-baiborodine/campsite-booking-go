@@ -89,7 +89,7 @@ follow this [guide](/docs/ide-setup/README.md) to configure it.
 > ⚠️ **Please note that all commands listed below should be executed from the project's root.**
 >
 
-## Up & Running Locally
+## Up and Running Locally
 
 ### Run with IntelliJ/GoLand IDE
 
@@ -100,6 +100,8 @@ follow this [guide](/docs/ide-setup/README.md) to configure it.
 
 * Start a PostgreSQL DB instance using **Docker Compose**:
 ```shell
+$ make compose-up-postgres
+# which is equivalent of
 $ docker compose -f docker/docker-compose.yml -p campsite-booking-go up -d postgres 
 ```
 
@@ -115,7 +117,9 @@ $ docker inspect --format="{{.State.Health.Status}}" postgres
 
 * Start PostgreSQL DB and Campgrounds API instances using **Docker Compose**:
 ```shell
-$ docker compose -f docker/docker-compose.yml -p campsite-booking-go up -d 
+$ make compose-up-all
+# which is equivalent of
+$ docker compose -f docker/docker-compose.yml -p campsite-booking-go up -d --build 
 ```
 
 ### Run with Kubernetes
@@ -137,6 +141,7 @@ $ sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
 $ kubectl version --client
 ```
 ---
+
 1. Spin up a 3-node cluster: 
 ```bash 
 $ make cluster-deploy
@@ -179,7 +184,7 @@ $ kubectl port-forward "$PROXY_POD_NAME" 8080:8080
 
 ## Tests
 
-### Unit & Integration
+### Unit and Integration
 
 1. Execute only unit tests:
 ```bash
@@ -194,7 +199,7 @@ $ make test-integration
 $ go test -tags=integration ./internal/...
 ```
 
-### gRPCurl
+### Service and Method Discovery
 
 **Prerequisites**:
 
@@ -205,6 +210,7 @@ $ grpcurl -version
 ```
 - The Campgrounds API should be up & running using either the [Run with IntelliJ/GoLand IDE](#run-with-intellijgoland-ide) or [Run with Docker Compose](#run-with-docker-compose).
 ---
+
 1. List the services present on the gRPC server:
 ```bash
 $ grpcurl -plaintext localhost:8085 list
@@ -237,7 +243,14 @@ message GetBookingRequest {
   string booking_id = 1 [(.buf.validate.field) = { string: { uuid: true } }];
 }
 ```
-4. Create a campsite:
+
+### Functional and Error Handling
+
+**Prerequisites**:
+- The same as for the Service and Method Discovery tests.
+---
+
+1. Create a campsite:
 ```bash
 $ grpcurl -plaintext -d \
     '{"campsite_code": "CAMP01", "capacity": 4, "drinking_water": true, "fire_pit": true, "picnic_table": true, "restrooms": false}' \
@@ -247,7 +260,7 @@ $ grpcurl -plaintext -d \
   "campsiteId": "07df7f35-9c7a-4b10-a702-66844a7ec08c"
 }
 ```
-5. Get campsites:
+2. Get campsites:
 ```bash
 $ grpcurl -plaintext -d '{}' localhost:8085 campgroundspb.v1.CampgroundsService/GetCampsites
 # output
@@ -265,7 +278,7 @@ $ grpcurl -plaintext -d '{}' localhost:8085 campgroundspb.v1.CampgroundsService/
   ]
 }
 ```
-6. Create a booking:
+3. Create a booking:
 ```bash
 $ grpcurl -plaintext -d \
     '{"campsite_id": "07df7f35-9c7a-4b10-a702-66844a7ec08c", "email": "john.smith@example.com", "full_name": "John Smith", "start_date": "2024-09-09", "end_date": "2024-09-12"}' \
@@ -275,7 +288,7 @@ $ grpcurl -plaintext -d \
   "bookingId": "692abbc0-5457-4f2b-8a6e-061ba2e5dd90"
 }
 ```
-7. Get a booking:
+4. Get a booking:
 ```bash
 $ grpcurl -plaintext -d \
     '{"booking_id": "692abbc0-5457-4f2b-8a6e-061ba2e5dd90"}' \
@@ -293,7 +306,7 @@ $ grpcurl -plaintext -d \
   }
 }
 ```
-8. Create a booking that does not meet the [booking constraints](#booking-constraints), for example a
+5. Create a booking that does not meet the [booking constraints](#booking-constraints), for example a
    maximum stay of three days:
 ```bash
 $ grpcurl -plaintext -d \
@@ -304,4 +317,80 @@ ERROR:
   Code: InvalidArgument
   Message: booking validation: 1 error occurred:
         * maximum stay: must be less or equal to three days
+```
+
+### Performance
+
+**Prerequisites**:
+- The Campgrounds API should be up & running using the [Run with Docker Compose](#run-with-docker-compose).
+- The `pprof` tool should reachable at http://localhost:6060/debug/pprof/ in a browser of your choice.
+- Run the data generator to create, for example, 100 campsites and non-consecutive bookings for each
+  campsite:
+```bash
+$ go run ./datagenerator/main.go localhost:8085 100
+# output
+igor@lptacr:~/GitRepos/igor-baiborodine/campsite-booking-go$ go run ./datagenerator/main.go localhost:8085 100
+2024/09/22 19:03:06 server address: localhost:8085, campsites count: 100
+2024/09/22 19:03:06 created 100 campsites
+2024/09/22 19:03:06 ...created 10 bookings for campsite ID bdf7e4fb-4d35-49aa-aca7-2876c4e25135
+2024/09/22 19:03:06 ...created 10 bookings for campsite ID 408de8b6-b552-4905-b1c3-c54e038bbfaf
+... more created bookings output
+2024/09/22 19:03:09 ...created 9 bookings for campsite ID f954f06b-e5c8-4b04-8f68-1b1e722ce0fb
+2024/09/22 19:03:10 ...created 9 bookings for campsite ID aada6ebf-9c5c-46fe-ad0e-f4a27741085f
+2024/09/22 19:03:10 created total 946 bookings
+```
+---
+
+#### pprof
+
+##### GetCampsites
+
+1. Start downloading the profiling data for the `GetCampsites` endpoint from the past 10 seconds and
+   save it to a local file named `get-campsites-profile.pprof`. Then immediately execute the
+   corresponding benchmark test:
+```bash
+$ make pprof-get-campsites
+# which is equivalent of
+$ curl --output ./tests/perf/get-campsites-profile.pprof "http://localhost:6060/debug/pprof/profile?seconds=10"
+$ SERVER_ADDR=localhost:8085 go test -bench BenchmarkGetCampsites ./tests/perf
+```
+2. Validate the profiling data for the `GetCampsites` endpoint by launching the `pprof` tool. When
+   prompted, enter the `web` option to generate a report in `SVG` format on a temp file, and start a
+   web browser to view it. Alternatively, you can use the `png` option, to generate a report in `PNG`
+   format:
+```bash
+$ make pprof-get-campsites-data
+# which is equivalent of
+go tool pprof ./tests/perf/get-campsites-profile.pprof
+# output
+File: app
+Type: cpu
+Time: Sep 21, 2024 at 5:52pm (EDT)
+Duration: 10.01s, Total samples = 1.20s (11.99%)
+Entering interactive mode (type "help" for commands, "o" for options)
+(pprof) web
+(pprof) png
+Generating report in profile001.png
+(pprof) 
+```
+3. See https://git.io/JfYMW on how to read the graph:
+   ![pprof GetCampsites data](/docs/pprof-get-campsites-data.png)
+
+##### GetVacantDates
+
+1. Start downloading the profiling data for the `GetVacantDates` endpoint from the past 10 seconds and
+   save it to a local file named `get-vacant-dates-profile.pprof`. Then immediately execute the
+   corresponding benchmark test:
+```bash
+$ make pprof-get-vacant-dates
+# which is equivalent of
+$ curl --output ./tests/perf/get-vacant-dates-profile.pprof "http://localhost:6060/debug/pprof/profile?seconds=10"
+$ SERVER_ADDR=localhost:8085 go test -bench BenchmarkGetVacantDates ./tests/perf
+```
+2. Validate the profiling data for the `GetVacantDates` endpoint by launching the `pprof` tool. When
+   prompted, use either the `web` or `png` option to generate a corresponding report.
+```bash
+$ make pprof-get-vacant-dates-data
+# which is equivalent of
+go tool pprof ./tests/perf/get-vacant-dates-profile.pprof
 ```
