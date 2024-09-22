@@ -1,6 +1,7 @@
 -include docker/Makefile
 -include k8s/Makefile
 -include tests/Makefile
+-include datagenerator/Makefile
 
 ################################################################################
 # Variables                                                                    #

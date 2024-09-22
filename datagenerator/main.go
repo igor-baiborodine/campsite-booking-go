@@ -39,6 +39,7 @@ func main() {
 	if len(args) > 1 {
 		campsitesCount, _ = strconv.Atoi(args[1])
 	}
+	log.Printf("server address: %s, campsites count: %d", addr, campsitesCount)
 
 	conn, err := grpc.NewClient(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {

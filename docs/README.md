@@ -117,7 +117,7 @@ $ docker inspect --format="{{.State.Health.Status}}" postgres
 
 * Start PostgreSQL DB and Campgrounds API instances using **Docker Compose**:
 ```shell
-$ make compose-up
+$ make compose-up-all
 # which is equivalent of
 $ docker compose -f docker/docker-compose.yml -p campsite-booking-go up -d --build 
 ```
@@ -324,7 +324,21 @@ ERROR:
 **Prerequisites**:
 - The Campgrounds API should be up & running using the [Run with Docker Compose](#run-with-docker-compose).
 - The `pprof` tool should reachable at http://localhost:6060/debug/pprof/ in a browser of your choice.
-- TODO: run data generator using the Docker image
+- Run the data generator to create, for example, 100 campsites and non-consecutive bookings for each
+  campsite:
+```bash
+$ go run ./datagenerator/main.go localhost:8085 100
+# output
+igor@lptacr:~/GitRepos/igor-baiborodine/campsite-booking-go$ go run ./datagenerator/main.go localhost:8085 100
+2024/09/22 19:03:06 server address: localhost:8085, campsites count: 100
+2024/09/22 19:03:06 created 100 campsites
+2024/09/22 19:03:06 ...created 10 bookings for campsite ID bdf7e4fb-4d35-49aa-aca7-2876c4e25135
+2024/09/22 19:03:06 ...created 10 bookings for campsite ID 408de8b6-b552-4905-b1c3-c54e038bbfaf
+... more created bookings output
+2024/09/22 19:03:09 ...created 9 bookings for campsite ID f954f06b-e5c8-4b04-8f68-1b1e722ce0fb
+2024/09/22 19:03:10 ...created 9 bookings for campsite ID aada6ebf-9c5c-46fe-ad0e-f4a27741085f
+2024/09/22 19:03:10 created total 946 bookings
+- ```
 ---
 
 #### pprof
@@ -381,6 +395,3 @@ $ make pprof-get-vacant-dates-data
 # which is equivalent of
 go tool pprof ./tests/perf/get-vacant-dates-profile.pprof
 ```
-
-#### ghz
-TODO: implement me
