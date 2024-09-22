@@ -14,13 +14,18 @@
   - [System Requirements](#system-requirements)
 - [Implementation Details](#implementation-details)
 - [Project Setup](#project-setup)
-- [Up & Running Locally](#up--running-locally)
+- [Up and Running Locally](#up-and-running-locally)
   - [Run with IntelliJ/GoLand IDE](#run-with-intellijgoland-ide)
   - [Run with Docker Compose](#run-with-docker-compose)
   - [Run with Kubernetes](#run-with-kubernetes)
 - [Tests](#tests)
-  - [Unit & Integration](#unit--integration)
-  - [gRPCurl](#grpcurl)
+  - [Unit and Integration](#unit-and-integration)
+  - [Service and Method Discovery](#service-and-method-discovery)
+  - [Functional and Error Handling](#functional-and-error-handling)
+  - [Performance](#performance)
+    - [pprof](#pprof)
+      - [GetCampsites](#getcampsites)
+      - [GetVacantDates](#getvacantdates)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
