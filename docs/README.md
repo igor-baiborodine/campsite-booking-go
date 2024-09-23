@@ -24,9 +24,11 @@
   - [Service and Method Discovery](#service-and-method-discovery)
   - [Functional and Error Handling](#functional-and-error-handling)
   - [Performance](#performance)
-    - [pprof](#pprof)
-      - [GetCampsites](#getcampsites)
-      - [GetVacantDates](#getvacantdates)
+    - [GetCampsites](#getcampsites)
+    - [GetVacantDates](#getvacantdates)
+  - [Load](#load)
+    - [GetCampsites](#getcampsites-1)
+    - [GetVacantDates](#getvacantdates-1)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
