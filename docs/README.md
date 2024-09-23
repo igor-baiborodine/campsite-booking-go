@@ -75,9 +75,9 @@ TODO: elaborate on implementation details
 ## Project Setup
 
 **Prerequisites**:
-1. [Git](https://git-scm.com/), see this [guide](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) on how to install Git.
-2. [Make](https://man7.org/linux/man-pages/man1/make.1.html)
-3. [Go](https://go.dev/) (version >= 1.22), see this [guide](https://go.dev/doc/install) on how to install Go.
+- [Git](https://git-scm.com/), see this [guide](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) on how to install Git.
+- [Make](https://man7.org/linux/man-pages/man1/make.1.html)
+- [Go](https://go.dev/) (version >= 1.22), see this [guide](https://go.dev/doc/install) on how to install Go.
 
 Clone the project and install the necessary tools(protoc, mockery, golines, goimports, gofumpt,
 golangci-lint):
@@ -137,7 +137,6 @@ $ docker compose -f docker/docker-compose.yml -p campsite-booking-go up -d --bui
 $ go install sigs.k8s.io/kind@$latest
 $ kind version
 ```
-
 - Install [kubectl](https://kubernetes.io/docs/reference/kubectl/):
 ```shell
 $ curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
@@ -347,9 +346,7 @@ igor@lptacr:~/GitRepos/igor-baiborodine/campsite-booking-go$ go run ./datagenera
 ```
 ---
 
-#### pprof
-
-##### GetCampsites
+#### GetCampsites
 
 1. Start downloading the profiling data for the `GetCampsites` endpoint from the past 10 seconds and
    save it to a local file named `get-campsites-profile.pprof`. Then immediately execute the
@@ -382,7 +379,7 @@ Generating report in profile001.png
 3. See https://git.io/JfYMW on how to read the graph:
    ![pprof GetCampsites data](/docs/pprof-get-campsites-data.png)
 
-##### GetVacantDates
+#### GetVacantDates
 
 1. Start downloading the profiling data for the `GetVacantDates` endpoint from the past 10 seconds and
    save it to a local file named `get-vacant-dates-profile.pprof`. Then immediately execute the
@@ -399,4 +396,124 @@ $ SERVER_ADDR=localhost:8085 go test -bench BenchmarkGetVacantDates ./tests/perf
 $ make pprof-get-vacant-dates-data
 # which is equivalent of
 go tool pprof ./tests/perf/get-vacant-dates-profile.pprof
+```
+
+### Load
+
+**Prerequisites**:
+- Install [ghz](https://ghz.sh/):
+```bash
+$ go install github.com/bojand/ghz/cmd/ghz@latest
+```
+- The Campgrounds API should be up & running using the [Run with Docker Compose](#run-with-docker-compose).
+- Run the data generator to create, for example, 100 campsites and non-consecutive bookings for each
+  campsite:
+```bash
+$ go run ./datagenerator/main.go localhost:8085 100
+```
+- When using the `buf generate` command, `buf` fetches the dependencies and uses them to generate
+  the necessary files. These dependencies are not stored on your local file system in a directly
+  accessible way. Instead, `buf` manages these dependencies in a non-visible, internal cache.
+  Therefore, execute the following command to load and save the `protovalidate` dependency:
+```bash
+$ buf export buf.build/bufbuild/protovalidate --output ./campgroundspb/v1/
+```
+
+#### GetCampsites
+
+Execute the following command to perform a basic load testing of the `GetCampsites` endpoint:
+```bash
+$ ghz --insecure --proto ./campgroundspb/v1/api.proto \
+  --import-paths ./campgroundspb/buf/validate/validate.proto \
+  --call campgroundspb.v1.CampgroundsService/GetCampsites \
+  -n 10000 -c 10 -d '{}' localhost:8085
+```
+Where:
+* `-n 10000` - number of requests to run
+* `-c 10` - number of request workers to run concurrently
+
+The output may look like the one below:
+```text
+Summary:
+  Count:        10000
+  Total:        21.53 s
+  Slowest:      100.66 ms
+  Fastest:      2.70 ms
+  Average:      21.25 ms
+  Requests/sec: 464.49
+
+Response time histogram:
+  2.704   [1]    |
+  12.499  [5177] |∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎
+  22.295  [1778] |∎∎∎∎∎∎∎∎∎∎∎∎∎∎
+  32.090  [268]  |∎∎
+  41.885  [859]  |∎∎∎∎∎∎∎
+  51.680  [1081] |∎∎∎∎∎∎∎∎
+  61.476  [563]  |∎∎∎∎
+  71.271  [184]  |∎
+  81.066  [70]   |∎
+  90.861  [16]   |
+  100.657 [3]    |
+
+Latency distribution:
+  10 % in 6.47 ms 
+  25 % in 8.44 ms 
+  50 % in 12.17 ms 
+  75 % in 36.18 ms 
+  90 % in 50.05 ms 
+  95 % in 56.51 ms 
+  99 % in 69.96 ms 
+
+Status code distribution:
+  [OK]   10000 responses   
+```
+
+#### GetVacantDates
+
+Execute the following command to perform a basic load testing of the `GetVacantDates` endpoint:
+```bash
+$ ghz --insecure --proto ./campgroundspb/v1/api.proto \
+  --import-paths ./campgroundspb/buf/validate/validate.proto \
+  --call campgroundspb.v1.CampgroundsService/GetVacantDates \
+  -n 10000 -c 10 \
+  -d '{"campsite_id":"167ce4b6-8616-4757-9de0-3bbed703d51a","start_date":"2024-09-23","end_date":"2024-10-23"}' localhost:8085
+```
+Where:
+* `-n 10000` - number of requests to run
+* `-c 10` - number of request workers to run concurrently
+
+The output may look like the one below:
+```text
+Summary:
+  Count:        10000
+  Total:        14.12 s
+  Slowest:      69.36 ms
+  Fastest:      1.22 ms
+  Average:      13.90 ms
+  Requests/sec: 708.25
+
+Response time histogram:
+  1.224  [1]    |
+  8.038  [6845] |∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎
+  14.852 [615]  |∎∎∎∎
+  21.666 [8]    |
+  28.479 [77]   |
+  35.293 [616]  |∎∎∎∎
+  42.107 [969]  |∎∎∎∎∎∎
+  48.921 [659]  |∎∎∎∎
+  55.735 [178]  |∎
+  62.549 [27]   |
+  69.363 [5]    |
+
+Latency distribution:
+  10 % in 3.14 ms 
+  25 % in 4.11 ms 
+  50 % in 5.74 ms 
+  75 % in 26.75 ms 
+  90 % in 41.12 ms 
+  95 % in 45.23 ms 
+  99 % in 51.71 ms 
+
+Status code distribution:
+  [OK]   10000 responses 
 ```
