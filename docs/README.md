@@ -414,14 +414,14 @@ $ go run ./datagenerator/main.go localhost:8085 100
 - When using the `buf generate` command, `buf` fetches the dependencies and uses them to generate
   the necessary files. These dependencies are not stored on your local file system in a directly
   accessible way. Instead, `buf` manages these dependencies in a non-visible, internal cache.
-  Therefore, execute the following command to load and save the `protovalide` dependency:
+  Therefore, execute the following command to load and save the `protovalidate` dependency:
 ```bash
 $ buf export buf.build/bufbuild/protovalidate --output ./campgroundspb/v1/
 ```
 
 #### GetCampsites
 
-Execute the following command to perform a basic load testing of the GetCampsites endpoint:
+Execute the following command to perform a basic load testing of the `GetCampsites` endpoint:
 ```bash
 $ ghz --insecure --proto ./campgroundspb/v1/api.proto \
   --import-paths ./campgroundspb/buf/validate/validate.proto \
@@ -470,7 +470,7 @@ Status code distribution:
 
 #### GetVacantDates
 
-Execute the following command to perform a basic load testing of the GetCampsites endpoint:
+Execute the following command to perform a basic load testing of the `GetVacantDates` endpoint:
 ```bash
 $ ghz --insecure --proto ./campgroundspb/v1/api.proto \
   --import-paths ./campgroundspb/buf/validate/validate.proto \
