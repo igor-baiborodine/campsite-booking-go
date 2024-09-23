@@ -4,6 +4,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/igor-baiborodine/campsite-booking-go)](https://goreportcard.com/report/github.com/igor-baiborodine/campsite-booking-go)
 [![codecov](https://codecov.io/gh/igor-baiborodine/campsite-booking-go/graph/badge.svg?token=XTDH6MGEDJ)](https://codecov.io/gh/igor-baiborodine/campsite-booking-go)
 
+🔥 A Java-based implementation is available in the [campsite-booking](https://github.com/igor-baiborodine/campsite-booking) repository. 
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
