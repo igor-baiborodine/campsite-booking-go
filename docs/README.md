@@ -67,12 +67,20 @@
 * [Go](https://github.com/golang/go), [gRPC](https://github.com/grpc/grpc-go) 
 * [protovalidate-go](https://github.com/bufbuild/protovalidate-go) (requests validation)
 * [goimports](https://pkg.go.dev/golang.org/x/tools/cmd/goimports), [golines](https://github.com/segmentio/golines), [gofumpt](https://github.com/mvdan/gofumpt) (code style & formatting)
+* [PostgreSQL](https://www.postgresql.org/)
 * [Goose](https://pressly.github.io/goose/) (DB migrations)
-* [PostgreSQL](https://www.postgresql.org/)  
 * [Docker](https://www.docker.com/), [Docker Compose](https://docs.docker.com/compose/)
-* TODO
+* [Kubernetes](https://kubernetes.io/)
 
-TODO: elaborate on implementation details
+The implementation of the Campsite Bookings API(or Campgrounds API) in Go is based on a
+domain-centric architecture using the command and query responsibility segregation(CQRS) pattern.
+It's greatly inspired by the Mallbots example application in Michael Stack's
+book ["Event-Driven Architecture in Golang"](https://www.amazon.com/Event-Driven-Architecture-Golang-asynchronicity-consistency/dp/1803238011)([GitHub](https://github.com/igor-baiborodine/event-driven-architecture-in-golang-workshop)).
+
+These resources were also used during the work on this project:
+* ["Distributed Services with Go"](https://www.amazon.com/Distributed-Services-Go-Reliable-Maintainable/dp/1680507605) by Jeffrey Travis, [GitHub](https://github.com/igor-baiborodine/distributed-services-with-go-workshop)
+* ["gRPC Go for Professionals"](https://www.amazon.com/gRPC-Professionals-Implement-production-grade-microservices/dp/1837638845) by Clément Jean, [GitHub](https://github.com/PacktPublishing/gRPC-Go-for-Professionals)
+* ["Test-Driven Development in Go"](https://www.amazon.com/Test-Driven-Development-practical-idiomatic-real-world/dp/1803247878) by Adelina Simion, [GitHub](https://github.com/PacktPublishing/Test-Driven-Development-in-Go)
 
 ## Project Setup
 
