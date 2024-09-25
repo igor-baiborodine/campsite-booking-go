@@ -131,6 +131,8 @@ $ docker inspect --format="{{.State.Health.Status}}" postgres
 
 ### Run with Docker Compose
 
+> Docker images for Campgrounds API are available on [Docker Hub](https://hub.docker.com/repository/docker/ibaiborodine/campsite-booking-go/tags). 
+
 * Start PostgreSQL DB and Campgrounds API instances using **Docker Compose**:
 ```shell
 $ make compose-up-all
