@@ -1,9 +1,12 @@
 services:
   campgrounds:
     container_name: campgrounds
+    # build from the source
     build:
       context: ..
       dockerfile: docker/Dockerfile
+    # or use the latest image from Docker Hub
+    # image: ibaiborodine/campsite-booking-go:latest
     ports:
       - "8085:8085"
       - "6060:6060"

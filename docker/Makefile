@@ -16,18 +16,18 @@ image-build-app:
 ###############################################################################
 .PHONY: compose-up-all
 compose-up-all:
-	docker compose -f docker/docker-compose.yml -p campsite-booking-go up -d --build
+	@docker compose -f docker/docker-compose.yml -p campsite-booking-go up -d --build
 
 ###############################################################################
 # Target: compose-up-postgres
 ###############################################################################
 .PHONY: compose-up-postgres
 compose-up-postgres:
-	docker compose -f docker/docker-compose.yml -p campsite-booking-go up -d postgres
+	@docker compose -f docker/docker-compose.yml -p campsite-booking-go up -d postgres
 
 ###############################################################################
 # Target: compose-down-all
 ###############################################################################
 .PHONY: compose-down-all
 compose-down-all:
-	docker compose -p campsite-booking-go down -v --remove-orphans
+	@docker compose -p campsite-booking-go down -v --remove-orphans
