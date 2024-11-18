@@ -18,7 +18,7 @@ while [ "$i" -le "$count" ]; do
   i=$((i+1))
 done
 
-printf "Created $count requests:  %s\n" "$requests"
+printf "about to execute $count requests:\n  %s\n" "$requests"
 eval "$requests"
 
 sleep 1
