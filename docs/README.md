@@ -335,6 +335,23 @@ ERROR:
   Message: booking validation: 1 error occurred:
         * maximum stay: must be less or equal to three days
 ```
+6. Create booking for non-existing campsite ID:
+```bash
+$ grpcurl -plaintext -d \
+  '{"campsite_id": "a2432518-0fc0-496f-8f78-ac9902a44e3d", "start_date": "2024-11-21", "end_date": "2024-11-23", "email": "john.smith.1@email.com", "full_name": "John Smith 1"}' \
+  localhost:8085 campgroundspb.v1.CampgroundsService/CreateBooking 
+# output
+ERROR:
+  Code: Internal
+  Message: insert booking: ERROR: insert or update on table "bookings" violates foreign key constraint "fk_bookings_campsite_id_campsites" (SQLSTATE 23503)
+  Details:
+  1)    {
+          "@type": "type.googleapis.com/errors.ErrorType",
+          "GRPCCode": "13",
+          "HTTPCode": "500",
+          "TypeCode": "INTERNAL_SERVER_ERROR"
+        }
+```
 
 ### Performance
 
