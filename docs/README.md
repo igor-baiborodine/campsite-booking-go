@@ -23,6 +23,8 @@
   - [Unit and Integration](#unit-and-integration)
   - [Service and Method Discovery](#service-and-method-discovery)
   - [Functional and Error Handling](#functional-and-error-handling)
+  - [Concurrent Requests](#concurrent-requests)
+    - [Bookings Creation](#bookings-creation)
   - [Performance](#performance)
     - [GetCampsites](#getcampsites)
     - [GetVacantDates](#getvacantdates)
