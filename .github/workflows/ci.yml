@@ -135,7 +135,7 @@ jobs:
         id: next-version
         uses: ietf-tools/semver-action@v1
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.PAT }}
           minorList: feat
           patchList: build,chore,ci,docs,style,refactor,perf,test
       - name: Create tag
