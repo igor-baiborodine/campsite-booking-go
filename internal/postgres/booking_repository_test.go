@@ -12,6 +12,7 @@ import (
 	"github.com/igor-baiborodine/campsite-booking-go/internal/domain"
 	queries "github.com/igor-baiborodine/campsite-booking-go/internal/postgres/sql"
 	"github.com/igor-baiborodine/campsite-booking-go/internal/testing/bootstrap"
+	"github.com/stackus/errors"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -318,8 +319,31 @@ func TestBookingRepository_Insert(t *testing.T) {
 			},
 			wantErr: bootstrap.ErrCommitTx,
 		},
+		"Error_SerializationTx_ExhaustRetries": {
+			mockTxPhases: func(mock sqlmock.Sqlmock) {
+				rows := sqlmock.NewRows(columnsRow)
+				// 1st attempt
+				mock.ExpectBegin()
+				mock.ExpectQuery(queries.FindAllBookingsForDateRange+"FOR UPDATE").
+					WithArgs(campsiteID, startDate, endDate).
+					WillReturnRows(rows)
+				mock.ExpectExec(queries.InsertBooking).
+					WithArgs(bookingArgs(booking)...).
+					WillReturnError(&bootstrap.ErrSerializationTx)
+				mock.ExpectRollback()
+				// 2nd attempt
+				mock.ExpectBegin()
+				mock.ExpectQuery(queries.FindAllBookingsForDateRange+"FOR UPDATE").
+					WithArgs(campsiteID, startDate, endDate).
+					WillReturnRows(rows)
+				mock.ExpectExec(queries.InsertBooking).
+					WithArgs(bookingArgs(booking)...).
+					WillReturnError(&bootstrap.ErrSerializationTx)
+				mock.ExpectRollback()
+			},
+			wantErr: errors.ErrInternal,
+		},
 	}
-
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// given

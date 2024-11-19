@@ -3,10 +3,12 @@ package postgres
 import (
 	"context"
 	"database/sql"
+	"log/slog"
 	"time"
 
 	"github.com/igor-baiborodine/campsite-booking-go/internal/domain"
 	queries "github.com/igor-baiborodine/campsite-booking-go/internal/postgres/sql"
+	"github.com/jackc/pgconn"
 	"github.com/stackus/errors"
 )
 
@@ -67,7 +69,46 @@ func (r BookingRepository) FindForDateRange(
 }
 
 func (r BookingRepository) Insert(ctx context.Context, booking *domain.Booking) error {
-	tx, err := r.db.BeginTx(ctx, &sql.TxOptions{Isolation: sql.LevelReadCommitted, ReadOnly: false})
+	const (
+		maxAttempts = 2
+		backoffBase = 500 * time.Millisecond
+	)
+	txName := "insert booking"
+
+	for attempt := 1; attempt <= maxAttempts; attempt++ {
+		err := r.insertTx(ctx, booking)
+		if err == nil {
+			return nil
+		}
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) {
+			if pgErr.Code == "40001" { // serialization failure
+				backoff := backoffBase * time.Duration(attempt)
+				slog.Warn(
+					"failed to execute transaction (serialization error)",
+					"tx_name",
+					txName,
+					"attempt",
+					attempt,
+					"retry_in_ms",
+					backoff.Milliseconds(),
+				)
+				time.Sleep(backoff)
+				continue
+			}
+		}
+		return err
+	}
+	return errors.Wrapf(
+		errors.ErrInternal,
+		"%s: exhaust retries after %d attempts",
+		txName,
+		maxAttempts,
+	)
+}
+
+func (r BookingRepository) insertTx(ctx context.Context, booking *domain.Booking) error {
+	tx, err := r.db.BeginTx(ctx, &sql.TxOptions{Isolation: sql.LevelSerializable, ReadOnly: false})
 	if err != nil {
 		return errors.Wrap(err, "begin transaction")
 	}
