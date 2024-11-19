@@ -3,7 +3,6 @@ package postgres
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"log/slog"
 	"time"
 
@@ -86,7 +85,7 @@ func (r BookingRepository) Insert(ctx context.Context, booking *domain.Booking) 
 			if pgErr.Code == "40001" { // serialization failure
 				backoff := backoffBase * time.Duration(attempt)
 				slog.Warn(
-					"failed to execute transaction due to serialization error",
+					"failed to execute transaction (serialization error)",
 					"tx_name",
 					txName,
 					"attempt",
@@ -100,7 +99,12 @@ func (r BookingRepository) Insert(ctx context.Context, booking *domain.Booking) 
 		}
 		return err
 	}
-	return fmt.Errorf("%s: exhaust retries after %d attempts", txName, maxAttempts)
+	return errors.Wrapf(
+		errors.ErrInternal,
+		"%s: exhaust retries after %d attempts",
+		txName,
+		maxAttempts,
+	)
 }
 
 func (r BookingRepository) insertTx(ctx context.Context, booking *domain.Booking) error {
