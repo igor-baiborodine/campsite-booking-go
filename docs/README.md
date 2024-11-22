@@ -376,7 +376,7 @@ $ grpcurl -plaintext -d \
 }
 ```
 
-2. Execute the [concurrent-create-bookings.sh](../tests/concurrent-create-bookings.sh) script to
+2. Execute the [concurrent-create-bookings.sh](../tests/concurrent/concurrent-create-bookings.sh) script to
    simulate execution of a specified number of concurrent requests to create bookings for the same
    campsite ID and booking dates:
 ```bash

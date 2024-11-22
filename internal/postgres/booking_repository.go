@@ -114,6 +114,10 @@ func insertTx(ctx context.Context, r BookingRepository, booking *domain.Booking)
 }
 
 func (r BookingRepository) Update(ctx context.Context, booking *domain.Booking) error {
+	return r.retryTransaction(ctx, booking, "update booking", updateTx)
+}
+
+func updateTx(ctx context.Context, r BookingRepository, booking *domain.Booking) error {
 	tx, err := r.db.BeginTx(ctx, &sql.TxOptions{Isolation: sql.LevelReadCommitted, ReadOnly: false})
 	if err != nil {
 		return errors.Wrap(err, "begin transaction")
