@@ -12,9 +12,16 @@ import (
 	"github.com/stackus/errors"
 )
 
+const (
+	maxAttempts = 2
+	backoffBase = 500 * time.Millisecond
+)
+
 type BookingRepository struct {
 	db *sql.DB
 }
+
+type retryableOperation func(ctx context.Context, r BookingRepository, booking *domain.Booking) error
 
 var _ domain.BookingRepository = (*BookingRepository)(nil)
 
@@ -69,45 +76,10 @@ func (r BookingRepository) FindForDateRange(
 }
 
 func (r BookingRepository) Insert(ctx context.Context, booking *domain.Booking) error {
-	const (
-		maxAttempts = 2
-		backoffBase = 500 * time.Millisecond
-	)
-	txName := "insert booking"
-
-	for attempt := 1; attempt <= maxAttempts; attempt++ {
-		err := r.insertTx(ctx, booking)
-		if err == nil {
-			return nil
-		}
-		var pgErr *pgconn.PgError
-		if errors.As(err, &pgErr) {
-			if pgErr.Code == "40001" { // serialization failure
-				backoff := backoffBase * time.Duration(attempt)
-				slog.Warn(
-					"failed to execute transaction (serialization error)",
-					"tx_name",
-					txName,
-					"attempt",
-					attempt,
-					"retry_in_ms",
-					backoff.Milliseconds(),
-				)
-				time.Sleep(backoff)
-				continue
-			}
-		}
-		return err
-	}
-	return errors.Wrapf(
-		errors.ErrInternal,
-		"%s: exhaust retries after %d attempts",
-		txName,
-		maxAttempts,
-	)
+	return r.retryTransaction(ctx, booking, "insert booking", insertTx)
 }
 
-func (r BookingRepository) insertTx(ctx context.Context, booking *domain.Booking) error {
+func insertTx(ctx context.Context, r BookingRepository, booking *domain.Booking) error {
 	tx, err := r.db.BeginTx(ctx, &sql.TxOptions{Isolation: sql.LevelSerializable, ReadOnly: false})
 	if err != nil {
 		return errors.Wrap(err, "begin transaction")
@@ -202,4 +174,42 @@ func (r BookingRepository) findForDateRangeWithTx(
 		return nil, errors.Wrap(err, "finish booking rows")
 	}
 	return bookings, nil
+}
+
+func (r BookingRepository) retryTransaction(
+	ctx context.Context,
+	b *domain.Booking,
+	txName string,
+	op retryableOperation,
+) error {
+	for attempt := 1; attempt <= maxAttempts; attempt++ {
+		err := op(ctx, r, b)
+		if err == nil {
+			return nil
+		}
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) {
+			if pgErr.Code == "40001" { // serialization failure
+				backoff := backoffBase * time.Duration(attempt)
+				slog.Warn(
+					"failed to execute transaction (serialization error)",
+					"tx_name",
+					txName,
+					"attempt",
+					attempt,
+					"retry_in_ms",
+					backoff.Milliseconds(),
+				)
+				time.Sleep(backoff)
+				continue
+			}
+		}
+		return err
+	}
+	return errors.Wrapf(
+		errors.ErrInternal,
+		"%s: exhaust retries after %d attempts",
+		txName,
+		maxAttempts,
+	)
 }
