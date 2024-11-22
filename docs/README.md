@@ -362,9 +362,6 @@ ERROR:
 
 #### Bookings Creation
 
-Execute the [concurrent-create-bookings.sh](../script/test/concurrent-create-bookings.sh) script to
-simulate concurrent booking creation for the same booking dates:
-
 1. Create a campsite:
 ```bash
 $ grpcurl -plaintext -d \
@@ -375,8 +372,7 @@ $ grpcurl -plaintext -d \
   "campsiteId": "07df7f35-9c7a-4b10-a702-66844a7ec08c"
 }
 ```
-
-2. Execute the [concurrent-create-bookings.sh](../tests/concurrent/concurrent-create-bookings.sh) script to
+2. Execute the [tests/concurrent/create-bookings.sh](../tests/concurrent/create-bookings.sh) script to
    simulate execution of a specified number of concurrent requests to create bookings for the same
    campsite ID and booking dates:
 ```bash
