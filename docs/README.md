@@ -376,7 +376,7 @@ $ grpcurl -plaintext -d \
    simulate execution of a specified number of concurrent requests to create bookings for the same
    campsite ID and booking dates:
 ```bash
-$ ./tests/concurrent-create-bookings.sh 4 07df7f35-9c7a-4b10-a702-66844a7ec08c 2024-11-25 2024-11-26
+$ ./tests/concurrent/create-bookings.sh 4 07df7f35-9c7a-4b10-a702-66844a7ec08c 2024-11-25 2024-11-26
 # output
 about to execute 4 requests:  
   grpcurl -plaintext -d '{"campsite_id": "07df7f35-9c7a-4b10-a702-66844a7ec08c", "start_date": "2024-11-25", "end_date": "2024-11-26", "email": "john.smith.1@email.com", "full_name": "John Smith 1"}' localhost:8085 campgroundspb.v1.CampgroundsService/CreateBooking & 
