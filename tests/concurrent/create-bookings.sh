@@ -18,8 +18,8 @@ while [ "$i" -le "$count" ]; do
   i=$((i+1))
 done
 
-printf "about to execute $count requests:\n  %s\n" "$requests"
+printf "✅ about to execute $count create request(s):\n  %s\n" "$requests"
 eval "$requests"
 
 sleep 1
-printf "\nConcurrent bookings creation completed\n"
+printf "\n✅ concurrent bookings creation completed\n"
