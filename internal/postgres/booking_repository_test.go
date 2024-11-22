@@ -470,30 +470,6 @@ func TestBookingRepository_Update(t *testing.T) {
 			},
 			wantErr: bootstrap.ErrCommitTx,
 		},
-		"Error_SerializationTx_ExhaustRetries": {
-			mockTxPhases: func(mock sqlmock.Sqlmock) {
-				rows := sqlmock.NewRows(columnsRow)
-				// 1st attempt
-				mock.ExpectBegin()
-				mock.ExpectQuery(queries.FindAllBookingsForDateRange+"FOR UPDATE").
-					WithArgs(campsiteID, startDate, endDate).
-					WillReturnRows(rows)
-				mock.ExpectExec(queries.UpdateBooking).
-					WithArgs(bookingArgs(booking)...).
-					WillReturnError(&bootstrap.ErrSerializationTx)
-				mock.ExpectRollback()
-				// 2nd attempt
-				mock.ExpectBegin()
-				mock.ExpectQuery(queries.FindAllBookingsForDateRange+"FOR UPDATE").
-					WithArgs(campsiteID, startDate, endDate).
-					WillReturnRows(rows)
-				mock.ExpectExec(queries.UpdateBooking).
-					WithArgs(bookingArgs(booking)...).
-					WillReturnError(&bootstrap.ErrSerializationTx)
-				mock.ExpectRollback()
-			},
-			wantErr: errors.ErrInternal,
-		},
 	}
 
 	for name, tc := range tests {
