@@ -378,7 +378,7 @@ $ grpcurl -plaintext -d \
 ```bash
 $ ./tests/concurrent/create-bookings.sh 4 07df7f35-9c7a-4b10-a702-66844a7ec08c 2024-11-25 2024-11-26
 # output
-about to execute 4 requests:  
+✅ about to execute 4 request(s):  
   grpcurl -plaintext -d '{"campsite_id": "07df7f35-9c7a-4b10-a702-66844a7ec08c", "start_date": "2024-11-25", "end_date": "2024-11-26", "email": "john.smith.1@email.com", "full_name": "John Smith 1"}' localhost:8085 campgroundspb.v1.CampgroundsService/CreateBooking & 
   grpcurl -plaintext -d '{"campsite_id": "07df7f35-9c7a-4b10-a702-66844a7ec08c", "start_date": "2024-11-25", "end_date": "2024-11-26", "email": "john.smith.2@email.com", "full_name": "John Smith 2"}' localhost:8085 campgroundspb.v1.CampgroundsService/CreateBooking & 
   grpcurl -plaintext -d '{"campsite_id": "07df7f35-9c7a-4b10-a702-66844a7ec08c", "start_date": "2024-11-25", "end_date": "2024-11-26", "email": "john.smith.3@email.com", "full_name": "John Smith 3"}' localhost:8085 campgroundspb.v1.CampgroundsService/CreateBooking & 
@@ -396,7 +396,7 @@ ERROR:
   Code: FailedPrecondition
   Message: booking dates not available from 2024-11-25 to 2024-11-26
 
-Concurrent bookings creation completed
+✅ concurrent bookings creation completed
 ```
 
 ### Performance
