@@ -115,6 +115,3 @@ modules.xml
 
 ### Go tool pprof
 **/*.pprof
-
-### buf
-campgroundspb/v1/buf/validate/validate.proto

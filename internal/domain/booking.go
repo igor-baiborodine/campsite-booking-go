@@ -16,6 +16,7 @@ type Booking struct {
 	StartDate  time.Time
 	EndDate    time.Time
 	Active     bool
+	Version    int64
 }
 
 func (b *Booking) BookingDates() []time.Time {

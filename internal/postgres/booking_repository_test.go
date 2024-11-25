@@ -25,6 +25,7 @@ var columnsRow = []string{
 	"start_date",
 	"end_date",
 	"active",
+	"version",
 }
 
 func TestBookingRepository_Find(t *testing.T) {
@@ -394,9 +395,9 @@ func TestBookingRepository_Update(t *testing.T) {
 				mock.ExpectQuery(queries.FindAllBookingsForDateRange+"FOR UPDATE").
 					WithArgs(booking.CampsiteID, booking.StartDate, booking.EndDate).
 					WillReturnRows(rows)
-				mock.ExpectExec(queries.UpdateBooking).
+				mock.ExpectQuery(queries.UpdateBooking).
 					WithArgs(bookingArgs(booking)...).
-					WillReturnResult(sqlmock.NewResult(1, 1))
+					WillReturnRows(sqlmock.NewRows([]string{"new_version"}).AddRow(booking.Version + 1))
 				mock.ExpectCommit()
 			},
 			wantErr: nil,
@@ -419,7 +420,7 @@ func TestBookingRepository_Update(t *testing.T) {
 			},
 			wantErr: bootstrap.ErrBeginTx,
 		},
-		"Error_Query": {
+		"Error_QueryFindAllBookingsForDateRange": {
 			mockTxPhases: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
 				mock.ExpectQuery(queries.FindAllBookingsForDateRange+"FOR UPDATE").
@@ -429,19 +430,19 @@ func TestBookingRepository_Update(t *testing.T) {
 			},
 			wantErr: bootstrap.ErrQuery,
 		},
-		"Error_Exec": {
+		"Error_QueryUpdateBooking": {
 			mockTxPhases: func(mock sqlmock.Sqlmock) {
 				rows := sqlmock.NewRows(columnsRow)
 				mock.ExpectBegin()
 				mock.ExpectQuery(queries.FindAllBookingsForDateRange+"FOR UPDATE").
 					WithArgs(campsiteID, startDate, endDate).
 					WillReturnRows(rows)
-				mock.ExpectExec(queries.UpdateBooking).
+				mock.ExpectQuery(queries.UpdateBooking).
 					WithArgs(bookingArgs(booking)...).
-					WillReturnError(bootstrap.ErrExec)
+					WillReturnError(bootstrap.ErrQuery)
 				mock.ExpectRollback()
 			},
-			wantErr: bootstrap.ErrExec,
+			wantErr: bootstrap.ErrQuery,
 		},
 		"Error_Rows": {
 			mockTxPhases: func(mock sqlmock.Sqlmock) {
@@ -463,9 +464,9 @@ func TestBookingRepository_Update(t *testing.T) {
 				mock.ExpectQuery(queries.FindAllBookingsForDateRange+"FOR UPDATE").
 					WithArgs(campsiteID, startDate, endDate).
 					WillReturnRows(rows)
-				mock.ExpectExec(queries.UpdateBooking).
+				mock.ExpectQuery(queries.UpdateBooking).
 					WithArgs(bookingArgs(booking)...).
-					WillReturnResult(sqlmock.NewResult(1, 1))
+					WillReturnRows(sqlmock.NewRows([]string{"new_version"}).AddRow(booking.Version + 1))
 				mock.ExpectCommit().WillReturnError(bootstrap.ErrCommitTx)
 			},
 			wantErr: bootstrap.ErrCommitTx,
@@ -507,5 +508,6 @@ func bookingRowValues(b *domain.Booking) []driver.Value {
 		b.StartDate,
 		b.EndDate,
 		b.Active,
+		b.Version,
 	}
 }

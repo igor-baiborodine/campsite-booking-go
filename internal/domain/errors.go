@@ -24,6 +24,8 @@ type (
 	ErrBookingValidation struct {
 		MultiErr *multierror.Error
 	}
+
+	ErrBookingConcurrentUpdate struct{}
 )
 
 func (e ErrBookingNotFound) Error() string {
@@ -46,8 +48,13 @@ func (e ErrBookingValidation) Error() string {
 	return ""
 }
 
+// Append TODO: fix mix of value and pointer receiver
 func (e *ErrBookingValidation) Append(err error) {
 	if err != nil {
 		e.MultiErr = multierror.Append(e.MultiErr, err)
 	}
+}
+
+func (e ErrBookingConcurrentUpdate) Error() string {
+	return "booking could not be updated due to concurrent modification"
 }

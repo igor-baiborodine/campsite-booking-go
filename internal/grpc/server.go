@@ -144,6 +144,7 @@ func (s server) UpdateBooking(
 		FullName:   req.Booking.FullName,
 		StartDate:  req.Booking.StartDate,
 		EndDate:    req.Booking.EndDate,
+		Version:    req.Booking.Version,
 	}
 	err := s.app.UpdateBooking(ctx, booking)
 	if err != nil {
@@ -206,6 +207,7 @@ func BookingFromDomain(booking *domain.Booking) *api.Booking {
 		StartDate:  booking.StartDate.Format(time.DateOnly),
 		EndDate:    booking.EndDate.Format(time.DateOnly),
 		Active:     booking.Active,
+		Version:    booking.Version,
 	}
 }
 
