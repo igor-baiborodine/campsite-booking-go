@@ -44,6 +44,7 @@ func NewBookingWithAddDays(
 	booking.StartDate = now.AddDate(0, 0, startAddDays)
 	booking.EndDate = now.AddDate(0, 0, endAddDays)
 	booking.Active = true
+	booking.Version = 1
 
 	return &booking, nil
 }

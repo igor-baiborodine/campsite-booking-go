@@ -230,16 +230,18 @@ func (s *bookingSuite) TestBookingRepository_Insert_Success() {
 	// when
 	s.NoError(s.repo.Insert(context.Background(), booking))
 	// then
-	query := "SELECT campsite_id, created_at, updated_at FROM bookings WHERE campsite_id = $1"
+	query := "SELECT campsite_id, created_at, updated_at, version FROM bookings WHERE campsite_id = $1"
 	row := s.db.QueryRow(query, campsite.CampsiteID)
 
 	if s.NoError(row.Err()) {
 		var campsiteID string
 		var createdAt, updatedAt time.Time
-		s.NoError(row.Scan(&campsiteID, &createdAt, &updatedAt))
+		var version int
+		s.NoError(row.Scan(&campsiteID, &createdAt, &updatedAt, &version))
 		s.Equal(booking.CampsiteID, campsiteID)
 		s.NotNil(createdAt)
 		s.Equal(createdAt, updatedAt)
+		s.Equal(1, version)
 	}
 }
 

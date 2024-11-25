@@ -321,7 +321,8 @@ $ grpcurl -plaintext -d \
     "fullName": "John Smith",
     "startDate": "2024-09-09",
     "endDate": "2024-09-12",
-    "active": true
+    "active": true,
+    "version": "1"
   }
 }
 ```
@@ -398,6 +399,48 @@ ERROR:
 
 ✅ concurrent bookings creation completed
 ```
+
+#### Bookings Update
+
+1. Create a campsite:
+```bash
+$ grpcurl -plaintext -d \
+    '{"campsite_code": "CAMP01", "capacity": 4, "drinking_water": true, "fire_pit": true, "picnic_table": true, "restrooms": false}' \
+    localhost:8085 campgroundspb.v1.CampgroundsService/CreateCampsite
+# output
+{
+  "campsiteId": "e4f97725-0d42-4b54-8f9a-ff45994ca0fe"
+}
+```
+2. Create a booking:
+```bash
+$ grpcurl -plaintext -d \
+    '{"campsite_id": "e4f97725-0d42-4b54-8f9a-ff45994ca0fe", "email": "john.smith@example.com", "full_name": "John Smith", "start_date": "2024-12-01", "end_date": "2024-12-02"}' \
+    localhost:8085 campgroundspb.v1.CampgroundsService/CreateBooking
+# output
+{
+  "bookingId": "16c69cdb-aadf-487b-aaa9-7cf970285450"
+}
+```
+
+3. Execute the [tests/concurrent/update-bookings.sh](../tests/concurrent/create-bookings.sh) script
+   to simulate execution of two concurrent requests to update existing bookings with the same new
+   booking dates:
+```bash
+$ ./tests/concurrent/update-bookings.sh e4f97725-0d42-4b54-8f9a-ff45994ca0fe 16c69cdb-aadf-487b-aaa9-7cf970285450 2024-12-04 2024-12-05
+# output
+✅ about to execute 2 update request(s):
+  grpcurl -plaintext -d '{"booking": {"campsite_id": "e4f97725-0d42-4b54-8f9a-ff45994ca0fe", "booking_id": "16c69cdb-aadf-487b-aaa9-7cf970285450", "start_date": "2024-12-04", "end_date": "2024-12-05", "email": "john.smith.1@email.com", "full_name": "John Smith 1", "version": "1"}}' localhost:8085 campgroundspb.v1.CampgroundsService/UpdateBooking & 
+  grpcurl -plaintext -d '{"booking": {"campsite_id": "e4f97725-0d42-4b54-8f9a-ff45994ca0fe", "booking_id": "16c69cdb-aadf-487b-aaa9-7cf970285450", "start_date": "2024-12-04", "end_date": "2024-12-05", "email": "john.smith.2@email.com", "full_name": "John Smith 2", "version": "1"}}' localhost:8085 campgroundspb.v1.CampgroundsService/UpdateBooking & 
+# first request
+{}
+# second request
+ERROR:
+  Code: Unknown
+  Message: booking could not be updated due to concurrent modification
+  
+✅ concurrent bookings update completed 
+````
 
 ### Performance
 

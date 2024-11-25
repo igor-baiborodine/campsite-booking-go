@@ -28,7 +28,7 @@ func InsertCampsite(db *sql.DB, c *domain.Campsite) error {
 
 func InsertBooking(db *sql.DB, b *domain.Booking) error {
 	_, err := db.ExecContext(context.Background(), queries.InsertBooking,
-		b.BookingID, b.CampsiteID, b.Email, b.FullName, b.StartDate, b.EndDate, b.Active,
+		b.BookingID, b.CampsiteID, b.Email, b.FullName, b.StartDate, b.EndDate, b.Active, b.Version,
 	)
 	return err
 }
@@ -39,7 +39,7 @@ func FindBooking(db *sql.DB, bookingID string) (*domain.Booking, error) {
 		context.Background(), queries.FindBookingByBookingID, bookingID,
 	).Scan(
 		&booking.ID, &booking.BookingID, &booking.CampsiteID, &booking.Email,
-		&booking.FullName, &booking.StartDate, &booking.EndDate, &booking.Active,
+		&booking.FullName, &booking.StartDate, &booking.EndDate, &booking.Active, &booking.Version,
 	); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, domain.ErrBookingNotFound{BookingID: bookingID}

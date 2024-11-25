@@ -109,4 +109,6 @@ message Booking {
   string end_date = 6 [(buf.validate.field).string.pattern = "^\\d{4}-([0][1-9]|1[0-2])-([0][1-9]|[1-2]\\d|3[01])$"];
   // Indicates if booking is active.
   bool active = 8;
+  // Version of booking.
+  int64 version = 9 [(buf.validate.field).int64.gt = 0];
 }

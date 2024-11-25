@@ -18,6 +18,7 @@ type (
 		FullName   string
 		StartDate  string
 		EndDate    string
+		Version    int64
 	}
 
 	// UpdateBookingHandler is a logging decorator for the updateBookingHandler struct.

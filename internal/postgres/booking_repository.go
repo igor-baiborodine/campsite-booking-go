@@ -41,7 +41,7 @@ func (r BookingRepository) Find(ctx context.Context, bookingID string) (*domain.
 		ctx, queries.FindBookingByBookingID, bookingID,
 	).Scan(
 		&booking.ID, &booking.BookingID, &booking.CampsiteID, &booking.Email,
-		&booking.FullName, &booking.StartDate, &booking.EndDate, &booking.Active,
+		&booking.FullName, &booking.StartDate, &booking.EndDate, &booking.Active, &booking.Version,
 	); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, domain.ErrBookingNotFound{BookingID: bookingID}
@@ -101,7 +101,7 @@ func insertTx(ctx context.Context, r BookingRepository, booking *domain.Booking)
 
 	_, err = tx.ExecContext(
 		ctx, queries.InsertBooking, booking.BookingID, booking.CampsiteID, booking.Email,
-		booking.FullName, booking.StartDate, booking.EndDate, booking.Active,
+		booking.FullName, booking.StartDate, booking.EndDate, booking.Active, 1,
 	)
 	if err != nil {
 		return errors.Wrap(err, "insert booking")
@@ -135,11 +135,15 @@ func (r BookingRepository) Update(ctx context.Context, booking *domain.Booking) 
 			}
 		}
 	}
-	_, err = tx.ExecContext(
+	var newVersion int
+	err = tx.QueryRowContext(
 		ctx, queries.UpdateBooking, booking.BookingID, booking.CampsiteID, booking.Email,
-		booking.FullName, booking.StartDate, booking.EndDate, booking.Active,
-	)
+		booking.FullName, booking.StartDate, booking.EndDate, booking.Active, booking.Version,
+	).Scan(&newVersion)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return domain.ErrBookingConcurrentUpdate{}
+		}
 		return errors.Wrap(err, "update booking")
 	}
 
@@ -164,6 +168,7 @@ func (r BookingRepository) findForDateRangeWithTx(
 		if err = rows.Scan(
 			&booking.ID, &booking.BookingID, &booking.CampsiteID, &booking.Email,
 			&booking.FullName, &booking.StartDate, &booking.EndDate, &booking.Active,
+			&booking.Version,
 		); err != nil {
 			return nil, errors.Wrap(err, "scan booking row")
 		}

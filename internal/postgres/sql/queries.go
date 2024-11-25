@@ -38,7 +38,8 @@ const (
 		    full_name, 
 		    start_date, 
 		    end_date, 
-		    active
+		    active,
+		    version
 		FROM bookings
 		WHERE booking_id = $1
 	`
@@ -51,9 +52,10 @@ const (
 			full_name, 
 			start_date, 
 			end_date, 
-			active
+			active,
+		    version
 		)
-		VALUES ($1, $2, $3, $4, $5, $6, $7)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 	`
 
 	FindAllBookingsForDateRange = `
@@ -65,7 +67,8 @@ const (
 		    full_name, 
 		    start_date, 
 		    end_date, 
-		    active
+		    active,
+		    version
 		FROM bookings
 		WHERE active = TRUE 
 		  	AND campsite_id = $1
@@ -82,7 +85,9 @@ const (
 		    full_name = $4, 
 		    start_date = $5,
 		    end_date = $6,
-		    active = $7
-		WHERE booking_id = $1
+		    active = $7, 
+		    version = version + 1
+		WHERE booking_id = $1 AND version = $8
+		RETURNING version
 	`
 )
