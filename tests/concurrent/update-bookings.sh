@@ -2,13 +2,13 @@
 
 set -e
 
-count="$1"
-campsite_id="$2"
-booking_id="$3"
-start_date="$4"
-end_date="$5"
+count=2
+campsite_id="$1"
+booking_id="$2"
+start_date="$3"
+end_date="$4"
 
-data="{\"booking\": {\"campsite_id\": \"$campsite_id\", \"booking_id\": \"$booking_id\", \"start_date\": \"$start_date\", \"end_date\": \"$end_date\", \"email\": \"EMAIL\", \"full_name\": \"FULL_NAME\"}}"
+data="{\"booking\": {\"campsite_id\": \"$campsite_id\", \"booking_id\": \"$booking_id\", \"start_date\": \"$start_date\", \"end_date\": \"$end_date\", \"email\": \"EMAIL\", \"full_name\": \"FULL_NAME\", \"version\": \"1\"}}"
 i=1
 requests=""
 
