@@ -25,6 +25,7 @@
   - [Functional and Error Handling](#functional-and-error-handling)
   - [Concurrent Requests](#concurrent-requests)
     - [Bookings Creation](#bookings-creation)
+    - [Bookings Update](#bookings-update)
   - [Performance](#performance)
     - [GetCampsites](#getcampsites)
     - [GetVacantDates](#getvacantdates)
