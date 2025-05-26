@@ -12,7 +12,7 @@ MOCKERY_VERSION = v2.43.2
 GOIMPORTS_VERSION = v0.22.0
 GOLINES_VERSION = v0.12.2
 GOFUMPT_VERSION = v0.6.0
-GOLANGCI_LINT_VERSION = v1.60.3
+GOLANGCI_LINT_VERSION = v2.1.6
 
 ################################################################################
 # Target: init-proto

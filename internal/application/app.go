@@ -46,40 +46,40 @@ var bookingValidators = []domain.BookingValidator{
 }
 
 func (a CampgroundsApp) CreateCampsite(ctx context.Context, cmd command.CreateCampsite) error {
-	return a.commands.CreateCampsiteHandler.Handle(ctx, cmd)
+	return a.CreateCampsiteHandler.Handle(ctx, cmd)
 }
 
 func (a CampgroundsApp) CreateBooking(ctx context.Context, cmd command.CreateBooking) error {
-	return a.commands.CreateBookingHandler.Handle(ctx, cmd)
+	return a.CreateBookingHandler.Handle(ctx, cmd)
 }
 
 func (a CampgroundsApp) UpdateBooking(ctx context.Context, cmd command.UpdateBooking) error {
-	return a.commands.UpdateBookingHandler.Handle(ctx, cmd)
+	return a.UpdateBookingHandler.Handle(ctx, cmd)
 }
 
 func (a CampgroundsApp) CancelBooking(ctx context.Context, cmd command.CancelBooking) error {
-	return a.commands.CancelBookingHandler.Handle(ctx, cmd)
+	return a.CancelBookingHandler.Handle(ctx, cmd)
 }
 
 func (a CampgroundsApp) GetCampsites(
 	ctx context.Context,
 	qry query.GetCampsites,
 ) ([]*domain.Campsite, error) {
-	return a.queries.GetCampsitesHandler.Handle(ctx, qry)
+	return a.GetCampsitesHandler.Handle(ctx, qry)
 }
 
 func (a CampgroundsApp) GetBooking(
 	ctx context.Context,
 	qry query.GetBooking,
 ) (*domain.Booking, error) {
-	return a.queries.GetBookingHandler.Handle(ctx, qry)
+	return a.GetBookingHandler.Handle(ctx, qry)
 }
 
 func (a CampgroundsApp) GetVacantDates(
 	ctx context.Context,
 	qry query.GetVacantDates,
 ) ([]string, error) {
-	return a.queries.GetVacantDatesHandler.Handle(ctx, qry)
+	return a.GetVacantDatesHandler.Handle(ctx, qry)
 }
 
 var _ App = (*CampgroundsApp)(nil)
