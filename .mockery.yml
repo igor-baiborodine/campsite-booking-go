@@ -1,0 +1,11 @@
+template: testify
+log-level: warn
+template-data:
+  unroll-variadic: true
+
+packages:
+  ./internal:
+    config:
+      recursive: true
+      all: true
+      filename: "mock_{{.InterfaceName}}.go"

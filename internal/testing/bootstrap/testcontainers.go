@@ -19,8 +19,8 @@ func NewPostgresContainer() (*postgres.PostgresContainer, error) {
 	dbUser := "test_campgrounds_user"
 	dbPassword := "test_campgrounds_pass"
 
-	return postgres.RunContainer(ctx,
-		testcontainers.WithImage("docker.io/postgres:15.2-alpine"),
+	return postgres.Run(ctx,
+		"docker.io/postgres:15.2-alpine",
 		postgres.WithDatabase(dbName),
 		postgres.WithUsername(dbUser),
 		postgres.WithPassword(dbPassword),
@@ -28,7 +28,7 @@ func NewPostgresContainer() (*postgres.PostgresContainer, error) {
 		testcontainers.WithWaitStrategy(
 			wait.ForLog("database system is ready to accept connections").
 				WithOccurrence(2).
-				WithStartupTimeout(5*time.Second)),
+				WithStartupTimeout(15*time.Second)),
 	)
 }
 
