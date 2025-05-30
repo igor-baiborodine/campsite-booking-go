@@ -1,7 +1,7 @@
 ################################################################################
 # Stage 1: cache modules
 ################################################################################
-FROM golang:1.22.4-bullseye AS modules
+FROM golang:1.24.2-bullseye AS modules
 
 COPY go.mod go.sum /usr/src/modules/
 WORKDIR /usr/src/modules
@@ -10,7 +10,7 @@ RUN go mod download
 ################################################################################
 # Stage 2: build executable
 ################################################################################
-FROM golang:1.22.4-bullseye AS builder
+FROM golang:1.24.2-bullseye AS builder
 
 COPY --from=modules /go/pkg /go/pkg
 COPY . /usr/src/app
