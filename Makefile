@@ -8,7 +8,7 @@
 ################################################################################
 PROTOC_GEN_GO_VERSION = v1.34.2
 PROTOC_GEN_GO_GRPC_VERSION = v1.4.0
-MOCKERY_VERSION = v2.43.2
+MOCKERY_VERSION = v3.3.1
 GOIMPORTS_VERSION = v0.22.0
 GOLINES_VERSION = v0.12.2
 GOFUMPT_VERSION = v0.6.0
@@ -27,7 +27,7 @@ init-proto:
 ################################################################################
 .PHONY: init-mock
 init-mock:
-	go install github.com/vektra/mockery/v2@$(MOCKERY_VERSION)
+	go install github.com/vektra/mockery/v3@$(MOCKERY_VERSION)
 
 ################################################################################
 # Target: init-format
@@ -71,7 +71,7 @@ gen-proto:
 ################################################################################
 .PHONY: gen-mock
 gen-mock:
-	mockery --quiet --dir ./internal -r --all --inpackage --case underscore
+	mockery
 
 ################################################################################
 # Target: format
