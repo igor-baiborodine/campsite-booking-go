@@ -17,7 +17,7 @@ jobs:
         target_os: [ "linux" ]
         target_arch: [ "amd64" ]
     env:
-      GOLANGCILINT_VER: "v1.60.3"
+      GOLANGCILINT_VER: "v2.1.6"
       GOOS: "${{ matrix.target_os }}"
       GOARCH: "${{ matrix.target_arch }}"
       GOPROXY: "https://proxy.golang.org"
