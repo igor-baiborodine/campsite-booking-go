@@ -208,7 +208,8 @@ func (s *bookingSuite) TestBookingRepository_FindForDateRange_Success() {
 			end, _ := time.Parse(time.DateOnly, test.re)
 			// when
 			got, err := s.repo.FindForDateRange(
-				context.Background(), campsite.CampsiteID, start, end)
+				context.Background(), campsite.CampsiteID, start, end,
+			)
 			// then
 			if s.NoError(err) {
 				s.Equal(test.len, len(got))

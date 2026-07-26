@@ -19,7 +19,8 @@ const (
 )
 
 func InsertCampsite(db *sql.DB, c *domain.Campsite) error {
-	_, err := db.ExecContext(context.Background(), queries.InsertCampsite,
+	_, err := db.ExecContext(
+		context.Background(), queries.InsertCampsite,
 		c.CampsiteID, c.CampsiteCode, c.Capacity, c.Restrooms, c.DrinkingWater, c.PicnicTable,
 		c.FirePit, c.Active,
 	)
@@ -27,7 +28,8 @@ func InsertCampsite(db *sql.DB, c *domain.Campsite) error {
 }
 
 func InsertBooking(db *sql.DB, b *domain.Booking) error {
-	_, err := db.ExecContext(context.Background(), queries.InsertBooking,
+	_, err := db.ExecContext(
+		context.Background(), queries.InsertBooking,
 		b.BookingID, b.CampsiteID, b.Email, b.FullName, b.StartDate, b.EndDate, b.Active, b.Version,
 	)
 	return err
