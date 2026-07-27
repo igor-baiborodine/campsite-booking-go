@@ -74,7 +74,7 @@ type MockGetCampsitesHandler_Handle_Call struct {
 // Handle is a helper method to define mock.On call
 //   - ctx context.Context
 //   - qry GetCampsites
-func (_e *MockGetCampsitesHandler_Expecter) Handle(ctx interface{}, qry interface{}) *MockGetCampsitesHandler_Handle_Call {
+func (_e *MockGetCampsitesHandler_Expecter) Handle(ctx any, qry any) *MockGetCampsitesHandler_Handle_Call {
 	return &MockGetCampsitesHandler_Handle_Call{Call: _e.mock.On("Handle", ctx, qry)}
 }
 

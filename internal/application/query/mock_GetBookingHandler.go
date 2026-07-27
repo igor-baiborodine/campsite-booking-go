@@ -74,7 +74,7 @@ type MockGetBookingHandler_Handle_Call struct {
 // Handle is a helper method to define mock.On call
 //   - ctx context.Context
 //   - qry GetBooking
-func (_e *MockGetBookingHandler_Expecter) Handle(ctx interface{}, qry interface{}) *MockGetBookingHandler_Handle_Call {
+func (_e *MockGetBookingHandler_Expecter) Handle(ctx any, qry any) *MockGetBookingHandler_Handle_Call {
 	return &MockGetBookingHandler_Handle_Call{Call: _e.mock.On("Handle", ctx, qry)}
 }
 

@@ -72,7 +72,7 @@ type MockCampsiteRepository_FindAll_Call struct {
 
 // FindAll is a helper method to define mock.On call
 //   - ctx context.Context
-func (_e *MockCampsiteRepository_Expecter) FindAll(ctx interface{}) *MockCampsiteRepository_FindAll_Call {
+func (_e *MockCampsiteRepository_Expecter) FindAll(ctx any) *MockCampsiteRepository_FindAll_Call {
 	return &MockCampsiteRepository_FindAll_Call{Call: _e.mock.On("FindAll", ctx)}
 }
 
@@ -124,7 +124,7 @@ type MockCampsiteRepository_Insert_Call struct {
 // Insert is a helper method to define mock.On call
 //   - ctx context.Context
 //   - campsite *Campsite
-func (_e *MockCampsiteRepository_Expecter) Insert(ctx interface{}, campsite interface{}) *MockCampsiteRepository_Insert_Call {
+func (_e *MockCampsiteRepository_Expecter) Insert(ctx any, campsite any) *MockCampsiteRepository_Insert_Call {
 	return &MockCampsiteRepository_Insert_Call{Call: _e.mock.On("Insert", ctx, campsite)}
 }
 

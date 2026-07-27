@@ -6,9 +6,9 @@
 ################################################################################
 # Variables                                                                    #
 ################################################################################
-PROTOC_GEN_GO_VERSION = v1.34.2
-PROTOC_GEN_GO_GRPC_VERSION = v1.4.0
-MOCKERY_VERSION = v3.3.1
+PROTOC_GEN_GO_VERSION = v1.36.11
+PROTOC_GEN_GO_GRPC_VERSION = v1.6.2
+MOCKERY_VERSION = v3.7.2
 GOIMPORTS_VERSION = v0.48.0
 GOLINES_VERSION = v0.13.0
 GOFUMPT_VERSION = v0.10.0

@@ -73,7 +73,7 @@ type MockGetVacantDatesHandler_Handle_Call struct {
 // Handle is a helper method to define mock.On call
 //   - ctx context.Context
 //   - qry GetVacantDates
-func (_e *MockGetVacantDatesHandler_Expecter) Handle(ctx interface{}, qry interface{}) *MockGetVacantDatesHandler_Handle_Call {
+func (_e *MockGetVacantDatesHandler_Expecter) Handle(ctx any, qry any) *MockGetVacantDatesHandler_Handle_Call {
 	return &MockGetVacantDatesHandler_Handle_Call{Call: _e.mock.On("Handle", ctx, qry)}
 }
 
