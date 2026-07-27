@@ -31,7 +31,7 @@ jobs:
       - name: Run mod tidy, check diff
         run: make mod-tidy check-mod-diff
       - name: Set up Buf
-        uses: bufbuild/buf-setup-action@v1.34.0
+        uses: bufbuild/buf-action@v1
       - name: Run format proto, check diff
         run: make format-proto check-proto-diff
       - name: Run lint proto, check diff
