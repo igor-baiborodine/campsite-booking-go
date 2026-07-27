@@ -1,7 +1,7 @@
 ################################################################################
 # Stage 1: cache modules
 ################################################################################
-FROM golang:1.24.2-bullseye AS modules
+FROM golang:1.26.5-trixie AS modules
 
 COPY go.mod go.sum /usr/src/modules/
 WORKDIR /usr/src/modules
