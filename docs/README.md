@@ -90,7 +90,7 @@ These resources were also used during the work on this project:
 **Prerequisites**:
 - [Git](https://git-scm.com/), see this [guide](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) on how to install Git.
 - [Make](https://man7.org/linux/man-pages/man1/make.1.html)
-- [Go](https://go.dev/) (version >= 1.22), see this [guide](https://go.dev/doc/install) on how to install Go.
+- [Go](https://go.dev/) (version >= 1.26), see this [guide](https://go.dev/doc/install) on how to install Go.
 
 Clone the project and install the necessary tools(protoc, mockery, golines, goimports, gofumpt,
 golangci-lint):

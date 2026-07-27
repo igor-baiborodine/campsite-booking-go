@@ -6,13 +6,14 @@
 ################################################################################
 # Variables                                                                    #
 ################################################################################
-PROTOC_GEN_GO_VERSION = v1.34.2
-PROTOC_GEN_GO_GRPC_VERSION = v1.4.0
+PROTOC_GEN_GO_VERSION = v1.36.11
+PROTOC_GEN_GO_GRPC_VERSION = v1.6.2
 MOCKERY_VERSION = v3.7.2
 GOIMPORTS_VERSION = v0.48.0
 GOLINES_VERSION = v0.13.0
 GOFUMPT_VERSION = v0.10.0
 GOLANGCI_LINT_VERSION = v2.11.4
+BUF_VERSION = v1.72.0
 
 ################################################################################
 # Target: init-proto
@@ -21,6 +22,7 @@ GOLANGCI_LINT_VERSION = v2.11.4
 init-proto:
 	go install google.golang.org/protobuf/cmd/protoc-gen-go@$(PROTOC_GEN_GO_VERSION)
 	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@$(PROTOC_GEN_GO_GRPC_VERSION)
+	go install github.com/bufbuild/buf/cmd/buf@$(BUF_VERSION)
 
 ################################################################################
 # Target: init-mock
