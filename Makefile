@@ -12,7 +12,7 @@ MOCKERY_VERSION = v3.3.1
 GOIMPORTS_VERSION = v0.48.0
 GOLINES_VERSION = v0.13.0
 GOFUMPT_VERSION = v0.10.0
-GOLANGCI_LINT_VERSION = v2.1.6
+GOLANGCI_LINT_VERSION = v2.11.4
 
 ################################################################################
 # Target: init-proto
@@ -43,7 +43,7 @@ init-format:
 ################################################################################
 .PHONY: init-golangci-lint
 init-golangci-lint:
-	sudo curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin $(GOLANGCI_LINT_VERSION)
+	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sudo sh -s -- -b $(go env GOPATH)/bin $(GOLANGCI_LINT_VERSION)
 	golangci-lint --version
 
 ################################################################################
