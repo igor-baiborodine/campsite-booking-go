@@ -65,7 +65,7 @@ type MockApp_CancelBooking_Call struct {
 // CancelBooking is a helper method to define mock.On call
 //   - ctx context.Context
 //   - cmd command.CancelBooking
-func (_e *MockApp_Expecter) CancelBooking(ctx interface{}, cmd interface{}) *MockApp_CancelBooking_Call {
+func (_e *MockApp_Expecter) CancelBooking(ctx any, cmd any) *MockApp_CancelBooking_Call {
 	return &MockApp_CancelBooking_Call{Call: _e.mock.On("CancelBooking", ctx, cmd)}
 }
 
@@ -122,7 +122,7 @@ type MockApp_CreateBooking_Call struct {
 // CreateBooking is a helper method to define mock.On call
 //   - ctx context.Context
 //   - cmd command.CreateBooking
-func (_e *MockApp_Expecter) CreateBooking(ctx interface{}, cmd interface{}) *MockApp_CreateBooking_Call {
+func (_e *MockApp_Expecter) CreateBooking(ctx any, cmd any) *MockApp_CreateBooking_Call {
 	return &MockApp_CreateBooking_Call{Call: _e.mock.On("CreateBooking", ctx, cmd)}
 }
 
@@ -179,7 +179,7 @@ type MockApp_CreateCampsite_Call struct {
 // CreateCampsite is a helper method to define mock.On call
 //   - ctx context.Context
 //   - cmd command.CreateCampsite
-func (_e *MockApp_Expecter) CreateCampsite(ctx interface{}, cmd interface{}) *MockApp_CreateCampsite_Call {
+func (_e *MockApp_Expecter) CreateCampsite(ctx any, cmd any) *MockApp_CreateCampsite_Call {
 	return &MockApp_CreateCampsite_Call{Call: _e.mock.On("CreateCampsite", ctx, cmd)}
 }
 
@@ -247,7 +247,7 @@ type MockApp_GetBooking_Call struct {
 // GetBooking is a helper method to define mock.On call
 //   - ctx context.Context
 //   - qry query.GetBooking
-func (_e *MockApp_Expecter) GetBooking(ctx interface{}, qry interface{}) *MockApp_GetBooking_Call {
+func (_e *MockApp_Expecter) GetBooking(ctx any, qry any) *MockApp_GetBooking_Call {
 	return &MockApp_GetBooking_Call{Call: _e.mock.On("GetBooking", ctx, qry)}
 }
 
@@ -315,7 +315,7 @@ type MockApp_GetCampsites_Call struct {
 // GetCampsites is a helper method to define mock.On call
 //   - ctx context.Context
 //   - qry query.GetCampsites
-func (_e *MockApp_Expecter) GetCampsites(ctx interface{}, qry interface{}) *MockApp_GetCampsites_Call {
+func (_e *MockApp_Expecter) GetCampsites(ctx any, qry any) *MockApp_GetCampsites_Call {
 	return &MockApp_GetCampsites_Call{Call: _e.mock.On("GetCampsites", ctx, qry)}
 }
 
@@ -383,7 +383,7 @@ type MockApp_GetVacantDates_Call struct {
 // GetVacantDates is a helper method to define mock.On call
 //   - ctx context.Context
 //   - qry query.GetVacantDates
-func (_e *MockApp_Expecter) GetVacantDates(ctx interface{}, qry interface{}) *MockApp_GetVacantDates_Call {
+func (_e *MockApp_Expecter) GetVacantDates(ctx any, qry any) *MockApp_GetVacantDates_Call {
 	return &MockApp_GetVacantDates_Call{Call: _e.mock.On("GetVacantDates", ctx, qry)}
 }
 
@@ -440,7 +440,7 @@ type MockApp_UpdateBooking_Call struct {
 // UpdateBooking is a helper method to define mock.On call
 //   - ctx context.Context
 //   - cmd command.UpdateBooking
-func (_e *MockApp_Expecter) UpdateBooking(ctx interface{}, cmd interface{}) *MockApp_UpdateBooking_Call {
+func (_e *MockApp_Expecter) UpdateBooking(ctx any, cmd any) *MockApp_UpdateBooking_Call {
 	return &MockApp_UpdateBooking_Call{Call: _e.mock.On("UpdateBooking", ctx, cmd)}
 }
 

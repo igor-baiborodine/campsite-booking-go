@@ -17,21 +17,21 @@ jobs:
         target_os: [ "linux" ]
         target_arch: [ "amd64" ]
     env:
-      GOLANGCILINT_VER: "v2.1.6"
+      GOLANGCILINT_VER: "v2.11.4"
       GOOS: "${{ matrix.target_os }}"
       GOARCH: "${{ matrix.target_arch }}"
       GOPROXY: "https://proxy.golang.org"
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: Set up Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v7
         with:
           go-version-file: "go.mod"
       - name: Run mod tidy, check diff
         run: make mod-tidy check-mod-diff
       - name: Set up Buf
-        uses: bufbuild/buf-setup-action@v1.34.0
+        uses: bufbuild/buf-action@v1
       - name: Run format proto, check diff
         run: make format-proto check-proto-diff
       - name: Run lint proto, check diff
@@ -43,7 +43,7 @@ jobs:
       - name: Run generate mock, check diff
         run: make init-mock gen-mock check-mock-diff
       - name: Run golangci-lint
-        uses: golangci/golangci-lint-action@v8.0.0
+        uses: golangci/golangci-lint-action@v9.3.0
         with:
           version: ${{ env.GOLANGCILINT_VER }}
           skip-cache: true
@@ -65,9 +65,9 @@ jobs:
       TEST_REPORT_FILE_PREFIX: "test_report"
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: Set up Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v7
         with:
           go-version-file: "go.mod"
       - name: Run tests
@@ -75,7 +75,7 @@ jobs:
           COVERAGE_OPTS: "-coverprofile=coverage.txt -covermode=atomic"
         run: make test
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v7
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
   integration-tests:
@@ -95,9 +95,9 @@ jobs:
       GOPROXY: "https://proxy.golang.org"
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: Set up Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v7
         with:
           go-version-file: "go.mod"
       - name: Run integration tests
@@ -109,13 +109,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
+        uses: docker/setup-qemu-action@v4
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
       - name: Build image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           push: false
           context: .
@@ -128,7 +128,7 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           token: ${{ secrets.PAT }}
       - name: Next version

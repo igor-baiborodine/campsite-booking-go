@@ -59,7 +59,7 @@ type MockBookingValidator_Validate_Call struct {
 
 // Validate is a helper method to define mock.On call
 //   - b *Booking
-func (_e *MockBookingValidator_Expecter) Validate(b interface{}) *MockBookingValidator_Validate_Call {
+func (_e *MockBookingValidator_Expecter) Validate(b any) *MockBookingValidator_Validate_Call {
 	return &MockBookingValidator_Validate_Call{Call: _e.mock.On("Validate", b)}
 }
 

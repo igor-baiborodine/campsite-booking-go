@@ -62,7 +62,7 @@ type MockCommand_Handle_Call[C any] struct {
 // Handle is a helper method to define mock.On call
 //   - ctx context.Context
 //   - cmd C
-func (_e *MockCommand_Expecter[C]) Handle(ctx interface{}, cmd interface{}) *MockCommand_Handle_Call[C] {
+func (_e *MockCommand_Expecter[C]) Handle(ctx any, cmd any) *MockCommand_Handle_Call[C] {
 	return &MockCommand_Handle_Call[C]{Call: _e.mock.On("Handle", ctx, cmd)}
 }
 

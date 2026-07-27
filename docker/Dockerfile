@@ -1,7 +1,7 @@
 ################################################################################
 # Stage 1: cache modules
 ################################################################################
-FROM golang:1.24.2-bullseye AS modules
+FROM golang:1.26.5-trixie AS modules
 
 COPY go.mod go.sum /usr/src/modules/
 WORKDIR /usr/src/modules
@@ -10,7 +10,7 @@ RUN go mod download
 ################################################################################
 # Stage 2: build executable
 ################################################################################
-FROM golang:1.24.2-bullseye AS builder
+FROM golang:1.26.5-trixie AS builder
 
 COPY --from=modules /go/pkg /go/pkg
 COPY . /usr/src/app
@@ -21,7 +21,7 @@ RUN CGO_ENABLED=0 go build -ldflags="-s -w" -v -o /bin/app ./cmd
 ################################################################################
 # Stage 3: build app image
 ################################################################################
-FROM debian:bullseye-slim
+FROM debian:trixie-slim
 
 LABEL \
     maintainer="Igor Baiborodine <igor@kiroule.com>" \

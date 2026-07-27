@@ -65,7 +65,8 @@ func (r BookingRepository) FindForDateRange(
 	defer rollbackTx(tx)
 
 	bookings, err := r.findForDateRangeWithTx(
-		ctx, tx, queries.FindAllBookingsForDateRange, campsiteID, startDate, endDate)
+		ctx, tx, queries.FindAllBookingsForDateRange, campsiteID, startDate, endDate,
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -88,7 +89,8 @@ func insertTx(ctx context.Context, r BookingRepository, booking *domain.Booking)
 
 	query := queries.FindAllBookingsForDateRange + " FOR UPDATE"
 	bookings, err := r.findForDateRangeWithTx(
-		ctx, tx, query, booking.CampsiteID, booking.StartDate, booking.EndDate)
+		ctx, tx, query, booking.CampsiteID, booking.StartDate, booking.EndDate,
+	)
 	if err != nil {
 		return errors.Wrap(err, "query bookings for date range")
 	}
@@ -122,7 +124,8 @@ func (r BookingRepository) Update(ctx context.Context, booking *domain.Booking) 
 
 	query := queries.FindAllBookingsForDateRange + "FOR UPDATE"
 	bookings, err := r.findForDateRangeWithTx(
-		ctx, tx, query, booking.CampsiteID, booking.StartDate, booking.EndDate)
+		ctx, tx, query, booking.CampsiteID, booking.StartDate, booking.EndDate,
+	)
 	if err != nil {
 		return errors.Wrap(err, "query bookings for date range")
 	}

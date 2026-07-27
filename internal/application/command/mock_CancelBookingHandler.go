@@ -62,7 +62,7 @@ type MockCancelBookingHandler_Handle_Call struct {
 // Handle is a helper method to define mock.On call
 //   - ctx context.Context
 //   - cmd CancelBooking
-func (_e *MockCancelBookingHandler_Expecter) Handle(ctx interface{}, cmd interface{}) *MockCancelBookingHandler_Handle_Call {
+func (_e *MockCancelBookingHandler_Expecter) Handle(ctx any, cmd any) *MockCancelBookingHandler_Handle_Call {
 	return &MockCancelBookingHandler_Handle_Call{Call: _e.mock.On("Handle", ctx, cmd)}
 }
 

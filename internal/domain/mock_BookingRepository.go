@@ -74,7 +74,7 @@ type MockBookingRepository_Find_Call struct {
 // Find is a helper method to define mock.On call
 //   - ctx context.Context
 //   - bookingID string
-func (_e *MockBookingRepository_Expecter) Find(ctx interface{}, bookingID interface{}) *MockBookingRepository_Find_Call {
+func (_e *MockBookingRepository_Expecter) Find(ctx any, bookingID any) *MockBookingRepository_Find_Call {
 	return &MockBookingRepository_Find_Call{Call: _e.mock.On("Find", ctx, bookingID)}
 }
 
@@ -144,7 +144,7 @@ type MockBookingRepository_FindForDateRange_Call struct {
 //   - campsiteID string
 //   - startDate time.Time
 //   - endDate time.Time
-func (_e *MockBookingRepository_Expecter) FindForDateRange(ctx interface{}, campsiteID interface{}, startDate interface{}, endDate interface{}) *MockBookingRepository_FindForDateRange_Call {
+func (_e *MockBookingRepository_Expecter) FindForDateRange(ctx any, campsiteID any, startDate any, endDate any) *MockBookingRepository_FindForDateRange_Call {
 	return &MockBookingRepository_FindForDateRange_Call{Call: _e.mock.On("FindForDateRange", ctx, campsiteID, startDate, endDate)}
 }
 
@@ -211,7 +211,7 @@ type MockBookingRepository_Insert_Call struct {
 // Insert is a helper method to define mock.On call
 //   - ctx context.Context
 //   - booking *Booking
-func (_e *MockBookingRepository_Expecter) Insert(ctx interface{}, booking interface{}) *MockBookingRepository_Insert_Call {
+func (_e *MockBookingRepository_Expecter) Insert(ctx any, booking any) *MockBookingRepository_Insert_Call {
 	return &MockBookingRepository_Insert_Call{Call: _e.mock.On("Insert", ctx, booking)}
 }
 
@@ -268,7 +268,7 @@ type MockBookingRepository_Update_Call struct {
 // Update is a helper method to define mock.On call
 //   - ctx context.Context
 //   - booking *Booking
-func (_e *MockBookingRepository_Expecter) Update(ctx interface{}, booking interface{}) *MockBookingRepository_Update_Call {
+func (_e *MockBookingRepository_Expecter) Update(ctx any, booking any) *MockBookingRepository_Update_Call {
 	return &MockBookingRepository_Update_Call{Call: _e.mock.On("Update", ctx, booking)}
 }
 

@@ -40,11 +40,11 @@ func (_m *MockWaiter) EXPECT() *MockWaiter_Expecter {
 // Add provides a mock function for the type MockWaiter
 func (_mock *MockWaiter) Add(fns ...WaitFunc) {
 	// WaitFunc
-	_va := make([]interface{}, len(fns))
+	_va := make([]any, len(fns))
 	for _i := range fns {
 		_va[_i] = fns[_i]
 	}
-	var _ca []interface{}
+	var _ca []any
 	_ca = append(_ca, _va...)
 	_mock.Called(_ca...)
 	return
@@ -57,9 +57,9 @@ type MockWaiter_Add_Call struct {
 
 // Add is a helper method to define mock.On call
 //   - fns ...WaitFunc
-func (_e *MockWaiter_Expecter) Add(fns ...interface{}) *MockWaiter_Add_Call {
+func (_e *MockWaiter_Expecter) Add(fns ...any) *MockWaiter_Add_Call {
 	return &MockWaiter_Add_Call{Call: _e.mock.On("Add",
-		append([]interface{}{}, fns...)...)}
+		append([]any{}, fns...)...)}
 }
 
 func (_c *MockWaiter_Add_Call) Run(run func(fns ...WaitFunc)) *MockWaiter_Add_Call {
